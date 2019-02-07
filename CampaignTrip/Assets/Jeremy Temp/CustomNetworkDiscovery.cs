@@ -3,33 +3,56 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class CustomNetworkDiscovery : NetworkDiscovery
 {
+    public static CustomNetworkDiscovery Instance;
+
     private Coroutine cleanup;
     private float timeout = 5;
 
     private class LANInfo
     {
+        public GameObject roomButton;
         public float removeAtTime;
         public string data;
         public string ipAddress;
 
-        public LANInfo(float _removeAtTime, string _data, string _ipAddress)
+        public LANInfo(float _removeAtTime, string _data, string _ipAddress, GameObject _roomButton)
         {
             removeAtTime = _removeAtTime;
             data = _data;
             ipAddress = _ipAddress;
+            roomButton = _roomButton;
         }
     }
 
     private List<LANInfo> lanAddresses = new List<LANInfo>();
 
-    private void Awake()
+    private void Start()
+    {
+        if(Instance != null)
+        {
+            Debug.LogError("Multiple CustomNetworkDiscovery objects exist.");
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
+
+    public void ListenForLANServers()
     {
         Initialize();
         StartAsClient();
-        StartCoroutine(CleanUpExpiredEntries());
+        cleanup = StartCoroutine(CleanUpExpiredEntries());
+    }
+
+    public void StopListening()
+    {
+        StopBroadcast();
+        StopCoroutine(cleanup);
     }
 
     public void BroadcastAsServer()
@@ -41,30 +64,24 @@ public class CustomNetworkDiscovery : NetworkDiscovery
 
     private void OnApplicationQuit()
     {
-        StopBroadcast();
+        if (running)
+            StopBroadcast();
     }
 
     private IEnumerator CleanUpExpiredEntries()
     {
         while (true)
         {
-            bool changed = false;
-
             for (int i = 0; i < lanAddresses.Count; i++)
             {
                 if (lanAddresses[i].removeAtTime <= Time.time)
                 {
+                    TitleUIManager.Instance.hostJoinRoomMenu.RemoveRoom(lanAddresses[i].roomButton);
                     lanAddresses.RemoveAt(i);
                     i--;
-                    changed = true;
                 }
             }
-
-            if (changed)
-            {
-                //UpdateMatchInfoUI(); - not implemented
-            }
-
+            
             yield return new WaitForSeconds(timeout);
         }
     }
@@ -82,7 +99,7 @@ public class CustomNetworkDiscovery : NetworkDiscovery
             }
         }
 
-        lanAddresses.Add(new LANInfo(Time.time + timeout, data, fromAddress));
-        //UpdateMatchInfoUI
+        GameObject button = TitleUIManager.Instance.hostJoinRoomMenu.AddRoom(data);
+        lanAddresses.Add(new LANInfo(Time.time + timeout, data, fromAddress, button));
     }
 }
