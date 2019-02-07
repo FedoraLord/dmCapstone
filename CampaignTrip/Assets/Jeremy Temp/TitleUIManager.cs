@@ -46,7 +46,7 @@ public class TitleUIManager : MonoBehaviour
         Navigate(hostJoinRoomMenu);
     }
 
-    public void Navigate_RoomSessionMenu(Text LANRoomButtonClickedText)
+    public void Navigate_RoomSessionMenu()
     {
         Navigate(roomSessionMenu);
     }

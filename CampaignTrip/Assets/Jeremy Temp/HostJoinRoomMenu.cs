@@ -13,13 +13,13 @@ public class HostJoinRoomMenu : NavigationMenu
     public override void NavigateTo()
     {
         base.NavigateTo();
-        CustomNetworkDiscovery.Instance.ListenForLANServers();
+        NetworkWrapper.discovery.ListenForLANServers();
     }
 
     public override void NavigateFrom()
     {
         base.NavigateFrom();
-        CustomNetworkDiscovery.Instance.StopListening();
+        NetworkWrapper.discovery.StopListening();
     }
 
     public GameObject AddRoom(string text)
@@ -44,13 +44,48 @@ public class HostJoinRoomMenu : NavigationMenu
         Destroy(btn);
     }
 
+    public void RoomSelected(GameObject buttonClicked)
+    {
+        Text t = buttonClicked.GetComponentInChildren<Text>();
+        if (t != null)
+        {
+            string ipAddress = NetworkWrapper.discovery.GetAddressOfRoom(t.text);
+            if (ipAddress != null)
+            {
+                NetworkWrapper.discovery.StopListening();
+
+                NetworkWrapper.manager.networkAddress = ipAddress;
+                NetworkWrapper.manager.StartClient();
+
+                NavigateToRoomSessionMenu(t.text);
+            }
+            else
+            {
+                Debug.LogErrorFormat("No room of name {0}", t.text);
+            }
+        }
+        else
+        {
+            Debug.LogError("Cannot get name of room selected.");
+        }
+    }
+
     public void CreateRoomButtonClicked(InputField roomName)
     {
         if (roomName.text.Length == 0)
             return;
 
-        CustomNetworkDiscovery discovery = CustomNetworkDiscovery.Instance;
-        discovery.broadcastData = roomName.text;
-        discovery.BroadcastAsServer();
+        NetworkWrapper.discovery.broadcastData = roomName.text;
+        NetworkWrapper.discovery.BroadcastAsServer();
+
+        NetworkWrapper.manager.StartHost();
+
+        NavigateToRoomSessionMenu(roomName.text);
+    }
+
+    private void NavigateToRoomSessionMenu(string roomName)
+    {
+        TitleUIManager.Instance.roomSessionMenu.roomName = roomName;
+        TitleUIManager.Instance.Navigate_RoomSessionMenu();
     }
 }

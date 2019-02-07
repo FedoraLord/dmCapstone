@@ -5,30 +5,21 @@ using UnityEngine.Networking;
 
 public class NetworkWrapper : MonoBehaviour
 {
-    public NetworkDiscovery discovery;
-    public NetworkManager manager;
-    public GameObject flagme;
+    public static CustomNetworkDiscovery discovery;
+    public static NetworkManager manager;
+    public static NetworkWrapper Instance;
 
     private void Start()
     {
-        StartCoroutine(CheckBroadcasts());
-    }
-
-    private IEnumerator CheckBroadcasts()
-    {
-        yield return new WaitUntil(() => discovery.broadcastsReceived != null);
-
-        while (true)
+        if (Instance != null)
         {
-            yield return new WaitForSeconds(3);
-
-            int count = discovery.broadcastsReceived.Count;
-            foreach (string key in discovery.broadcastsReceived.Keys)
-            {
-                Debug.LogFormat("{0} broadcasts received - last one was {1}", count, key);
-                flagme.SetActive(true);
-                break;
-            }
+            Debug.LogError("Multiple NetworkWrapper objects exist.");
+            Destroy(gameObject);
+            return;
         }
+
+        Instance = this;
+        discovery = GetComponent<CustomNetworkDiscovery>();
+        manager = GetComponent<NetworkManager>();
     }
 }

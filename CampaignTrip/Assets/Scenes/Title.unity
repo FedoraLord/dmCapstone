@@ -173,7 +173,7 @@ MonoBehaviour:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 14
     m_FontStyle: 0
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 10
     m_MaxSize: 40
     m_Alignment: 0
@@ -396,10 +396,10 @@ RectTransform:
   m_Father: {fileID: 1786902443}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.082, y: 0.4607036}
-  m_AnchorMax: {x: 0.4343015, y: 0.55170363}
-  m_AnchoredPosition: {x: 2, y: 0.8999939}
-  m_SizeDelta: {x: -2.5, y: -1.7999878}
+  m_AnchorMin: {x: 0.07573041, y: 0.4625789}
+  m_AnchorMax: {x: 0.44220635, y: 0.5498554}
+  m_AnchoredPosition: {x: 1, y: 0.8999939}
+  m_SizeDelta: {x: -1.5, y: 0.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &264390044
 MonoBehaviour:
@@ -1055,12 +1055,12 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1728058395}
-        m_MethodName: Navigate_RoomSessionMenu
+      - m_Target: {fileID: 1786902444}
+        m_MethodName: RoomSelected
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 1012854113}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Text, UnityEngine.UI
+          m_ObjectArgument: {fileID: 632505201}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1258,9 +1258,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0887806c8d82de744a36b19c7f1190af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  discovery: {fileID: 639189882}
-  manager: {fileID: 639189884}
-  flagme: {fileID: 0}
 --- !u!4 &639189886
 Transform:
   m_ObjectHideFlags: 0
@@ -1478,8 +1475,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1122466934}
+  - component: {fileID: 1122466933}
   - component: {fileID: 1122466931}
   - component: {fileID: 1122466935}
+  - component: {fileID: 1122466932}
   m_Layer: 0
   m_Name: Network Custom
   m_TagString: Untagged
@@ -1509,7 +1508,7 @@ MonoBehaviour:
   m_MaxDelay: 0.01
   m_LogLevel: 2
   m_PlayerPrefab: {fileID: 0}
-  m_AutoCreatePlayer: 1
+  m_AutoCreatePlayer: 0
   m_PlayerSpawnMethod: 0
   m_OfflineScene: 
   m_OnlineScene: 
@@ -1569,6 +1568,34 @@ MonoBehaviour:
   matchSize: 4
   isNetworkActive: 0
   matchMaker: {fileID: 0}
+--- !u!114 &1122466932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1122466930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 227461547, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  manager: {fileID: 0}
+  showGUI: 1
+  offsetX: 200
+  offsetY: 0
+--- !u!114 &1122466933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1122466930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0887806c8d82de744a36b19c7f1190af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1122466934
 Transform:
   m_ObjectHideFlags: 0
@@ -2004,6 +2031,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7dea61b0395df8b4ea4d5c986c3c9bcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  roomName: 
 --- !u!1 &1523401843
 GameObject:
   m_ObjectHideFlags: 0

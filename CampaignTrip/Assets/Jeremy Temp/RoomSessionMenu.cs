@@ -4,15 +4,5 @@ using UnityEngine;
 
 public class RoomSessionMenu : NavigationMenu
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [HideInInspector] public string roomName;
 }

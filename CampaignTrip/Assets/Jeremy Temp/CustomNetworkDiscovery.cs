@@ -7,40 +7,19 @@ using UnityEngine.UI;
 
 public class CustomNetworkDiscovery : NetworkDiscovery
 {
-    public static CustomNetworkDiscovery Instance;
-
     private Coroutine cleanup;
     private float timeout = 5;
 
     private class LANInfo
     {
-        public GameObject roomButton;
         public float removeAtTime;
+        public GameObject roomButton;
         public string data;
         public string ipAddress;
-
-        public LANInfo(float _removeAtTime, string _data, string _ipAddress, GameObject _roomButton)
-        {
-            removeAtTime = _removeAtTime;
-            data = _data;
-            ipAddress = _ipAddress;
-            roomButton = _roomButton;
-        }
+        public string roomName;
     }
 
     private List<LANInfo> lanAddresses = new List<LANInfo>();
-
-    private void Start()
-    {
-        if(Instance != null)
-        {
-            Debug.LogError("Multiple CustomNetworkDiscovery objects exist.");
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-    }
 
     public void ListenForLANServers()
     {
@@ -51,7 +30,10 @@ public class CustomNetworkDiscovery : NetworkDiscovery
 
     public void StopListening()
     {
-        StopBroadcast();
+        if (isClient)
+        {
+            StopBroadcast();
+        }
         StopCoroutine(cleanup);
     }
 
@@ -86,13 +68,17 @@ public class CustomNetworkDiscovery : NetworkDiscovery
         }
     }
 
-    public override void OnReceivedBroadcast(string fromAddress, string data)
+    public override void OnReceivedBroadcast(string rawAddress, string data)
     {
-        base.OnReceivedBroadcast(fromAddress, data);
+        base.OnReceivedBroadcast(rawAddress, data);
+
+        //::ffff:192.168.0.4 this is a rawAddress value
+        int ipStart = rawAddress.LastIndexOf(':') + 1;
+        string cleanAddress = rawAddress.Substring(ipStart);
 
         for (int i = 0; i < lanAddresses.Count; i++)
         {
-            if (lanAddresses[i].ipAddress == fromAddress)
+            if (lanAddresses[i].ipAddress == cleanAddress)
             {
                 lanAddresses[i].removeAtTime = Time.time + timeout;
                 return;
@@ -100,6 +86,29 @@ public class CustomNetworkDiscovery : NetworkDiscovery
         }
 
         GameObject button = TitleUIManager.Instance.hostJoinRoomMenu.AddRoom(data);
-        lanAddresses.Add(new LANInfo(Time.time + timeout, data, fromAddress, button));
+        string roomName = button.GetComponentInChildren<Text>().text;
+        
+        LANInfo info = new LANInfo()
+        {
+            removeAtTime = Time.time + timeout,
+            data = data,
+            ipAddress = cleanAddress,
+            roomButton = button,
+            roomName = roomName
+        };
+
+        lanAddresses.Add(info);
+    }
+
+    public string GetAddressOfRoom(string roomName)
+    {
+        for (int i = 0; i < lanAddresses.Count; i++)
+        {
+            if (lanAddresses[i].roomName == roomName)
+            {
+                return lanAddresses[i].ipAddress;
+            }
+        }
+        return null;
     }
 }
