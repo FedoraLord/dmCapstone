@@ -4,9 +4,15 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+/// <summary>
+/// Controls the UI in the object named "Host-Join Room Menu".
+/// All button clicks etc. are handled by this script.
+/// </summary>
 public class HostJoinRoomMenu : NavigationMenu
 {
+#pragma warning disable CS0649
     [SerializeField] private GameObject roomButtonTemplate;
+#pragma warning restore CS0649
 
     private List<GameObject> roomButtons = new List<GameObject>();
 
@@ -22,6 +28,11 @@ public class HostJoinRoomMenu : NavigationMenu
         NetworkWrapper.discovery.StopListening();
     }
 
+    /// <summary>
+    /// Adds a room to the list of available rooms
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
     public GameObject AddRoom(string text)
     {
         GameObject btn = Instantiate(roomButtonTemplate, roomButtonTemplate.transform.parent);
@@ -38,12 +49,20 @@ public class HostJoinRoomMenu : NavigationMenu
         return btn;
     }
 
+    /// <summary>
+    /// Removes this room from our list when it is no longer discovered on the network
+    /// </summary>
+    /// <param name="btn"></param>
     public void RemoveRoom(GameObject btn)
     {
         roomButtons.Remove(btn);
         Destroy(btn);
     }
 
+    /// <summary>
+    /// Button click method (set in the inspector) for buttons on the list of rooms
+    /// </summary>
+    /// <param name="buttonClicked"></param>
     public void RoomSelected(GameObject buttonClicked)
     {
         Text t = buttonClicked.GetComponentInChildren<Text>();
@@ -70,6 +89,10 @@ public class HostJoinRoomMenu : NavigationMenu
         }
     }
 
+    /// <summary>
+    /// Button click method for "Create Room"
+    /// </summary>
+    /// <param name="roomName">Textbox for the name of the room</param>
     public void CreateRoomButtonClicked(InputField roomName)
     {
         if (roomName.text.Length == 0)

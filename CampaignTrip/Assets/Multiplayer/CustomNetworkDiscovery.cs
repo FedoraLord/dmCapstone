@@ -5,6 +5,12 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+#pragma warning disable CS0618
+/// <summary>
+/// The script for discovering hosts or broadcasting that you are hosting on a network.
+/// This is just to discover or share a host ip address. The NetworkManager Unity component is what lets you CONNECT to each other.
+/// Get connected for free free with education connection.
+/// </summary>
 public class CustomNetworkDiscovery : NetworkDiscovery
 {
     private Coroutine cleanup;
@@ -21,6 +27,9 @@ public class CustomNetworkDiscovery : NetworkDiscovery
 
     private List<LANInfo> lanAddresses = new List<LANInfo>();
 
+    /// <summary>
+    /// Client starts listening
+    /// </summary>
     public void ListenForLANServers()
     {
         Initialize();
@@ -28,6 +37,9 @@ public class CustomNetworkDiscovery : NetworkDiscovery
         cleanup = StartCoroutine(CleanUpExpiredEntries());
     }
 
+    /// <summary>
+    /// Client stops listening
+    /// </summary>
     public void StopListening()
     {
         if (isClient)
@@ -37,6 +49,9 @@ public class CustomNetworkDiscovery : NetworkDiscovery
         StopCoroutine(cleanup);
     }
 
+    /// <summary>
+    /// Host begins broadcasting
+    /// </summary>
     public void BroadcastAsServer()
     {
         StopBroadcast();
@@ -44,12 +59,19 @@ public class CustomNetworkDiscovery : NetworkDiscovery
         StartAsServer();
     }
 
+    /// <summary>
+    /// This is just because im bad at code
+    /// </summary>
     private void OnApplicationQuit()
     {
         if (running)
             StopBroadcast();
     }
 
+    /// <summary>
+    /// Remove available room if it stops broadcasting
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator CleanUpExpiredEntries()
     {
         while (true)
@@ -68,6 +90,11 @@ public class CustomNetworkDiscovery : NetworkDiscovery
         }
     }
 
+    /// <summary>
+    /// Parse room name, ip address, and add a button to our room list
+    /// </summary>
+    /// <param name="rawAddress"></param>
+    /// <param name="data"></param>
     public override void OnReceivedBroadcast(string rawAddress, string data)
     {
         base.OnReceivedBroadcast(rawAddress, data);
@@ -99,7 +126,9 @@ public class CustomNetworkDiscovery : NetworkDiscovery
 
         lanAddresses.Add(info);
     }
-
+    
+    /// <param name="roomName">The name of the room as appears on a button</param>
+    /// <returns>The pretty ip address that you connect with i.e. "192.168.0.2"</returns>
     public string GetAddressOfRoom(string roomName)
     {
         for (int i = 0; i < lanAddresses.Count; i++)
@@ -112,3 +141,4 @@ public class CustomNetworkDiscovery : NetworkDiscovery
         return null;
     }
 }
+#pragma warning restore CS0618
