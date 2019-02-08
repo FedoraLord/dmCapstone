@@ -113,15 +113,13 @@ public class CustomNetworkDiscovery : NetworkDiscovery
         }
 
         GameObject button = TitleUIManager.Instance.hostJoinRoomMenu.AddRoom(data);
-        string roomName = button.GetComponentInChildren<Text>().text;
         
         LANInfo info = new LANInfo()
         {
             removeAtTime = Time.time + timeout,
-            data = data,
             ipAddress = cleanAddress,
             roomButton = button,
-            roomName = roomName
+            roomName = data
         };
 
         lanAddresses.Add(info);
