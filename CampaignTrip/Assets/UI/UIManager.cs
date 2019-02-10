@@ -17,6 +17,14 @@ public class UIManager : MonoBehaviour
     {
         if (startingMenu != null)
         {
+            NavigationMenu[] menus = GetComponentsInChildren<NavigationMenu>();
+            for (int i = 0; i < menus.Length; i++)
+            {
+                if (menus[i] != startingMenu)
+                {
+                    menus[i].gameObject.SetActive(false);
+                }
+            }
             Navigate(startingMenu);
         }
     }
