@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -10,8 +11,13 @@ using UnityEngine.Networking;
 public class NetworkWrapper : MonoBehaviour
 {
     public static CustomNetworkDiscovery discovery;
-    public static NetworkManager manager;
+    public static CustomNetworkManager manager;
     public static NetworkWrapper Instance;
+
+    public static bool IsHost { get { return hosting; } }
+    public static bool IsClient { get { return !hosting; } }
+
+    private static bool hosting;
 
     private void Start()
     {
@@ -24,7 +30,23 @@ public class NetworkWrapper : MonoBehaviour
 
         Instance = this;
         discovery = GetComponent<CustomNetworkDiscovery>();
-        manager = GetComponent<NetworkManager>();
+        manager = GetComponent<CustomNetworkManager>();
+    }
+
+    public static void ConnectToServer(string ipAddress)
+    {
+        discovery.StopListening();
+        manager.networkAddress = ipAddress;
+        manager.StartClient();
+        hosting = false;
+    }
+
+    public static void StartServer(string roomName)
+    {
+        discovery.broadcastData = roomName;
+        discovery.BroadcastAsServer();
+        manager.StartHost();
+        hosting = true;
     }
 }
 #pragma warning restore CS0618

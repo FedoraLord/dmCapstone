@@ -71,11 +71,7 @@ public class HostJoinRoomMenu : NavigationMenu
             string ipAddress = NetworkWrapper.discovery.GetAddressOfRoom(t.text);
             if (ipAddress != null)
             {
-                NetworkWrapper.discovery.StopListening();
-
-                NetworkWrapper.manager.networkAddress = ipAddress;
-                NetworkWrapper.manager.StartClient();
-
+                NetworkWrapper.ConnectToServer(ipAddress);
                 NavigateToRoomSessionMenu(t.text);
             }
             else
@@ -98,11 +94,7 @@ public class HostJoinRoomMenu : NavigationMenu
         if (roomName.text.Length == 0)
             return;
 
-        NetworkWrapper.discovery.broadcastData = roomName.text;
-        NetworkWrapper.discovery.BroadcastAsServer();
-
-        NetworkWrapper.manager.StartHost();
-
+        NetworkWrapper.StartServer(roomName.text);
         NavigateToRoomSessionMenu(roomName.text);
     }
 

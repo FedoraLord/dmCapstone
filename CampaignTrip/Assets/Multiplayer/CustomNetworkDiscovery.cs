@@ -20,7 +20,6 @@ public class CustomNetworkDiscovery : NetworkDiscovery
     {
         public float removeAtTime;
         public GameObject roomButton;
-        public string data;
         public string ipAddress;
         public string roomName;
     }

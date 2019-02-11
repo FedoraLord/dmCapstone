@@ -1,18 +1,43 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class RoomSessionMenu : NavigationMenu
 {
     [HideInInspector] public string roomName;
-	public Image characterImage;
-	public Text flavorText;
-	public List<CharacterData> characters;
 
+    public GameObject rootPlayerPanel;
+    public Image characterImage;
+    public List<CharacterData> characters;
+    public Text className;
+	public Text flavorText;
+    public Text roomNameText;
+    public List<GameObject> tempPanels;
+
+    public List<PlayerPanel> playerPanels = new List<PlayerPanel>();
 	private int characterIndex = 0;
 
-	public override void NavigateFrom()
+    public override void NavigateTo()
+    {
+        base.NavigateTo();
+
+        roomNameText.text = roomName;
+        ResetPlayerPanels();
+        UpdateCharacterPanel();
+    }
+
+    private void ResetPlayerPanels()
+    {
+        playerPanels = new List<PlayerPanel>();
+        for (int i = 0; i < tempPanels.Count; i++)
+        {
+            tempPanels[i].SetActive(true);
+        }
+    }
+    
+    public override void NavigateFrom()
 	{
 		base.NavigateFrom();
 
@@ -20,22 +45,46 @@ public class RoomSessionMenu : NavigationMenu
 		{
 			NetworkWrapper.discovery.StopBroadcast();
 			NetworkWrapper.manager.StopHost();
+            
+            //TODO: kick players back to the first menu
 		}
 		else
 		{
 			NetworkWrapper.manager.StopClient();
+
+            //remove player panel on the server
+            Player.localAuthorityPlayer.CmdRemovePanel();
 		}
 	}
 
-	public void BackButtonClicked()
+    public void AddPlayerPanel(PlayerPanel panel)
+    {
+        panel.transform.SetParent(rootPlayerPanel.transform);
+
+        int transformIndex = playerPanels.Count;
+        playerPanels.Add(panel);
+        panel.SetPlayerName(transformIndex + 1);
+
+        tempPanels[transformIndex].gameObject.SetActive(false);
+        panel.transform.SetSiblingIndex(transformIndex);
+    }
+
+    public void RemovePlayerPanel(PlayerPanel panel)
+    {
+        int index = playerPanels.IndexOf(panel);
+        playerPanels.RemoveAt(index);
+
+    }
+
+    public void BackButtonClicked()
 	{
 		TitleUIManager.Instance.Navigate_HostJoinRoomMenu();
 	}
 
 	public void ReadyButtonClicked()
 	{
-		
-	}
+
+    }
 
 	public void ClassCycleLeftButtonClicked()
 	{
@@ -62,6 +111,7 @@ public class RoomSessionMenu : NavigationMenu
 	/// </summary>
 	private void UpdateCharacterPanel()
 	{
+        className.text = characters[characterIndex].name;
 		flavorText.text = characters[characterIndex].flavorText;
 		characterImage.sprite = characters[characterIndex].icon;
 	}

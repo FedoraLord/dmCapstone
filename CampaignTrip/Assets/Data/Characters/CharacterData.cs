@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewCharacterClass", menuName = "Scriptable Objects/CharacterData")]
+[CreateAssetMenu(fileName = "NewCharacterClass", menuName = "Data Object/Character")]
 public class CharacterData : ScriptableObject
 {
 	public string flavorText;
