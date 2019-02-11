@@ -80,7 +80,7 @@ public class RoomSessionMenu : NavigationMenu
 
     private IEnumerator ClientLeave()
     {
-        Player.localAuthorityPlayer.CmdRemovePanel();
+        Player.localAuthorityPlayer.CmdDisconnect();
         
         //Need to wait a little before disconnecting so we can call the server Command method.
         yield return new WaitForSeconds(0.2f);
