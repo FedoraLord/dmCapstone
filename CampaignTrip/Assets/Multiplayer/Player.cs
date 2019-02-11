@@ -17,6 +17,7 @@ public class Player : NetworkBehaviour
 
         localAuthorityPlayer = this;
         CmdSpawnPanel();
+        name += GetComponent<NetworkIdentity>().netId;
     }
 
     public override void OnNetworkDestroy()
@@ -30,15 +31,6 @@ public class Player : NetworkBehaviour
         }
     }
 
-    //this doesnt update fast enough because it isnt called for a few seconds when the connection times out. implement the two methods below
-    //public override void OnNetworkDestroy()
-    //{
-    //    base.OnNetworkDestroy();
-    //    PlayerPanel pp = lobbyPanelInstance.GetComponent<PlayerPanel>();
-    //    TitleUIManager.Instance.roomSessionMenu.RemovePlayerPanel(pp);
-    //    Destroy(lobbyPanelInstance);
-    //}
-
     [Command]
     public void CmdSpawnPanel()
     {
@@ -46,22 +38,19 @@ public class Player : NetworkBehaviour
         NetworkServer.Spawn(lobbyPanelInstance);
     }
 
-    //call this method on a client when the client leaves the lobby and it will run on the server
     [Command]
     public void CmdRemovePanel()
     {
         PlayerPanel pp = lobbyPanelInstance.GetComponent<PlayerPanel>();
         TitleUIManager.Instance.roomSessionMenu.RemovePlayerPanel(pp);
+
+        //Destroying an object with a NetworkIdentity component on the server also destroys it on the clients
         Destroy(lobbyPanelInstance);
-        RpcRemovePanel();
     }
 
-    //call this method on the server and it will run on all the clients
     [ClientRpc]
-    public void RpcRemovePanel()
+    private void RpcRemovePanel()
     {
-        PlayerPanel pp = lobbyPanelInstance.GetComponent<PlayerPanel>();
-        TitleUIManager.Instance.roomSessionMenu.RemovePlayerPanel(pp);
-        Destroy(lobbyPanelInstance);
+
     }
 }

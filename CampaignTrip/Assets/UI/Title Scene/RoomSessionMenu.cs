@@ -40,21 +40,6 @@ public class RoomSessionMenu : NavigationMenu
     public override void NavigateFrom()
 	{
 		base.NavigateFrom();
-
-		if (NetworkWrapper.discovery.isServer)
-		{
-			NetworkWrapper.discovery.StopBroadcast();
-			NetworkWrapper.manager.StopHost();
-            
-            //TODO: kick players back to the first menu
-		}
-		else
-		{
-			NetworkWrapper.manager.StopClient();
-
-            //remove player panel on the server
-            Player.localAuthorityPlayer.CmdRemovePanel();
-		}
 	}
 
     public void AddPlayerPanel(PlayerPanel panel)
@@ -73,15 +58,38 @@ public class RoomSessionMenu : NavigationMenu
     {
         int index = playerPanels.IndexOf(panel);
         playerPanels.RemoveAt(index);
-
+        tempPanels[index].SetActive(true);
     }
 
     public void BackButtonClicked()
 	{
-		TitleUIManager.Instance.Navigate_HostJoinRoomMenu();
+        if (NetworkWrapper.discovery.isServer)
+        {
+            NetworkWrapper.discovery.StopBroadcast();
+            NetworkWrapper.manager.StopHost();
+
+            //TODO: kick players back to the first menu
+
+            TitleUIManager.Instance.Navigate_HostJoinRoomMenu();
+        }
+        else
+        {
+            StartCoroutine(ClientLeave());
+        }
 	}
 
-	public void ReadyButtonClicked()
+    private IEnumerator ClientLeave()
+    {
+        Player.localAuthorityPlayer.CmdRemovePanel();
+        
+        //Need to wait a little before disconnecting so we can call the server Command method.
+        yield return new WaitForSeconds(0.2f);
+
+        NetworkWrapper.manager.StopClient();
+        TitleUIManager.Instance.Navigate_HostJoinRoomMenu();
+    }
+
+    public void ReadyButtonClicked()
 	{
 
     }
