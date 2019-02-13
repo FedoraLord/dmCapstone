@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class SM_Player : MonoBehaviour
 {
-    public float speed = 1;
+    public float speed = 3;
     private Rigidbody2D rb;
     private Vector3 movementTarget;
 
