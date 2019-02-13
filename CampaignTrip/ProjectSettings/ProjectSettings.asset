@@ -704,10 +704,10 @@ PlayerSettings:
   facebookXfbml: 0
   facebookFrictionlessRequests: 1
   apiCompatibilityLevel: 6
-  cloudProjectId: 
+  cloudProjectId: 302ae031-d18e-435b-b343-a0047afab134
   framebufferDepthMemorylessMode: 0
-  projectName: 
-  organizationId: 
+  projectName: CampaignTrip (1)
+  organizationId: fedoralord
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0
