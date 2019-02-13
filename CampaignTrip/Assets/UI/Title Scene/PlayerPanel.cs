@@ -20,13 +20,15 @@ public class PlayerPanel : MonoBehaviour
     {
         yield return new WaitUntil(() => associatedPlayer.playerNum > 0);
 
-        GameObject root = TitleUIManager.Instance.roomSessionMenu.rootPlayerPanel;
+        GameObject root = TitleUIManager.RoomSessionMenu.rootPlayerPanel;
         transform.SetParent(root.transform);
         SetPlayerName(associatedPlayer.playerNum);
 
         Vector2 size = root.GetComponent<RectTransform>().rect.size;
         size.y /= 4;
         GetComponent<RectTransform>().sizeDelta = size;
+
+        TitleUIManager.RoomSessionMenu.UpdateCharacterPanel();
     }
 
     public void SetPlayerName(int pnum)
@@ -37,5 +39,12 @@ public class PlayerPanel : MonoBehaviour
     public void SetPlayerName(string name)
     {
         playerName.text = name;
+    }
+
+    public void UpdateUI(int characterIndex, bool isReady)
+    {
+        CharacterData data = TitleUIManager.RoomSessionMenu.characters[characterIndex];
+        selectedClass.sprite = data.icon;
+        readyState.enabled = isReady;
     }
 }

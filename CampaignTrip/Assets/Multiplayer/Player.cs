@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 public class Player : NetworkBehaviour
 {
-    public static Player localAuthorityPlayer;
+    public static Player localAuthority;
     public static List<Player> players = new List<Player>();
 
     [SyncVar]
@@ -26,14 +26,14 @@ public class Player : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
-        localAuthorityPlayer = this;
+        localAuthority = this;
     }
 
     private void OnDestroy()
     {
         if (isLocalPlayer)
         {
-            localAuthorityPlayer = null;
+            localAuthority = null;
         }
         else
         {
@@ -55,5 +55,17 @@ public class Player : NetworkBehaviour
     public void CmdDisconnect()
     {
         NetworkServer.Destroy(gameObject);
+    }
+
+    [Command]
+    public void CmdUpdatePanel(int characterIndex, bool isReady)
+    {
+        RpcUpdatePanel(characterIndex, isReady);
+    }
+
+    [ClientRpc]
+    public void RpcUpdatePanel(int characterIndex, bool isReady)
+    {
+        lobbyPanel.UpdateUI(characterIndex, isReady);
     }
 }

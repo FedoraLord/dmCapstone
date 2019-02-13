@@ -8,10 +8,13 @@ using UnityEngine.UI;
 /// </summary>
 public class TitleUIManager : UIManager
 {
-    public static TitleUIManager Instance;
+    public static HostJoinRoomMenu HostJoinRoomMenu { get; set; }
+    public static RoomSessionMenu RoomSessionMenu { get; set; }
 
-    public HostJoinRoomMenu hostJoinRoomMenu;
-    public RoomSessionMenu roomSessionMenu;
+    private static TitleUIManager Instance;
+
+    [SerializeField] private HostJoinRoomMenu hostJoinRoomMenu;
+    [SerializeField] private RoomSessionMenu roomSessionMenu;
     
     protected override void Start()
     {
@@ -24,15 +27,17 @@ public class TitleUIManager : UIManager
             return;
         }
         Instance = this;
+        HostJoinRoomMenu = hostJoinRoomMenu;
+        RoomSessionMenu = roomSessionMenu;
     }
     
-    public void Navigate_HostJoinRoomMenu()
+    public static void Navigate_HostJoinRoomMenu()
     {
-        Navigate(hostJoinRoomMenu);
+        Instance.Navigate(Instance.hostJoinRoomMenu);
     }
 
-    public void Navigate_RoomSessionMenu()
+    public static void Navigate_RoomSessionMenu()
     {
-        Navigate(roomSessionMenu);
+        Instance.Navigate(Instance.roomSessionMenu);
     }
 }
