@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Tiles
   layers:
   - Default
   - TransparentFX
@@ -41,9 +42,15 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Floors
+  - name: Floor
     uniqueID: 1016323639
     locked: 0
-  - name: Walls
+  - name: Objects
     uniqueID: 754352487
+    locked: 0
+  - name: Player
+    uniqueID: 526470245
+    locked: 0
+  - name: FrontOfPlayer
+    uniqueID: 2469129301
     locked: 0
