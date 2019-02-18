@@ -13,6 +13,7 @@ public class Player : NetworkBehaviour
     public int playerNum;
 
     public PlayerPanel lobbyPanel;
+	public bool isReady;
 
     private void Start()
     {

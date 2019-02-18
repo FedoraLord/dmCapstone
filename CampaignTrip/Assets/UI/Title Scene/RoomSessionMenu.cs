@@ -7,8 +7,7 @@ using UnityEngine.UI;
 public class RoomSessionMenu : NavigationMenu
 {
     [HideInInspector] public string roomName;
-
-    public bool isReady;
+	
     public GameObject rootPlayerPanel;
     public Image characterImage;
     public List<CharacterData> characters;
@@ -22,7 +21,7 @@ public class RoomSessionMenu : NavigationMenu
         base.NavigateTo();
 
         roomNameText.text = roomName;
-        isReady = false;
+		Player.localAuthority.isReady = false;
     }
     
     public override void NavigateFrom()
@@ -30,7 +29,9 @@ public class RoomSessionMenu : NavigationMenu
 		base.NavigateFrom();
 	}
 
-    public void BackButtonClicked()
+	#region Buttons
+
+	public void BackButtonClicked()
 	{
         if (NetworkWrapper.discovery.isServer)
         {
@@ -47,21 +48,11 @@ public class RoomSessionMenu : NavigationMenu
         }
 	}
 
-    private IEnumerator ClientLeave()
-    {
-        Player.localAuthority.CmdDisconnect();
-        
-        //Need to wait a little before disconnecting so we can call the server Command method.
-        yield return new WaitForSeconds(0.2f);
-
-        NetworkWrapper.manager.StopClient();
-        TitleUIManager.Navigate_HostJoinRoomMenu();
-    }
-
     public void ReadyButtonClicked()
 	{
-        isReady = !isReady;
-        Player.localAuthority.CmdUpdatePanel(characterIndex, isReady);
+		Player.localAuthority.isReady = !Player.localAuthority.isReady;
+        Player.localAuthority.CmdUpdatePanel(characterIndex, Player.localAuthority.isReady);
+		TryStart();
     }
 
 	public void ClassCycleLeftButtonClicked()
@@ -84,6 +75,8 @@ public class RoomSessionMenu : NavigationMenu
 		UpdateCharacterPanel();
 	}
 
+	#endregion
+
 	/// <summary>
 	/// Changes the icon and description to match the character data
 	/// </summary>
@@ -93,6 +86,37 @@ public class RoomSessionMenu : NavigationMenu
 		flavorText.text = characters[characterIndex].flavorText;
 		characterImage.sprite = characters[characterIndex].icon;
 
-        Player.localAuthority.CmdUpdatePanel(characterIndex, isReady);
+        Player.localAuthority.CmdUpdatePanel(characterIndex, Player.localAuthority.isReady);
+	}
+
+	private void TryStart()
+	{
+		foreach (Player p in Player.players)
+			if (!p.isReady)
+				return; //someones not ready so don't start
+		NetworkWrapper.manager.ServerChangeScene("mainBattleScene");
+	}
+
+	//[Command]
+	//private void CmdRelayStart()
+	//{
+	//	RpcRelayStart();
+	//}
+
+	//[ClientRpc]
+	//private void RpcRelayStart()
+	//{
+	//	ClientScene.Ready(ClientScene.readyConnection);
+	//}
+
+	private IEnumerator ClientLeave()
+	{
+		Player.localAuthority.CmdDisconnect();
+
+		//Need to wait a little before disconnecting so we can call the server Command method.
+		yield return new WaitForSeconds(0.2f);
+
+		NetworkWrapper.manager.StopClient();
+		TitleUIManager.Navigate_HostJoinRoomMenu();
 	}
 }
