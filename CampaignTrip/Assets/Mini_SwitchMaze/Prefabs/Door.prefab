@@ -97,7 +97,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   closedSprite: {fileID: 21300142, guid: 1cb17029de20b47799168bdd80ec42e2, type: 3}
   openSprite: {fileID: 21300146, guid: 1cb17029de20b47799168bdd80ec42e2, type: 3}
-  controllingSwitch: {fileID: 0}
+  spriteRenderer: {fileID: 7814994563801701022}
+  multiInputSwitches: []
+  singleInputSwitches: []
   closedCollider: {fileID: 7814994563801701088}
   openColliderLeft: {fileID: 0}
   openColliderRight: {fileID: 0}

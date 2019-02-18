@@ -6,20 +6,20 @@ public class SM_Switch : MonoBehaviour
 {
     public Sprite offSprite;
     public Sprite onSprite;
+
     private SpriteRenderer sr;
+    private List<SM_Door> doors = new List<SM_Door>();
 
     public bool isPressed;
-
-    // Start is called before the first frame update
+    
     void Start()
     {
         sr = GetComponent<SpriteRenderer>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void RegisterDoor(SM_Door door)
     {
-        
+        doors.Add(door);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -28,6 +28,10 @@ public class SM_Switch : MonoBehaviour
         {
             sr.sprite = onSprite;
             isPressed = true;
+            for (int i = 0; i < doors.Count; i++)
+            {
+                doors[i].SwitchDown(this);
+            }
         }
     }
 
@@ -37,6 +41,10 @@ public class SM_Switch : MonoBehaviour
         {
             sr.sprite = offSprite;
             isPressed = false;
+            for (int i = 0; i < doors.Count; i++)
+            {
+                doors[i].SwitchUp(this);
+            }
         }
     }
 }
