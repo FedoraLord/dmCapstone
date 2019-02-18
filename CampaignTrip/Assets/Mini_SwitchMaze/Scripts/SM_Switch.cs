@@ -10,7 +10,7 @@ public class SM_Switch : MonoBehaviour
     private SpriteRenderer sr;
     private List<SM_Door> doors = new List<SM_Door>();
 
-    public bool isPressed;
+    private int numPlayersOnSwitch = 0;
     
     void Start()
     {
@@ -27,10 +27,14 @@ public class SM_Switch : MonoBehaviour
         if (collision.tag.Equals("Player"))
         {
             sr.sprite = onSprite;
-            isPressed = true;
-            for (int i = 0; i < doors.Count; i++)
+            numPlayersOnSwitch++;
+
+            if (numPlayersOnSwitch == 1)
             {
-                doors[i].SwitchDown(this);
+                for (int i = 0; i < doors.Count; i++)
+                {
+                    doors[i].SwitchDown(this);
+                }
             }
         }
     }
@@ -40,10 +44,14 @@ public class SM_Switch : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             sr.sprite = offSprite;
-            isPressed = false;
-            for (int i = 0; i < doors.Count; i++)
+            numPlayersOnSwitch--;
+
+            if (numPlayersOnSwitch == 0)
             {
-                doors[i].SwitchUp(this);
+                for (int i = 0; i < doors.Count; i++)
+                {
+                    doors[i].SwitchUp(this);
+                }
             }
         }
     }
