@@ -21,7 +21,6 @@ public class RoomSessionMenu : NavigationMenu
         base.NavigateTo();
 
         roomNameText.text = roomName;
-		Player.localAuthority.isReady = false;
     }
     
     public override void NavigateFrom()
@@ -95,19 +94,20 @@ public class RoomSessionMenu : NavigationMenu
 			if (!p.isReady)
 				return; //someones not ready so don't start
 		NetworkWrapper.manager.ServerChangeScene("mainBattleScene");
+		CmdRelayStart();
 	}
 
-	//[Command]
-	//private void CmdRelayStart()
-	//{
-	//	RpcRelayStart();
-	//}
+	[Command]
+	private void CmdRelayStart()
+	{
+		RpcRelayStart();
+	}
 
-	//[ClientRpc]
-	//private void RpcRelayStart()
-	//{
-	//	ClientScene.Ready(ClientScene.readyConnection);
-	//}
+	[ClientRpc]
+	private void RpcRelayStart()
+	{
+		ClientScene.Ready(Player.localAuthority.networkIdentity.connectionToServer);
+	}
 
 	private IEnumerator ClientLeave()
 	{
