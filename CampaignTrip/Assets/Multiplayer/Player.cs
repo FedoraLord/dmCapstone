@@ -61,7 +61,9 @@ public class Player : NetworkBehaviour
         NetworkServer.Destroy(gameObject);
     }
 
-    [Command]
+	#region Lobby
+
+	[Command]
     public void CmdUpdatePanel(int characterIndex, bool isReadyNow)
     {
 		if (isReadyNow)
@@ -88,15 +90,11 @@ public class Player : NetworkBehaviour
 		RpcRelayStart();
 	}
 
-	[Command]
-	private void CmdRelayStart()
-	{
-		RpcRelayStart();
-	}
-
 	[ClientRpc]
 	private void RpcRelayStart()
 	{
 		ClientScene.Ready(Player.localAuthority.networkIdentity.connectionToServer);
 	}
+
+	#endregion
 }
