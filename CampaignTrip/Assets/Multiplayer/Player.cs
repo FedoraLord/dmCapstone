@@ -64,7 +64,11 @@ public class Player : NetworkBehaviour
     [Command]
     public void CmdUpdatePanel(int characterIndex, bool isReadyNow)
     {
-		isReady = isReadyNow;
+		if (isReadyNow)
+		{
+			isReady = isReadyNow;
+			TryStart();
+		}
 		RpcUpdatePanel(characterIndex, isReady);
     }
 
@@ -73,5 +77,26 @@ public class Player : NetworkBehaviour
     {
 		isReady = isReadyNow;
         lobbyPanel.UpdateUI(characterIndex, isReady);
-    }
+	}
+
+	private void TryStart()
+	{
+		foreach (Player p in Player.players)
+			if (!p.isReady)
+				return; //someones not ready so don't start
+		NetworkWrapper.manager.ServerChangeScene("mainBattleScene");
+		RpcRelayStart();
+	}
+
+	[Command]
+	private void CmdRelayStart()
+	{
+		RpcRelayStart();
+	}
+
+	[ClientRpc]
+	private void RpcRelayStart()
+	{
+		ClientScene.Ready(Player.localAuthority.networkIdentity.connectionToServer);
+	}
 }

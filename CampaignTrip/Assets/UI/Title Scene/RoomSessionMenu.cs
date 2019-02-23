@@ -51,7 +51,6 @@ public class RoomSessionMenu : NavigationMenu
 	{
 		Player.localAuthority.isReady = !Player.localAuthority.isReady;
         Player.localAuthority.CmdUpdatePanel(characterIndex, Player.localAuthority.isReady);
-		TryStart();
     }
 
 	public void ClassCycleLeftButtonClicked()
@@ -86,27 +85,6 @@ public class RoomSessionMenu : NavigationMenu
 		characterImage.sprite = characters[characterIndex].icon;
 
         Player.localAuthority.CmdUpdatePanel(characterIndex, Player.localAuthority.isReady);
-	}
-
-	private void TryStart()
-	{
-		foreach (Player p in Player.players)
-			if (!p.isReady)
-				return; //someones not ready so don't start
-		NetworkWrapper.manager.ServerChangeScene("mainBattleScene");
-		CmdRelayStart();
-	}
-
-	[Command]
-	private void CmdRelayStart()
-	{
-		RpcRelayStart();
-	}
-
-	[ClientRpc]
-	private void RpcRelayStart()
-	{
-		ClientScene.Ready(Player.localAuthority.networkIdentity.connectionToServer);
 	}
 
 	private IEnumerator ClientLeave()
