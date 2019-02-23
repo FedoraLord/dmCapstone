@@ -61,10 +61,16 @@ public class Player : NetworkBehaviour
         NetworkServer.Destroy(gameObject);
     }
 
-    [Command]
+	#region Lobby
+
+	[Command]
     public void CmdUpdatePanel(int characterIndex, bool isReadyNow)
     {
-		isReady = isReadyNow;
+		if (isReadyNow)
+		{
+			isReady = isReadyNow;
+			TryStart();
+		}
 		RpcUpdatePanel(characterIndex, isReady);
     }
 
@@ -73,5 +79,22 @@ public class Player : NetworkBehaviour
     {
 		isReady = isReadyNow;
         lobbyPanel.UpdateUI(characterIndex, isReady);
-    }
+	}
+
+	private void TryStart()
+	{
+		foreach (Player p in Player.players)
+			if (!p.isReady)
+				return; //someones not ready so don't start
+		NetworkWrapper.manager.ServerChangeScene(NetworkWrapper.manager.sceneAfterLobbyName);
+		RpcRelayStart();
+	}
+
+	[ClientRpc]
+	private void RpcRelayStart()
+	{
+		ClientScene.Ready(Player.localAuthority.networkIdentity.connectionToServer);
+	}
+
+	#endregion
 }
