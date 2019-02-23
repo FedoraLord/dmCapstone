@@ -2028,6 +2028,7 @@ MonoBehaviour:
   matchSize: 4
   isNetworkActive: 0
   matchMaker: {fileID: 0}
+  sceneAfterLobbyName: mainBattleScene
 --- !u!114 &1122466932
 MonoBehaviour:
   m_ObjectHideFlags: 0

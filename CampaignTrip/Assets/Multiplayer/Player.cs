@@ -86,7 +86,7 @@ public class Player : NetworkBehaviour
 		foreach (Player p in Player.players)
 			if (!p.isReady)
 				return; //someones not ready so don't start
-		NetworkWrapper.manager.ServerChangeScene("mainBattleScene");
+		NetworkWrapper.manager.ServerChangeScene(NetworkWrapper.manager.sceneAfterLobbyName);
 		RpcRelayStart();
 	}
 

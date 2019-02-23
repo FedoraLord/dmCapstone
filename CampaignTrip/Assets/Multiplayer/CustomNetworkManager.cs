@@ -6,6 +6,8 @@ using UnityEngine.Networking;
 #pragma warning disable CS0618
 public class CustomNetworkManager : NetworkManager
 {
+	public string sceneAfterLobbyName;
+
     //public override void OnClientConnect(NetworkConnection conn)
     //{
     //    base.OnClientConnect(conn);
