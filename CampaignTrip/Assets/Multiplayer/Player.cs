@@ -82,12 +82,9 @@ public class Player : NetworkBehaviour
     public void CmdUpdatePanel(int characterIndex, bool isReadyNow)
 	{
 		characterPrefab = TitleUIManager.RoomSessionMenu.characters[characterIndex].characterPrefab;
-		RpcUpdatePanel(characterIndex, isReady);
-		if (isReadyNow)
-		{
-			isReady = isReadyNow;
-			TryStart();
-		}
+		isReady = isReadyNow;
+		RpcUpdatePanel(characterIndex, isReadyNow);
+		TryStart();
     }
 
     [ClientRpc]
