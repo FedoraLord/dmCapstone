@@ -1,95 +1,100 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
 public class Player : NetworkBehaviour
 {
-    public static Player localAuthorityPlayer;
+    public static Player localAuthority;
     public static List<Player> players = new List<Player>();
 
     [SyncVar]
     public int playerNum;
 
-    public GameObject lobbyPanelPrefab;
-
-    private GameObject lobbyPanelInstance;
+    public PlayerPanel lobbyPanel;
+	public NetworkIdentity networkIdentity;
+	public bool isReady;
 
     private void Start()
     {
-        if (!isLocalPlayer)
+        players.Add(this);
+        if (NetworkWrapper.IsHost)
         {
-            players.Add(this);
-            name += " " + playerNum;
+            playerNum = players.Count;
         }
+		networkIdentity = GetComponent<NetworkIdentity>();
     }
-
-    /// <summary>
-    /// Called before Start()
-    /// </summary>
+    
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
-
-        localAuthorityPlayer = this;
-        players.Add(this);
-        playerNum = players.Count;
-        name += " " + playerNum;
-        CmdSpawnPanel();
+        localAuthority = this;
     }
 
-    public override void OnNetworkDestroy()
+    private void OnDestroy()
     {
-        players.Remove(this);
-        Destroy(lobbyPanelInstance);
-        
         if (isLocalPlayer)
         {
-            localAuthorityPlayer = null;
-        }
-
-        base.OnNetworkDestroy();
-    }
-
-    [Command]
-    public void CmdSpawnPanel()
-    {
-        lobbyPanelInstance = Instantiate(lobbyPanelPrefab);
-        if (connectionToServer == null)
-        {
-            if (connectionToClient == null)
-                Debug.LogError("they both null");
-            else
-                Debug.Log("use connectionToClient");
+            localAuthority = null;
         }
         else
         {
-            Debug.Log("you good");
+            for (int i = playerNum; i < players.Count; i++)
+            {
+                players[i].lobbyPanel.SetPlayerName(i);
+                if (NetworkWrapper.IsHost)
+                {
+                    players[i].playerNum = i;
+                }
+            }
         }
-        NetworkServer.Spawn(lobbyPanelInstance);
+
+        players.Remove(this);
+		if(lobbyPanel && lobbyPanel.gameObject)
+			Destroy(lobbyPanel.gameObject);
     }
-    
-    //lobbyPanelInstance.GetComponent<NetworkIdentity>().AssignClientAuthority(connectionToClient);
 
     [Command]
     public void CmdDisconnect()
     {
         NetworkServer.Destroy(gameObject);
-        //PlayerPanel pp = lobbyPanelInstance.GetComponent<PlayerPanel>();
-        //TitleUIManager.Instance.roomSessionMenu.RemovePlayerPanel(pp);
-        //Destroy(lobbyPanelInstance);
-        //RpcRemovePanel();
+    }
+
+	#region Lobby
+
+	[Command]
+    public void CmdUpdatePanel(int characterIndex, bool isReadyNow)
+    {
+		if (isReadyNow)
+		{
+			isReady = isReadyNow;
+			TryStart();
+		}
+		RpcUpdatePanel(characterIndex, isReady);
     }
 
     [ClientRpc]
-    private void RpcRemovePanel()
+    public void RpcUpdatePanel(int characterIndex, bool isReadyNow)
     {
-        PlayerPanel pp = lobbyPanelInstance.GetComponent<PlayerPanel>();
-        TitleUIManager.Instance.roomSessionMenu.RemovePlayerPanel(pp);
+		isReady = isReadyNow;
+        lobbyPanel.UpdateUI(characterIndex, isReady);
+	}
 
-        if (lobbyPanelInstance != null)
-        {
-            Destroy(lobbyPanelInstance);
-        }
-    }
+	private void TryStart()
+	{
+		foreach (Player p in Player.players)
+			if (!p.isReady)
+				return; //someones not ready so don't start
+		NetworkWrapper.manager.ServerChangeScene(NetworkWrapper.manager.sceneAfterLobbyName);
+		RpcRelayStart();
+	}
+
+	[ClientRpc]
+	private void RpcRelayStart()
+	{
+		ClientScene.Ready(Player.localAuthority.networkIdentity.connectionToServer);
+	}
+
+	#endregion
 }

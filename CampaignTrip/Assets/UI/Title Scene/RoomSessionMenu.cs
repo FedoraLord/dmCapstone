@@ -7,16 +7,13 @@ using UnityEngine.UI;
 public class RoomSessionMenu : NavigationMenu
 {
     [HideInInspector] public string roomName;
-
+	
     public GameObject rootPlayerPanel;
     public Image characterImage;
     public List<CharacterData> characters;
     public Text className;
 	public Text flavorText;
     public Text roomNameText;
-    public List<GameObject> tempPanels;
-
-    public List<PlayerPanel> playerPanels = new List<PlayerPanel>();
 	private int characterIndex = 0;
 
     public override void NavigateTo()
@@ -24,17 +21,6 @@ public class RoomSessionMenu : NavigationMenu
         base.NavigateTo();
 
         roomNameText.text = roomName;
-        ResetPlayerPanels();
-        UpdateCharacterPanel();
-    }
-
-    private void ResetPlayerPanels()
-    {
-        playerPanels = new List<PlayerPanel>();
-        for (int i = 0; i < tempPanels.Count; i++)
-        {
-            tempPanels[i].SetActive(true);
-        }
     }
     
     public override void NavigateFrom()
@@ -42,26 +28,9 @@ public class RoomSessionMenu : NavigationMenu
 		base.NavigateFrom();
 	}
 
-    public void AddPlayerPanel(PlayerPanel panel)
-    {
-        panel.transform.SetParent(rootPlayerPanel.transform);
+	#region Buttons
 
-        int transformIndex = playerPanels.Count;
-        playerPanels.Add(panel);
-        panel.SetPlayerName(transformIndex + 1);
-
-        tempPanels[transformIndex].gameObject.SetActive(false);
-        panel.transform.SetSiblingIndex(transformIndex);
-    }
-
-    public void RemovePlayerPanel(PlayerPanel panel)
-    {
-        int index = playerPanels.IndexOf(panel);
-        playerPanels.RemoveAt(index);
-        tempPanels[index].SetActive(true);
-    }
-
-    public void BackButtonClicked()
+	public void BackButtonClicked()
 	{
         if (NetworkWrapper.discovery.isServer)
         {
@@ -70,7 +39,7 @@ public class RoomSessionMenu : NavigationMenu
 
             //TODO: kick players back to the first menu
 
-            TitleUIManager.Instance.Navigate_HostJoinRoomMenu();
+            TitleUIManager.Navigate_HostJoinRoomMenu();
         }
         else
         {
@@ -78,20 +47,10 @@ public class RoomSessionMenu : NavigationMenu
         }
 	}
 
-    private IEnumerator ClientLeave()
-    {
-        Player.localAuthorityPlayer.CmdDisconnect();
-        
-        //Need to wait a little before disconnecting so we can call the server Command method.
-        yield return new WaitForSeconds(0.2f);
-
-        NetworkWrapper.manager.StopClient();
-        TitleUIManager.Instance.Navigate_HostJoinRoomMenu();
-    }
-
     public void ReadyButtonClicked()
 	{
-
+		Player.localAuthority.isReady = !Player.localAuthority.isReady;
+        Player.localAuthority.CmdUpdatePanel(characterIndex, Player.localAuthority.isReady);
     }
 
 	public void ClassCycleLeftButtonClicked()
@@ -114,13 +73,28 @@ public class RoomSessionMenu : NavigationMenu
 		UpdateCharacterPanel();
 	}
 
+	#endregion
+
 	/// <summary>
 	/// Changes the icon and description to match the character data
 	/// </summary>
-	private void UpdateCharacterPanel()
+	public void UpdateCharacterPanel()
 	{
         className.text = characters[characterIndex].name;
 		flavorText.text = characters[characterIndex].flavorText;
 		characterImage.sprite = characters[characterIndex].icon;
+
+        Player.localAuthority.CmdUpdatePanel(characterIndex, Player.localAuthority.isReady);
+	}
+
+	private IEnumerator ClientLeave()
+	{
+		Player.localAuthority.CmdDisconnect();
+
+		//Need to wait a little before disconnecting so we can call the server Command method.
+		yield return new WaitForSeconds(0.2f);
+
+		NetworkWrapper.manager.StopClient();
+		TitleUIManager.Navigate_HostJoinRoomMenu();
 	}
 }

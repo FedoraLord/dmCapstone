@@ -100,7 +100,7 @@ public class HostJoinRoomMenu : NavigationMenu
 
     private void NavigateToRoomSessionMenu(string roomName)
     {
-        TitleUIManager.Instance.roomSessionMenu.roomName = roomName;
-        TitleUIManager.Instance.Navigate_RoomSessionMenu();
+        TitleUIManager.RoomSessionMenu.roomName = roomName;
+        TitleUIManager.Navigate_RoomSessionMenu();
     }
 }

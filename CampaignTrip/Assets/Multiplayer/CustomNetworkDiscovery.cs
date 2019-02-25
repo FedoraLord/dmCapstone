@@ -79,7 +79,7 @@ public class CustomNetworkDiscovery : NetworkDiscovery
             {
                 if (lanAddresses[i].removeAtTime <= Time.time)
                 {
-                    TitleUIManager.Instance.hostJoinRoomMenu.RemoveRoom(lanAddresses[i].roomButton);
+                    TitleUIManager.HostJoinRoomMenu.RemoveRoom(lanAddresses[i].roomButton);
                     lanAddresses.RemoveAt(i);
                     i--;
                 }
@@ -111,7 +111,7 @@ public class CustomNetworkDiscovery : NetworkDiscovery
             }
         }
 
-        GameObject button = TitleUIManager.Instance.hostJoinRoomMenu.AddRoom(data);
+        GameObject button = TitleUIManager.HostJoinRoomMenu.AddRoom(data);
         
         LANInfo info = new LANInfo()
         {
