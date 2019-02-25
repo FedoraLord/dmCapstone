@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class SM_Player : MonoBehaviour
+public class SM_Player : NetworkBehaviour
 {
     public float speed = 3;
+    public bool localAuthority;
 
     Rigidbody2D rb;
 
