@@ -7,12 +7,19 @@ public class BattleController : NetworkBehaviour
 {
 	public static BattleController instance;
 	[Tooltip("Groups of enemies to spawn together.")]
-	public GameObject[][] waves;
+	public Wave[] waves;
 	protected int waveIndex = 0;
 	public List<Enemy> enemies;
+	
+	[System.Serializable]
+	public struct Wave
+	{
+		public GameObject[] members;
+	}
 
 	protected void Start()
 	{
+		CmdSpawnNewWave();
 		if (instance)
 			throw new System.Exception("There can only be one BattleController.");
 		instance = this;
@@ -48,7 +55,7 @@ public class BattleController : NetworkBehaviour
 		}
 
 		//Spawn the next wave then
-		foreach(GameObject g in waves[waveIndex])
+		foreach(GameObject g in waves[waveIndex].members)
 		{
 			GameObject newEnemy = Instantiate(g);
 			enemies.Add(newEnemy.GetComponent<Enemy>());

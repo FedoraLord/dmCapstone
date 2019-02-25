@@ -15,6 +15,7 @@ public class Player : NetworkBehaviour
 
     public PlayerPanel lobbyPanel;
 	public NetworkIdentity networkIdentity;
+	public GameObject characterObject;
 	protected GameObject characterPrefab;
 	public bool isReady;
 
@@ -44,7 +45,8 @@ public class Player : NetworkBehaviour
 	[Command]
 	private void CmdSpawnCharacter()
 	{
-		NetworkServer.Spawn(Instantiate(characterPrefab));
+		characterObject = Instantiate(characterPrefab);
+		NetworkServer.Spawn(characterObject);
 	}
 
 	private void OnDestroy()

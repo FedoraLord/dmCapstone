@@ -19,12 +19,20 @@ public class Enemy : NetworkBehaviour
 	{
 		health += adjustment;
 		if (!isAlive)
-			Die();
+			CmdDie();
 	}
 
-	protected void Die()
+	[Command]
+	protected void CmdDie()
 	{
 		BattleController.instance.CmdTryEndWave();
+		gameObject.SetActive(false);
+		RpcDie();
+	}
+
+	[ClientRpc]
+	protected void RpcDie()
+	{
 		gameObject.SetActive(false);
 	}
 }
