@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311918, g: 0.3807398, b: 0.35872716, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2028,7 +2028,7 @@ MonoBehaviour:
   matchSize: 4
   isNetworkActive: 0
   matchMaker: {fileID: 0}
-  sceneAfterLobbyName: mainBattleScene
+  sceneAfterLobbyName: SwitchMaze
 --- !u!114 &1122466932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2206,7 +2206,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.2663864, y: 0.87655294}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.6179962, y: 0.8000183}
+  m_AnchoredPosition: {x: -0.6180115, y: 0.8000183}
   m_SizeDelta: {x: 1.2400055, y: -2.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1266227117

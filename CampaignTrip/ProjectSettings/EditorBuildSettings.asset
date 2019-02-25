@@ -11,9 +11,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Android Test.unity
     guid: 49eed4f7610e6483e83aac34a3342082
-    path: Assets/Scenes/Title.unity
-    guid: 391f8c4628cb934459167db40403642a
   - enabled: 1
     path: Assets/Scenes/mainBattleScene.unity
     guid: de5115eb129d1404a8ad791d34989ec0
+  - enabled: 1
+    path: Assets/Scenes/Title.unity
+    guid: 391f8c4628cb934459167db40403642a
+  - enabled: 1
+    path: Assets/Mini_SwitchMaze/SwitchMaze.unity
+    guid: 30641b38b4a9f4633aa1285d8e9ca752
   m_configObjects: {}
