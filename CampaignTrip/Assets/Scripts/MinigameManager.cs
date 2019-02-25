@@ -15,4 +15,9 @@ public class MinigameManager : MonoBehaviour
     {
         
     }
+
+    private void OnLevelWasLoaded(int level)
+    {
+        NetworkWrapper.Instance.
+    }
 }
