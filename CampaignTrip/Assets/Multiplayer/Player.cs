@@ -15,9 +15,9 @@ public class Player : NetworkBehaviour
 
     public PlayerPanel lobbyPanel;
 	public NetworkIdentity networkIdentity;
-	public GameObject characterObject;
 	protected GameObject characterPrefab;
 	public bool isReady;
+    public CombatPlayer combatPlayer;
 
     private void Start()
     {
@@ -35,19 +35,28 @@ public class Player : NetworkBehaviour
         base.OnStartLocalPlayer();
         localAuthority = this;
     }
-
-	private void OnLevelWasLoaded(int level)
-	{
-		if (isLocalPlayer && SceneManager.GetActiveScene().name == "mainBattleScene")
-			CmdSpawnCharacter();
-	}
-
+    
 	[Command]
-	private void CmdSpawnCharacter()
+	public void CmdSpawnCharacter()
 	{
-		characterObject = Instantiate(characterPrefab);
-		NetworkServer.Spawn(characterObject);
+        GameObject cp = Instantiate(characterPrefab);
+        NetworkServer.Spawn(cp);
+        StartCoroutine(WaitToInitCharacter(cp));
 	}
+
+    private IEnumerator WaitToInitCharacter(GameObject cp)
+    {
+        yield return new WaitForSeconds(0.5f);
+		RpcInitCharacter(cp);
+    }
+
+    [ClientRpc]
+    private void RpcInitCharacter(GameObject combatChar)
+    {
+        combatPlayer = combatChar.GetComponent<CombatPlayer>();
+        combatPlayer.persistentPlayer = this;
+        combatPlayer.Initialize();
+    }
 
 	private void OnDestroy()
     {
