@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flavorText: Attacks with his crow and poison potions
   icon: {fileID: 21300000, guid: 4399e4570058f4740be457f196627e2c, type: 3}
+  battlePrefab: {fileID: 8344999493500134097, guid: fc71bf669d867224d8b50c2cd29c127f,
+    type: 3}

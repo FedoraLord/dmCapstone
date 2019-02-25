@@ -8,16 +8,10 @@ public class CustomNetworkManager : NetworkManager
 {
 	public string sceneAfterLobbyName;
 
-    //public override void OnClientConnect(NetworkConnection conn)
-    //{
-    //    base.OnClientConnect(conn);
-    //    TitleUIManager.Instance.roomSessionMenu.ClientConnected(conn);
-    //}
-
-    //public override void OnClientDisconnect(NetworkConnection conn)
-    //{
-    //    base.OnClientDisconnect(conn);
-    //    TitleUIManager.Instance.roomSessionMenu.ClientDisconnected(conn);
-    //}
+	public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
+	{
+		GameObject player = (GameObject)Instantiate(CharacterCreator.instance.chosenCharacters[conn.connectionId].battlePrefab);
+		NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
+	}
 }
 #pragma warning restore CS0618

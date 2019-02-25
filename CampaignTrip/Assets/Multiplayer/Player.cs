@@ -24,13 +24,20 @@ public class Player : NetworkBehaviour
             playerNum = players.Count;
         }
 		networkIdentity = GetComponent<NetworkIdentity>();
-    }
+	}
     
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
         localAuthority = this;
-    }
+		StartCoroutine(SpawnWhenCan());
+	}
+
+	private IEnumerator SpawnWhenCan()
+	{
+		yield return new WaitUntil(() => networkIdentity);
+		CharacterCreator.instance.CmdSpawnCharacter(networkIdentity.connectionToServer.connectionId);
+	}
 
     private void OnDestroy()
     {
@@ -69,7 +76,7 @@ public class Player : NetworkBehaviour
 		if (isReadyNow)
 		{
 			isReady = isReadyNow;
-			TryStart();
+			TryStart(characterIndex);
 		}
 		RpcUpdatePanel(characterIndex, isReady);
     }
@@ -81,18 +88,21 @@ public class Player : NetworkBehaviour
         lobbyPanel.UpdateUI(characterIndex, isReady);
 	}
 
-	private void TryStart()
+	private void TryStart(int characterIndex)
 	{
 		foreach (Player p in Player.players)
 			if (!p.isReady)
 				return; //someones not ready so don't start
 		NetworkWrapper.manager.ServerChangeScene(NetworkWrapper.manager.sceneAfterLobbyName);
-		RpcRelayStart();
+		RpcRelayStart(characterIndex);
 	}
 
 	[ClientRpc]
-	private void RpcRelayStart()
+	private void RpcRelayStart(int characterIndex)
 	{
+		//give our characterData to the manager
+		CharacterCreator.instance.chosenCharacters.Add(Player.localAuthority.networkIdentity.connectionToServer.connectionId, TitleUIManager.RoomSessionMenu.characters[characterIndex]);
+		//Let unity know were ready to change scenes
 		ClientScene.Ready(Player.localAuthority.networkIdentity.connectionToServer);
 	}
 
