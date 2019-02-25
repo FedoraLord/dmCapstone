@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class Player : NetworkBehaviour
 {
@@ -14,10 +15,12 @@ public class Player : NetworkBehaviour
 
     public PlayerPanel lobbyPanel;
 	public NetworkIdentity networkIdentity;
+	protected GameObject characterPrefab;
 	public bool isReady;
 
     private void Start()
     {
+		DontDestroyOnLoad(gameObject);
         players.Add(this);
         if (NetworkWrapper.IsHost)
         {
@@ -32,7 +35,19 @@ public class Player : NetworkBehaviour
         localAuthority = this;
     }
 
-    private void OnDestroy()
+	private void OnLevelWasLoaded(int level)
+	{
+		if (isLocalPlayer && SceneManager.GetActiveScene().name == "mainBattleScene")
+			CmdSpawnCharacter();
+	}
+
+	[Command]
+	private void CmdSpawnCharacter()
+	{
+		NetworkServer.Spawn(Instantiate(characterPrefab));
+	}
+
+	private void OnDestroy()
     {
         if (isLocalPlayer)
         {
@@ -65,18 +80,20 @@ public class Player : NetworkBehaviour
 
 	[Command]
     public void CmdUpdatePanel(int characterIndex, bool isReadyNow)
-    {
+	{
+		characterPrefab = TitleUIManager.RoomSessionMenu.characters[characterIndex].characterPrefab;
+		RpcUpdatePanel(characterIndex, isReady);
 		if (isReadyNow)
 		{
 			isReady = isReadyNow;
 			TryStart();
 		}
-		RpcUpdatePanel(characterIndex, isReady);
     }
 
     [ClientRpc]
     public void RpcUpdatePanel(int characterIndex, bool isReadyNow)
     {
+		characterPrefab = TitleUIManager.RoomSessionMenu.characters[characterIndex].characterPrefab;
 		isReady = isReadyNow;
         lobbyPanel.UpdateUI(characterIndex, isReady);
 	}
