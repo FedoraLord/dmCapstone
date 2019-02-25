@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b29e01d01f27884fa8baaf04b7886ad, type: 3}
   m_Name: Rogue
   m_EditorClassIdentifier: 
-  flavorText: Sneaky boi
-  icon: {fileID: 21300000, guid: fcd5027a43f2302428e0975cde5d2cbc, type: 3}
+  flavorText: Quick and sneaky character who likes backstabbing enemies
+  icon: {fileID: 21300000, guid: 7a806a1e1418ba74a8720c9da1ab258c, type: 3}

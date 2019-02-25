@@ -13,6 +13,8 @@ public class Player : NetworkBehaviour
     public int playerNum;
 
     public PlayerPanel lobbyPanel;
+	public NetworkIdentity networkIdentity;
+	public bool isReady;
 
     private void Start()
     {
@@ -21,6 +23,7 @@ public class Player : NetworkBehaviour
         {
             playerNum = players.Count;
         }
+		networkIdentity = GetComponent<NetworkIdentity>();
     }
     
     public override void OnStartLocalPlayer()
@@ -48,7 +51,8 @@ public class Player : NetworkBehaviour
         }
 
         players.Remove(this);
-        Destroy(lobbyPanel.gameObject);
+		if(lobbyPanel && lobbyPanel.gameObject)
+			Destroy(lobbyPanel.gameObject);
     }
 
     [Command]
@@ -57,15 +61,40 @@ public class Player : NetworkBehaviour
         NetworkServer.Destroy(gameObject);
     }
 
-    [Command]
-    public void CmdUpdatePanel(int characterIndex, bool isReady)
+	#region Lobby
+
+	[Command]
+    public void CmdUpdatePanel(int characterIndex, bool isReadyNow)
     {
-        RpcUpdatePanel(characterIndex, isReady);
+		if (isReadyNow)
+		{
+			isReady = isReadyNow;
+			TryStart();
+		}
+		RpcUpdatePanel(characterIndex, isReady);
     }
 
     [ClientRpc]
-    public void RpcUpdatePanel(int characterIndex, bool isReady)
+    public void RpcUpdatePanel(int characterIndex, bool isReadyNow)
     {
+		isReady = isReadyNow;
         lobbyPanel.UpdateUI(characterIndex, isReady);
-    }
+	}
+
+	private void TryStart()
+	{
+		foreach (Player p in Player.players)
+			if (!p.isReady)
+				return; //someones not ready so don't start
+		NetworkWrapper.manager.ServerChangeScene(NetworkWrapper.manager.sceneAfterLobbyName);
+		RpcRelayStart();
+	}
+
+	[ClientRpc]
+	private void RpcRelayStart()
+	{
+		ClientScene.Ready(Player.localAuthority.networkIdentity.connectionToServer);
+	}
+
+	#endregion
 }
