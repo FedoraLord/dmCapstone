@@ -1978,6 +1978,8 @@ MonoBehaviour:
   - {fileID: 5553856512177297884, guid: 84e6f5bde7c85af41a7e6734f429e0cc, type: 3}
   - {fileID: 2732521013029907918, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
   - {fileID: 1269885308792982226, guid: 722416cb1d3dffb409b806446c11cabe, type: 3}
+  - {fileID: 4958897434475965043, guid: ec360ed5430254a3ab1c779036c47bc2, type: 3}
+  - {fileID: 5389947726256375910, guid: 5edbfece0d9fa46d1a5b13ea5ee779ee, type: 3}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:

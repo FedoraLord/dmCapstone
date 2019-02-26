@@ -37,9 +37,14 @@ public class Player : NetworkBehaviour
 
 	private void OnLevelWasLoaded(int level)
 	{
-		if (isLocalPlayer && SceneManager.GetActiveScene().name == "mainBattleScene")
-			CmdSpawnCharacter();
-	}
+        if (NetworkWrapper.Instance.SpawnerInstance == null)
+            NetworkWrapper.Instance.SpawnerInstance = Instantiate(NetworkWrapper.Instance.SpawnerPrefab).GetComponent<Spawner>();  // Need to only spawn once
+
+        if (SceneManager.GetActiveScene().name.Equals("SwitchMaze"))
+        {
+            NetworkWrapper.Instance.SpawnerInstance.CmdSpawnMinigameManager();
+        }
+    }
 
 	[Command]
 	private void CmdSpawnCharacter()
@@ -110,5 +115,5 @@ public class Player : NetworkBehaviour
 		ClientScene.Ready(Player.localAuthority.networkIdentity.connectionToServer);
 	}
 
-	#endregion
+    #endregion
 }

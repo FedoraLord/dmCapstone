@@ -13,6 +13,7 @@ public class NetworkWrapper : MonoBehaviour
     public static CustomNetworkDiscovery discovery;
     public static CustomNetworkManager manager;
     public static NetworkWrapper Instance;
+    public GameObject SpawnerPrefab;
 
     public static bool IsHost { get { return hosting; } }
     public static bool IsClient { get { return !hosting; } }

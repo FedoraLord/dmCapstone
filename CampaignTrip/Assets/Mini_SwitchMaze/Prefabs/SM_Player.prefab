@@ -10,10 +10,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1269885308792982223}
   - component: {fileID: 1269885308792982219}
+  - component: {fileID: 1269885308792982217}
   - component: {fileID: 1269885308792982216}
   - component: {fileID: 1269885308792982220}
   - component: {fileID: 1269885308792982221}
-  - component: {fileID: 1269885308792982217}
+  - component: {fileID: 4492306924531231508}
   m_Layer: 0
   m_Name: SM_Player
   m_TagString: Player
@@ -56,6 +57,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!70 &1269885308792982217
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1269885308792982226}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.0052095414, y: 0}
+  m_Size: {x: 0.9896704, y: 0.9375001}
+  m_Direction: 0
 --- !u!212 &1269885308792982216
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -117,6 +134,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 3
+  localAuthority: 0
 --- !u!114 &1269885308792982221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,20 +167,26 @@ MonoBehaviour:
     i14: 0
     i15: 0
   m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0
---- !u!70 &1269885308792982217
-CapsuleCollider2D:
+  m_LocalPlayerAuthority: 1
+--- !u!114 &4492306924531231508
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1269885308792982226}
   m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.625, y: 0.9375}
-  m_Direction: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_TransformSyncMode: 2
+  m_SendInterval: 0.1
+  m_SyncRotationAxis: 3
+  m_RotationSyncCompression: 0
+  m_SyncSpin: 0
+  m_MovementTheshold: 0.001
+  m_VelocityThreshold: 0.0001
+  m_SnapThreshold: 5
+  m_InterpolateRotation: 1
+  m_InterpolateMovement: 1

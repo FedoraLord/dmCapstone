@@ -13,7 +13,6 @@ public class MinigameManager : NetworkBehaviour
     void Start()
     {
         CmdInitialize();
-
     }
 
     // Update is called once per frame
