@@ -5,6 +5,9 @@ using UnityEngine.Networking;
 
 public class BattlePlayer : NetworkBehaviour
 {
+    [SyncVar(hook = "UpdateHealthUI")]
+    public int health;
+
     public PersistentPlayer persistentPlayer;
 
     public void Initialize()
@@ -21,5 +24,10 @@ public class BattlePlayer : NetworkBehaviour
         Vector3 worldPosition = cam.ScreenToWorldPoint(camPos);
         worldPosition.z = 0;
         transform.position = worldPosition;
+    }
+
+    private void UpdateHealthUI()
+    {
+
     }
 }
