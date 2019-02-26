@@ -5,10 +5,10 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
-public class Player : NetworkBehaviour
+public class PersistentPlayer : NetworkBehaviour
 {
-    public static Player localAuthority;
-    public static List<Player> players = new List<Player>();
+    public static PersistentPlayer localAuthority;
+    public static List<PersistentPlayer> players = new List<PersistentPlayer>();
 
     [SyncVar]
     public int playerNum;
@@ -17,6 +17,9 @@ public class Player : NetworkBehaviour
 	public NetworkIdentity networkIdentity;
 	protected GameObject characterPrefab;
 	public bool isReady;
+    public BattlePlayer combatPlayer;
+
+    #region InitAndDestroy
 
     private void Start()
     {
@@ -34,11 +37,11 @@ public class Player : NetworkBehaviour
         base.OnStartLocalPlayer();
         localAuthority = this;
     }
-
+    
 	private void OnLevelWasLoaded(int level)
 	{
         if (NetworkWrapper.Instance.SpawnerInstance == null)
-            NetworkWrapper.Instance.SpawnerInstance = Instantiate(NetworkWrapper.Instance.SpawnerPrefab).GetComponent<Spawner>();  // Need to only spawn once
+            NetworkWrapper.Instance.SpawnerInstance = Instantiate(NetworkWrapper.Instance.SpawnerPrefab).GetComponent<Spawner>();
 
         if (SceneManager.GetActiveScene().name.Equals("SwitchMaze"))
         {
@@ -51,7 +54,7 @@ public class Player : NetworkBehaviour
 	{
 		NetworkServer.Spawn(Instantiate(characterPrefab));
 	}
-
+    
 	private void OnDestroy()
     {
         if (isLocalPlayer)
@@ -81,9 +84,11 @@ public class Player : NetworkBehaviour
         NetworkServer.Destroy(gameObject);
     }
 
-	#region Lobby
+    #endregion
 
-	[Command]
+    #region Lobby
+
+    [Command]
     public void CmdUpdatePanel(int characterIndex, bool isReadyNow)
 	{
 		characterPrefab = TitleUIManager.RoomSessionMenu.characters[characterIndex].characterPrefab;
@@ -102,7 +107,7 @@ public class Player : NetworkBehaviour
 
 	private void TryStart()
 	{
-		foreach (Player p in Player.players)
+		foreach (PersistentPlayer p in PersistentPlayer.players)
 			if (!p.isReady)
 				return; //someones not ready so don't start
 		NetworkWrapper.manager.ServerChangeScene(NetworkWrapper.manager.sceneAfterLobbyName);
@@ -112,8 +117,34 @@ public class Player : NetworkBehaviour
 	[ClientRpc]
 	private void RpcRelayStart()
 	{
-		ClientScene.Ready(Player.localAuthority.networkIdentity.connectionToServer);
+		ClientScene.Ready(PersistentPlayer.localAuthority.networkIdentity.connectionToServer);
 	}
+
+    #endregion
+
+    #region Battle
+
+    [Command]
+    public void CmdSpawnCharacter()
+    {
+        GameObject cp = Instantiate(characterPrefab);
+        NetworkServer.Spawn(cp);
+        StartCoroutine(WaitToInitCharacter(cp));
+    }
+
+    private IEnumerator WaitToInitCharacter(GameObject cp)
+    {
+        yield return new WaitForSeconds(0.5f);
+        RpcInitCharacter(cp);
+    }
+
+    [ClientRpc]
+    private void RpcInitCharacter(GameObject combatChar)
+    {
+        combatPlayer = combatChar.GetComponent<BattlePlayer>();
+        combatPlayer.persistentPlayer = this;
+        combatPlayer.Initialize();
+    }
 
     #endregion
 }

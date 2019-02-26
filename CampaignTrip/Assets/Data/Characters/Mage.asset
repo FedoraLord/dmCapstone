@@ -14,5 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flavorText: Heals friends and attacks with magic
   icon: {fileID: 21300000, guid: e2f468372ea8d0d418ac87089d5f5291, type: 3}
-  characterPrefab: {fileID: 587414646479245843, guid: 5b89cd150dc3ded4ca7504bc91fe44ff,
-    type: 3}
+  characterPrefab: {fileID: 25, guid: 5b89cd150dc3ded4ca7504bc91fe44ff, type: 3}

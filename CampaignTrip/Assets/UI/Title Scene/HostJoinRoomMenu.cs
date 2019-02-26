@@ -34,11 +34,11 @@ public class HostJoinRoomMenu : NavigationMenu
     {
         while (true)
         {
-            yield return new WaitForSeconds(1);
             if (!NetworkWrapper.discovery.running)
             {
                 NetworkWrapper.discovery.ListenForLANServers();
             }
+            yield return new WaitForSeconds(1);
         }
     }
 
