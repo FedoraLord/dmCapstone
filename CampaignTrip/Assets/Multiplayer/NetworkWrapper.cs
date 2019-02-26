@@ -13,12 +13,11 @@ public class NetworkWrapper : MonoBehaviour
     public static CustomNetworkDiscovery discovery;
     public static CustomNetworkManager manager;
     public static NetworkWrapper Instance;
-    public GameObject SpawnerPrefab;
 
-    public static bool IsHost { get { return hosting; } }
-    public static bool IsClient { get { return !hosting; } }
+    public static bool IsHost { get; private set; }
+    public static bool IsClient { get { return !IsHost; } }
 
-    private static bool hosting;
+    public GameObject spawnerPrefab;
 
     private void Start()
     {
@@ -39,7 +38,7 @@ public class NetworkWrapper : MonoBehaviour
         discovery.StopListening();
         manager.networkAddress = ipAddress;
         manager.StartClient();
-        hosting = false;
+        IsHost = false;
     }
 
     public static void StartServer(string roomName)
@@ -47,7 +46,7 @@ public class NetworkWrapper : MonoBehaviour
         discovery.broadcastData = roomName;
         discovery.BroadcastAsServer();
         manager.StartHost();
-        hosting = true;
+        IsHost = true;
     }
 }
 #pragma warning restore CS0618

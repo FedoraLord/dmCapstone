@@ -13,11 +13,13 @@ public class PersistentPlayer : NetworkBehaviour
     [SyncVar]
     public int playerNum;
 
-    public PlayerPanel lobbyPanel;
-	public NetworkIdentity networkIdentity;
-	protected GameObject characterPrefab;
-	public bool isReady;
     public BattlePlayer combatPlayer;
+	public bool isReady;
+    public PlayerPanel lobbyPanel;
+
+    private bool gameplayInitialized;
+    private GameObject characterPrefab;
+	private NetworkIdentity networkIdentity;
 
     #region InitAndDestroy
 
@@ -40,22 +42,23 @@ public class PersistentPlayer : NetworkBehaviour
     
 	private void OnLevelWasLoaded(int level)
 	{
-        if (NetworkWrapper.Instance.SpawnerInstance == null)
-            NetworkWrapper.Instance.SpawnerInstance = Instantiate(NetworkWrapper.Instance.SpawnerPrefab).GetComponent<Spawner>();
-
-        if (SceneManager.GetActiveScene().name.Equals("SwitchMaze"))
+        if (isServer && isLocalPlayer)
         {
-            NetworkWrapper.Instance.SpawnerInstance.CmdSpawnMinigameManager();
+            InitGameplay();
         }
     }
 
-	[Command]
-	private void CmdSpawnCharacter()
-	{
-		NetworkServer.Spawn(Instantiate(characterPrefab));
-	}
-    
-	private void OnDestroy()
+    private void InitGameplay()
+    {
+        if (gameplayInitialized)
+            return;
+
+        gameplayInitialized = true;
+        GameObject obj = Instantiate(NetworkWrapper.Instance.spawnerPrefab);
+        NetworkServer.Spawn(obj);
+    }
+
+    private void OnDestroy()
     {
         if (isLocalPlayer)
         {

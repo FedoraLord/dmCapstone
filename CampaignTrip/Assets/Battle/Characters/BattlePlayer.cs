@@ -26,7 +26,7 @@ public class BattlePlayer : NetworkBehaviour
         transform.position = worldPosition;
     }
 
-    private void UpdateHealthUI()
+    private void UpdateHealthUI(int hp)
     {
 
     }

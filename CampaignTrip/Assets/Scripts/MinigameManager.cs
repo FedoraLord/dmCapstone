@@ -3,37 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class MinigameManager : NetworkBehaviour
+public class MinigameManager : MonoBehaviour
 {
     public GameObject playerPrefab;
+    public List<Transform> spawnPoints;
 
-    public Camera mainCamera;
-
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        CmdInitialize();
+        if (NetworkWrapper.IsHost && playerPrefab != null)
+        {
+            SpawnPlayers();
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public virtual void SpawnPlayers()
     {
-        
-    }
-
-    private void OnLevelWasLoaded(int level)
-    {
-        
-    }
-
-    [Command]
-    private void CmdInitialize()
-    {
-        GameObject player = Instantiate(playerPrefab);
-        NetworkServer.Spawn(player);
-
-        mainCamera.transform.parent = player.transform;
-        mainCamera.transform.localPosition = new Vector3(0, 0, -10f);
-        mainCamera.transform.LookAt(player.transform);
+        for (int i = 0; i < PersistentPlayer.players.Count; i++)
+        {
+            GameObject obj = Instantiate(playerPrefab);
+            playerPrefab.transform.position = spawnPoints[i].position;
+            NetworkSpawner.Instance.NetworkSpawn(obj);
+        }
     }
 }
