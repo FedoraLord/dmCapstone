@@ -25,7 +25,7 @@ public class Enemy : NetworkBehaviour
 	[Command]
 	protected void CmdDie()
 	{
-		BattleController.instance.CmdTryEndWave();
+		BattleController.Instance.CmdTryEndWave();
 		gameObject.SetActive(false);
 		RpcDie();
 	}

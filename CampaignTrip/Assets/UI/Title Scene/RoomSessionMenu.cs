@@ -49,8 +49,8 @@ public class RoomSessionMenu : NavigationMenu
 
     public void ReadyButtonClicked()
 	{
-		Player.localAuthority.isReady = !Player.localAuthority.isReady;
-        Player.localAuthority.CmdUpdatePanel(characterIndex, Player.localAuthority.isReady);
+		PersistentPlayer.localAuthority.isReady = !PersistentPlayer.localAuthority.isReady;
+        PersistentPlayer.localAuthority.CmdUpdatePanel(characterIndex, PersistentPlayer.localAuthority.isReady);
     }
 
 	public void ClassCycleLeftButtonClicked()
@@ -84,12 +84,12 @@ public class RoomSessionMenu : NavigationMenu
 		flavorText.text = characters[characterIndex].flavorText;
 		characterImage.sprite = characters[characterIndex].icon;
 
-        Player.localAuthority.CmdUpdatePanel(characterIndex, Player.localAuthority.isReady);
+        PersistentPlayer.localAuthority.CmdUpdatePanel(characterIndex, PersistentPlayer.localAuthority.isReady);
 	}
 
 	private IEnumerator ClientLeave()
 	{
-		Player.localAuthority.CmdDisconnect();
+		PersistentPlayer.localAuthority.CmdDisconnect();
 
 		//Need to wait a little before disconnecting so we can call the server Command method.
 		yield return new WaitForSeconds(0.2f);

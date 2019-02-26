@@ -5,13 +5,16 @@ using UnityEngine.Networking;
 
 public class BattleController : NetworkBehaviour
 {
-	public static BattleController instance;
-	[Tooltip("Groups of enemies to spawn together.")]
-	public Wave[] waves;
-	protected int waveIndex = 0;
+	public static BattleController Instance;
+
+    [Tooltip("Groups of enemies to spawn together.")]
 	public List<Enemy> enemies;
-	
-	[System.Serializable]
+    public List<RectTransform> spawnPoints;
+	public Wave[] waves;
+
+    protected int waveIndex = 0;
+
+    [System.Serializable]
 	public struct Wave
 	{
 		public GameObject[] members;
@@ -20,10 +23,11 @@ public class BattleController : NetworkBehaviour
 	protected void Start()
 	{
 		CmdSpawnNewWave();
-		if (instance)
+		if (Instance)
 			throw new System.Exception("There can only be one BattleController.");
-		instance = this;
-	}
+		Instance = this;
+        PersistentPlayer.localAuthority.CmdSpawnCharacter();
+    }
 
 	protected void Win()
 	{
