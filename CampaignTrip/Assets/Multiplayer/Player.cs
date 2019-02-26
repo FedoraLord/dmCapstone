@@ -41,17 +41,17 @@ public class Player : NetworkBehaviour
 	{
         GameObject cp = Instantiate(characterPrefab);
         NetworkServer.Spawn(cp);
-        StartCoroutine(asdf(cp));
+        StartCoroutine(WaitToInitCharacter(cp));
 	}
 
-    private IEnumerator asdf(GameObject cp)
+    private IEnumerator WaitToInitCharacter(GameObject cp)
     {
         yield return new WaitForSeconds(0.5f);
-        RpcSpawnCharacter(cp);
+		RpcInitCharacter(cp);
     }
 
     [ClientRpc]
-    private void RpcSpawnCharacter(GameObject combatChar)
+    private void RpcInitCharacter(GameObject combatChar)
     {
         combatPlayer = combatChar.GetComponent<CombatPlayer>();
         combatPlayer.persistentPlayer = this;
