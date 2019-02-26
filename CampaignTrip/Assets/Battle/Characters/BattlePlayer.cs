@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class CombatPlayer : NetworkBehaviour
+public class BattlePlayer : NetworkBehaviour
 {
-    public Player persistentPlayer;
+    public PersistentPlayer persistentPlayer;
 
     public void Initialize()
     {
@@ -13,7 +13,7 @@ public class CombatPlayer : NetworkBehaviour
 
         Camera cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         Vector3[] corners = new Vector3[4];
-        Combat.Instance.spawnPoints[i].GetWorldCorners(corners);
+        BattleController.Instance.spawnPoints[i].GetWorldCorners(corners);
 
         Vector3 camPos = corners[0] + corners[1] + corners[2] + corners[3];
         camPos /= 4;

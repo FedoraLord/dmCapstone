@@ -9,7 +9,7 @@ public class PlayerPanel : MonoBehaviour
     public Text playerName;
     public Image selectedClass;
     public Image readyState;
-    public Player associatedPlayer;
+    public PersistentPlayer associatedPlayer;
 
     private void Start()
     {
