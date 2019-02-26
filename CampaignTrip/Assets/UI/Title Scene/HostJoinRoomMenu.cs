@@ -15,17 +15,31 @@ public class HostJoinRoomMenu : NavigationMenu
 #pragma warning restore CS0649
 
     private List<GameObject> roomButtons = new List<GameObject>();
+    private Coroutine listenRoutine;
 
     public override void NavigateTo()
     {
         base.NavigateTo();
-        NetworkWrapper.discovery.ListenForLANServers();
+        listenRoutine = StartCoroutine(TryListen());
     }
 
     public override void NavigateFrom()
     {
-        base.NavigateFrom();
+        StopCoroutine(listenRoutine);
         NetworkWrapper.discovery.StopListening();
+        base.NavigateFrom();
+    }
+
+    private IEnumerator TryListen()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+            if (!NetworkWrapper.discovery.running)
+            {
+                NetworkWrapper.discovery.ListenForLANServers();
+            }
+        }
     }
 
     /// <summary>

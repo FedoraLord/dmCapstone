@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class Player : NetworkBehaviour
 {
@@ -14,10 +15,13 @@ public class Player : NetworkBehaviour
 
     public PlayerPanel lobbyPanel;
 	public NetworkIdentity networkIdentity;
+	protected GameObject characterPrefab;
 	public bool isReady;
+    public CombatPlayer combatPlayer;
 
     private void Start()
     {
+		DontDestroyOnLoad(gameObject);
         players.Add(this);
         if (NetworkWrapper.IsHost)
         {
@@ -31,8 +35,30 @@ public class Player : NetworkBehaviour
         base.OnStartLocalPlayer();
         localAuthority = this;
     }
+    
+	[Command]
+	public void CmdSpawnCharacter()
+	{
+        GameObject cp = Instantiate(characterPrefab);
+        NetworkServer.Spawn(cp);
+        StartCoroutine(WaitToInitCharacter(cp));
+	}
 
-    private void OnDestroy()
+    private IEnumerator WaitToInitCharacter(GameObject cp)
+    {
+        yield return new WaitForSeconds(0.5f);
+		RpcInitCharacter(cp);
+    }
+
+    [ClientRpc]
+    private void RpcInitCharacter(GameObject combatChar)
+    {
+        combatPlayer = combatChar.GetComponent<CombatPlayer>();
+        combatPlayer.persistentPlayer = this;
+        combatPlayer.Initialize();
+    }
+
+	private void OnDestroy()
     {
         if (isLocalPlayer)
         {
@@ -65,18 +91,17 @@ public class Player : NetworkBehaviour
 
 	[Command]
     public void CmdUpdatePanel(int characterIndex, bool isReadyNow)
-    {
-		if (isReadyNow)
-		{
-			isReady = isReadyNow;
-			TryStart();
-		}
-		RpcUpdatePanel(characterIndex, isReady);
+	{
+		characterPrefab = TitleUIManager.RoomSessionMenu.characters[characterIndex].characterPrefab;
+		isReady = isReadyNow;
+		RpcUpdatePanel(characterIndex, isReadyNow);
+		TryStart();
     }
 
     [ClientRpc]
     public void RpcUpdatePanel(int characterIndex, bool isReadyNow)
     {
+		characterPrefab = TitleUIManager.RoomSessionMenu.characters[characterIndex].characterPrefab;
 		isReady = isReadyNow;
         lobbyPanel.UpdateUI(characterIndex, isReady);
 	}
