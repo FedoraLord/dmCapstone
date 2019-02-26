@@ -5,12 +5,22 @@ using UnityEngine.Networking;
 
 public class Enemy : NetworkBehaviour
 {
-	[SerializeField][SyncVar]
-	protected int health = 100;
+    public int maxHealth = 100;
+
+    [SyncVar]
+	protected int health;
 
 	public bool isAlive { get { return health > 0; } }
 
-	private void OnMouseUpAsButton()
+    private void Start()
+    {
+        if (NetworkWrapper.IsHost)
+        {
+            health = maxHealth;
+        }
+    }
+
+    private void OnMouseUpAsButton()
 	{
 		AdjustHealth(-20);
 	}
@@ -18,8 +28,8 @@ public class Enemy : NetworkBehaviour
 	public void AdjustHealth(int adjustment)
 	{
 		health += adjustment;
-		if (!isAlive)
-			CmdDie();
+        if (!isAlive)
+            Destroy(gameObject);//CmdDie();
 	}
 
 	[Command]

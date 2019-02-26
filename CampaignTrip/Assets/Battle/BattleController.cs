@@ -15,10 +15,15 @@ public class BattleController : NetworkBehaviour
     protected int waveIndex = 0;
 
     [System.Serializable]
-	public struct Wave
+	public class Wave
 	{
-		public GameObject[] members;
-	}
+		public GameObject[] Members { get { return new GameObject[] { enemy1, enemy2, enemy4, enemy4 }; } }
+               
+        public GameObject enemy1;
+        public GameObject enemy2;
+        public GameObject enemy3;
+        public GameObject enemy4;
+    }
 
 	protected void Start()
 	{
@@ -59,7 +64,7 @@ public class BattleController : NetworkBehaviour
 		}
 
 		//Spawn the next wave then
-		foreach(GameObject g in waves[waveIndex].members)
+		foreach(GameObject g in waves[waveIndex].Members)
 		{
 			GameObject newEnemy = Instantiate(g);
 			enemies.Add(newEnemy.GetComponent<Enemy>());
