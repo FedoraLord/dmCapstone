@@ -50,7 +50,27 @@ public class SM_Player : NetworkBehaviour
 
             velocity = velocity.normalized * speed;
             rb.velocity = velocity;
+
+            CmdUpdatePosition(this.gameObject);
         }
 
+    }
+
+    [Command]
+    private void CmdUpdatePosition(GameObject player)
+    {
+        RpcUpdatePosition(player);
+    }
+
+    [ClientRpc]
+    private void RpcUpdatePosition(GameObject player)
+    {
+        foreach(SM_Player playerObject in FindObjectsOfType<SM_Player>())
+        {
+            if (player.GetComponent<SM_Player>().playernum == playerObject.playernum)
+            {
+                playerObject.transform.position = player.transform.position;
+            }
+        }
     }
 }
