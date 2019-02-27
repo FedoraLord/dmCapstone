@@ -45031,7 +45031,7 @@ GameObject:
   - component: {fileID: 135471624}
   m_Layer: 0
   m_Name: Camera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -48173,6 +48173,57 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ccbbf59fc010945e8a789647a3558efa, type: 3}
+--- !u!1 &1236481849
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1236481851}
+  - component: {fileID: 1236481850}
+  m_Layer: 0
+  m_Name: MinigameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1236481850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1236481849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98db1c0e8f024eb41a0437250754b8f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerPrefab: {fileID: 1269885308792982226, guid: 722416cb1d3dffb409b806446c11cabe,
+    type: 3}
+  spawnPoints:
+  - {fileID: 367174624}
+  - {fileID: 1073647834}
+  - {fileID: 587035174}
+  - {fileID: 1619044743}
+  mainCamera: {fileID: 135471625}
+--- !u!4 &1236481851
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1236481849}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.7079504, y: -3.4818652, z: -0.19595326}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 16
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &1328781954 stripped
 BoxCollider2D:
   m_CorrespondingSourceObject: {fileID: 7814994563801701090, guid: 86fb4b32027c2ab449b02d413ae5a87a,
@@ -48467,110 +48518,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ccbbf59fc010945e8a789647a3558efa, type: 3}
---- !u!1001 &4958897433246047562
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4958897434475965043, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: m_Name
-      value: MinigameManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 4958897434475965043, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4958897434475965041, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 3.7079504
-      objectReference: {fileID: 0}
-    - target: {fileID: 4958897434475965041, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -3.4818652
-      objectReference: {fileID: 0}
-    - target: {fileID: 4958897434475965041, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.19595326
-      objectReference: {fileID: 0}
-    - target: {fileID: 4958897434475965041, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4958897434475965041, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4958897434475965041, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4958897434475965041, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4958897434475965041, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 16
-      objectReference: {fileID: 0}
-    - target: {fileID: 4958897434475965041, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4958897434475965041, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4958897434475965041, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4958897434475965040, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: spawnPoints.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 4958897434475965040, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: mainCamera
-      value: 
-      objectReference: {fileID: 135471625}
-    - target: {fileID: 4958897434475965040, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: spawnPoints.Array.data[0]
-      value: 
-      objectReference: {fileID: 367174624}
-    - target: {fileID: 4958897434475965040, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: spawnPoints.Array.data[1]
-      value: 
-      objectReference: {fileID: 1073647834}
-    - target: {fileID: 4958897434475965040, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: spawnPoints.Array.data[2]
-      value: 
-      objectReference: {fileID: 587035174}
-    - target: {fileID: 4958897434475965040, guid: ec360ed5430254a3ab1c779036c47bc2,
-        type: 3}
-      propertyPath: spawnPoints.Array.data[3]
-      value: 
-      objectReference: {fileID: 1619044743}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: ec360ed5430254a3ab1c779036c47bc2, type: 3}
 --- !u!1001 &7814994563943208030
 PrefabInstance:
   m_ObjectHideFlags: 0
