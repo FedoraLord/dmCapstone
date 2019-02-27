@@ -38,17 +38,17 @@ public class SM_Door : MonoBehaviour
         if (i != -1)
         {
             singleInputDown++;
-            Open();
         }
 
         i = multiInputSwitches.IndexOf(button);
         if (i != -1)
         {
             multiInputDown++;
-            if (multiInputDown == multiInputSwitches.Count)
-            {
-                Open();
-            }
+        }
+
+        if (singleInputDown > 0 || multiInputDown == multiInputSwitches.Count)
+        {
+            Open();
         }
     }
 
@@ -58,20 +58,17 @@ public class SM_Door : MonoBehaviour
         if (i != -1)
         {
             singleInputDown--;
-            if (singleInputDown == 0)
-            {
-                Close();
-            }
         }
 
         i = multiInputSwitches.IndexOf(button);
         if (i != -1)
         {
             multiInputDown--;
-            if (multiInputDown < multiInputSwitches.Count)
-            {
-                Close();
-            }
+        }
+
+        if (singleInputDown == 0 && multiInputDown < multiInputSwitches.Count)
+        {
+            Close();
         }
     }
 
