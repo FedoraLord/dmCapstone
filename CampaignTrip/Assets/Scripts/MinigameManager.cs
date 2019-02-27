@@ -22,7 +22,9 @@ public class MinigameManager : MonoBehaviour
         {
             GameObject obj = Instantiate(playerPrefab);
             obj.transform.position = spawnPoints[i].position;
-            NetworkSpawner.Instance.NetworkSpawn(obj);
+
+            //NetworkSpawner.Instance.NetworkSpawn(obj);
+            NetworkSpawner.Instance.NetworkSpawn(obj, PersistentPlayer.players[i].gameObject);
         }
     }
 }
