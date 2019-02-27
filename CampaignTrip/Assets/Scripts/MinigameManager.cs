@@ -37,8 +37,8 @@ public class MinigameManager : MonoBehaviour
             GameObject obj = Instantiate(playerPrefab);
             obj.transform.position = spawnPoints[i].position;
 
-            NetworkSpawner.Instance.NetworkSpawn(obj, p.gameObject);
             obj.GetComponent<SM_Player>().playernum = p.playerNum;
+            NetworkSpawner.Instance.NetworkSpawn(obj, p.gameObject);
         }
     }
 
@@ -56,8 +56,8 @@ public class MinigameManager : MonoBehaviour
 
             }
 
-            NetworkSpawner.Instance.NetworkSpawn(obj, p.gameObject);
             obj.GetComponent<SM_Player>().playernum = p.playerNum;
+            NetworkSpawner.Instance.NetworkSpawn(obj, p.gameObject);
         }
     }
 }

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1269885308792982216}
   - component: {fileID: 1269885308792982220}
   - component: {fileID: 1269885308792982221}
-  - component: {fileID: 4492306924531231508}
+  - component: {fileID: 6671864174149751762}
   m_Layer: 0
   m_Name: SM_Player
   m_TagString: Player
@@ -135,6 +135,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 3
   localAuthority: 0
+  playernum: 0
 --- !u!114 &1269885308792982221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168,7 +169,7 @@ MonoBehaviour:
     i15: 0
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
---- !u!114 &4492306924531231508
+--- !u!114 &6671864174149751762
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -180,7 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TransformSyncMode: 2
+  m_TransformSyncMode: 1
   m_SendInterval: 0.1
   m_SyncRotationAxis: 3
   m_RotationSyncCompression: 0
