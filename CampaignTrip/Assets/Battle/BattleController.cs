@@ -6,13 +6,16 @@ using UnityEngine.Networking;
 public class BattleController : NetworkBehaviour
 {
 	public static BattleController Instance;
-
-    [Tooltip("Groups of enemies to spawn together.")]
-	public List<Enemy> enemies;
-    public List<RectTransform> spawnPoints;
+	[Tooltip("Groups of enemies to spawn together.")]
 	public Wave[] waves;
+	public List<RectTransform> spawnPoints;
+	public RectTransform[] enemySpawnPoints;
+	[HideInInspector]
+	public List<Enemy> enemies;
+	//used for spawning stuff in the right place
+	private Camera cam;
 
-    protected int waveIndex = 0;
+	protected int waveIndex = 0;
 
     [System.Serializable]
 	public struct Wave
@@ -22,6 +25,8 @@ public class BattleController : NetworkBehaviour
 
 	protected void Start()
 	{
+		cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+		// spawn the first wave
 		CmdSpawnNewWave();
 		if (Instance)
 			throw new System.Exception("There can only be one BattleController.");
@@ -52,16 +57,18 @@ public class BattleController : NetworkBehaviour
 		enemies.Clear();
 
 		//Are all the waves done with?
-		if(waveIndex == waves.Length)
+		if (waveIndex == waves.Length)
 		{
 			Win();
 			return;
 		}
 
 		//Spawn the next wave then
-		foreach(GameObject g in waves[waveIndex].members)
+		for (int i = 0; i < waves[waveIndex].members.Length; i++)
 		{
-			GameObject newEnemy = Instantiate(g);
+			Vector3 pos = cam.ScreenToWorldPoint(enemySpawnPoints[i].position);
+			pos.z = 0; //otherwise its on the same z as the camera and we cant see it
+			GameObject newEnemy = Instantiate(waves[waveIndex].members[i], pos, Quaternion.identity);
 			enemies.Add(newEnemy.GetComponent<Enemy>());
 			NetworkServer.Spawn(newEnemy);
 		}
