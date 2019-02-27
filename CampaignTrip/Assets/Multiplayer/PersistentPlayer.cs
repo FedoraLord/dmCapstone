@@ -39,14 +39,6 @@ public class PersistentPlayer : NetworkBehaviour
         base.OnStartLocalPlayer();
         localAuthority = this;
     }
-    
-	private void OnLevelWasLoaded(int level)
-	{
-        if (isServer && isLocalPlayer)
-        {
-            InitGameplay();
-        }
-    }
 
     private void InitGameplay()
     {
@@ -110,17 +102,21 @@ public class PersistentPlayer : NetworkBehaviour
 
 	private void TryStart()
 	{
-		foreach (PersistentPlayer p in PersistentPlayer.players)
+		foreach (PersistentPlayer p in players)
+        {
 			if (!p.isReady)
 				return; //someones not ready so don't start
-		NetworkWrapper.manager.ServerChangeScene(NetworkWrapper.manager.sceneAfterLobbyName);
+        }
+
+        InitGameplay();
+        NetworkWrapper.manager.ServerChangeScene(NetworkWrapper.manager.sceneAfterLobbyName);
 		RpcRelayStart();
 	}
 
 	[ClientRpc]
 	private void RpcRelayStart()
 	{
-		ClientScene.Ready(PersistentPlayer.localAuthority.networkIdentity.connectionToServer);
+		ClientScene.Ready(localAuthority.networkIdentity.connectionToServer);
 	}
 
     #endregion

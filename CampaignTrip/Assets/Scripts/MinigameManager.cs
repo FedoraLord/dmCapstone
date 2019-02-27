@@ -17,7 +17,8 @@ public class MinigameManager : MonoBehaviour
 
         if (NetworkWrapper.IsHost && playerPrefab != null)
         {
-            SpawnPlayers();
+            //SpawnPlayers();
+            StartCoroutine(_SpawnPlayers());
         }
     }
 
@@ -26,31 +27,37 @@ public class MinigameManager : MonoBehaviour
         Instance = null;
     }
 
+    private IEnumerator _SpawnPlayers()
+    {
+        for (int i = 0; i < PersistentPlayer.players.Count; i++)
+        {
+            PersistentPlayer p = PersistentPlayer.players[i];
+            yield return new WaitUntil(() => p.connectionToClient.isReady);
+
+            GameObject obj = Instantiate(playerPrefab);
+            obj.transform.position = spawnPoints[i].position;
+
+            NetworkSpawner.Instance.NetworkSpawn(obj, p.gameObject);
+            obj.GetComponent<SM_Player>().playernum = p.playerNum;
+        }
+    }
+
     public virtual void SpawnPlayers()
     {
-        //var i = 0;
-        //foreach(PersistentPlayer player in PersistentPlayer.players)
-        //{
-        //    GameObject obj = Instantiate(playerPrefab);
-        //    obj.transform.position = spawnPoints[i].position;
+        for (int i = 0; i < PersistentPlayer.players.Count; i++)
+        {
+            GameObject obj = Instantiate(playerPrefab);
+            obj.transform.position = spawnPoints[i].position;
 
-        //    obj.GetComponent<SM_Player>().playernum = player.playerNum;
-        //    NetworkSpawner.Instance.NetworkSpawn(obj);
-        //    i++;
-        //}
+            PersistentPlayer p = PersistentPlayer.players[i];
 
-        var player = PersistentPlayer.players[0];
-        GameObject obj = Instantiate(playerPrefab);
-        obj.transform.position = spawnPoints[0].position;
+            if (p.connectionToClient.isReady)
+            {
 
-        obj.GetComponent<SM_Player>().playernum = player.playerNum;
-        NetworkSpawner.Instance.NetworkSpawn(obj);
+            }
 
-        player = PersistentPlayer.players[1];
-        obj = Instantiate(playerPrefab);
-        obj.transform.position = spawnPoints[1].position;
-
-        obj.GetComponent<SM_Player>().playernum = player.playerNum;
-        NetworkSpawner.Instance.NetworkSpawn(obj);
+            NetworkSpawner.Instance.NetworkSpawn(obj, p.gameObject);
+            obj.GetComponent<SM_Player>().playernum = p.playerNum;
+        }
     }
 }
