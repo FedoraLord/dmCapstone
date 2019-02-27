@@ -56,6 +56,22 @@ public class SM_Player : NetworkBehaviour
 
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("WinArea"))
+        {
+            MinigameManager.Instance.numPlayersInWinArea++;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("WinArea"))
+        {
+            MinigameManager.Instance.numPlayersInWinArea--;
+        }
+    }
+
     [Command]
     private void CmdUpdatePosition(Vector2 velocity, Vector3 playerPosition)
     {

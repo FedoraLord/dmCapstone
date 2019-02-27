@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class MinigameManager : MonoBehaviour
 {
@@ -11,14 +12,29 @@ public class MinigameManager : MonoBehaviour
     public Camera mainCamera;
     public static MinigameManager Instance;
 
+    public int numPlayersInWinArea;
+    public Text winText;
+
     private void Start()
     {
         Instance = this;
+
+        numPlayersInWinArea = 0;
+
+        //winText.text = "";
 
         if (NetworkWrapper.IsHost && playerPrefab != null)
         {
             //SpawnPlayers();
             StartCoroutine(_SpawnPlayers());
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (numPlayersInWinArea == 4)
+        {
+            winText.text = "Success!";
         }
     }
 

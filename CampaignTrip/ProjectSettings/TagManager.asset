@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Tiles
+  - WinArea
   layers:
   - Default
   - TransparentFX
@@ -53,4 +54,7 @@ TagManager:
     locked: 0
   - name: FrontOfPlayer
     uniqueID: 2469129301
+    locked: 0
+  - name: UI
+    uniqueID: 844158667
     locked: 0
