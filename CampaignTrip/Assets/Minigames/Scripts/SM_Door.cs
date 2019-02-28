@@ -66,7 +66,7 @@ public class SM_Door : MonoBehaviour
             multiInputDown--;
         }
 
-        if (singleInputDown == 0 && multiInputDown < multiInputSwitches.Count)
+        if (singleInputDown == 0 && (multiInputDown == 0 || multiInputDown < multiInputSwitches.Count))
         {
             Close();
         }
