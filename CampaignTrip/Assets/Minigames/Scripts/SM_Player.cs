@@ -55,16 +55,16 @@ public class SM_Player : NetworkBehaviour
         }
 
     }
-
-    private void OnCollisionEnter2D(Collision2D collision)
+    
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("WinArea"))
         {
             MinigameManager.Instance.numPlayersInWinArea++;
         }
     }
-
-    private void OnCollisionExit2D(Collision2D collision)
+    
+    private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("WinArea"))
         {
