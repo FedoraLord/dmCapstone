@@ -83,7 +83,8 @@ public class SM_Player : NetworkBehaviour
     {
         if (!localAuthority)
         {
-            this.transform.position = playerPosition;
+            transform.position = playerPosition;
+            rb.velocity = velocity;
         }
     }
 }
