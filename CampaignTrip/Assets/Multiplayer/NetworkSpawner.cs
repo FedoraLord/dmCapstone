@@ -20,4 +20,12 @@ public class NetworkSpawner : NetworkBehaviour
 
         NetworkServer.Spawn(obj);
     }
+
+    public void NetworkSpawn(GameObject obj, GameObject player)
+    {
+        if (!NetworkWrapper.IsHost)
+            return;
+        
+        NetworkServer.SpawnWithClientAuthority(obj, player);
+    }
 }
