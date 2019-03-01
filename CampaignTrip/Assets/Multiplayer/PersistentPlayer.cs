@@ -13,13 +13,15 @@ public class PersistentPlayer : NetworkBehaviour
     [SyncVar]
     public int playerNum;
 
-    public BattlePlayer combatPlayer;
 	public bool isReady;
-    public PlayerPanel lobbyPanel;
+
+    [HideInInspector] public BattlePlayer combatPlayer;
+    [HideInInspector] public PlayerPanel lobbyPanel;
+
+	[SerializeField] private NetworkIdentity networkIdentity;
 
     private bool gameplayInitialized;
     private GameObject characterPrefab;
-	private NetworkIdentity networkIdentity;
 
     #region InitAndDestroy
 
@@ -31,7 +33,6 @@ public class PersistentPlayer : NetworkBehaviour
         {
             playerNum = players.Count;
         }
-		networkIdentity = GetComponent<NetworkIdentity>();
     }
     
     public override void OnStartLocalPlayer()
@@ -60,17 +61,18 @@ public class PersistentPlayer : NetworkBehaviour
         {
             for (int i = playerNum; i < players.Count; i++)
             {
-                players[i].lobbyPanel.SetPlayerName(i);
+                if (NetworkWrapper.Instance.currentScene == NetworkWrapper.Scene.MainMenu)
+                    players[i].lobbyPanel.SetPlayerName(i);
                 if (NetworkWrapper.IsHost)
-                {
                     players[i].playerNum = i;
-                }
             }
         }
 
-        players.Remove(this);
-		if(lobbyPanel && lobbyPanel.gameObject)
-			Destroy(lobbyPanel.gameObject);
+        if (NetworkWrapper.Instance.currentScene == NetworkWrapper.Scene.MainMenu)
+        {
+            players.Remove(this);
+            Destroy(lobbyPanel.gameObject);
+        }
     }
 
     [Command]
@@ -127,22 +129,8 @@ public class PersistentPlayer : NetworkBehaviour
     public void CmdSpawnCharacter()
     {
         GameObject cp = Instantiate(characterPrefab);
+        cp.GetComponent<BattlePlayer>().playerNum = playerNum;
         NetworkServer.Spawn(cp);
-        StartCoroutine(WaitToInitCharacter(cp));
-    }
-
-    private IEnumerator WaitToInitCharacter(GameObject cp)
-    {
-        yield return new WaitForSeconds(0.5f);
-        RpcInitCharacter(cp);
-    }
-
-    [ClientRpc]
-    private void RpcInitCharacter(GameObject combatChar)
-    {
-        combatPlayer = combatChar.GetComponent<BattlePlayer>();
-        combatPlayer.persistentPlayer = this;
-        combatPlayer.Initialize();
     }
 
     #endregion

@@ -19,6 +19,13 @@ public class NetworkWrapper : MonoBehaviour
 
     public GameObject spawnerPrefab;
 
+    [HideInInspector] public Scene currentScene;
+    public enum Scene
+    {
+        MainMenu,
+        Battle
+    }
+
     private void Start()
     {
         if (Instance != null)

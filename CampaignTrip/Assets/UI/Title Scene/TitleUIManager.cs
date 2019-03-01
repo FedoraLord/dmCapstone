@@ -26,9 +26,11 @@ public class TitleUIManager : UIManager
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
         HostJoinRoomMenu = hostJoinRoomMenu;
         RoomSessionMenu = roomSessionMenu;
+        NetworkWrapper.Instance.currentScene = NetworkWrapper.Scene.MainMenu;
     }
     
     public static void Navigate_HostJoinRoomMenu()

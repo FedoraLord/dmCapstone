@@ -2,20 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Serialization;
 
 public class BattleController : NetworkBehaviour
 {
 	public static BattleController Instance;
-	[Tooltip("Groups of enemies to spawn together.")]
-	public Wave[] waves;
-	public List<RectTransform> spawnPoints;
-	public RectTransform[] enemySpawnPoints;
-	[HideInInspector]
-	public List<Enemy> enemies;
-	//used for spawning stuff in the right place
-	private Camera cam;
 
-	protected int waveIndex = 0;
+    [Tooltip("Groups of enemies to spawn together.")]
+	public Wave[] waves;
+
+    [HideInInspector] public List<Vector3> playerSpawnPoints;
+    [HideInInspector] public List<Vector3> enemySpawnPoints;
+    [HideInInspector] public List<Enemy> enemies;
+
+    [SerializeField] private RectTransform playerSpawnArea;
+    [SerializeField] private RectTransform enemySpawnArea;
+    [SerializeField] private Camera cam;
+
+	public int waveIndex = 0;
 
     [System.Serializable]
 	public class Wave
@@ -30,13 +34,64 @@ public class BattleController : NetworkBehaviour
 
 	protected void Start()
 	{
-		cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-		// spawn the first wave
-		CmdSpawnNewWave();
-		if (Instance)
+        NetworkWrapper.Instance.currentScene = NetworkWrapper.Scene.Battle;
+        
+        if (Instance)
 			throw new System.Exception("There can only be one BattleController.");
+        
 		Instance = this;
+        CalculateSpawnPoints();
+        //TestSpawnPoints();
         PersistentPlayer.localAuthority.CmdSpawnCharacter();
+        
+        // spawn the first wave
+        CmdSpawnNewWave();
+    }
+
+    public List<GameObject> SPAWN_TEST_PLAYERS;
+    public List<GameObject> SPAWN_TEST_ENEMIES;
+
+    private void TestSpawnPoints()
+    {
+        for (int i = 0; i < SPAWN_TEST_PLAYERS.Count; i++)
+        {
+            SPAWN_TEST_PLAYERS[i].transform.position = playerSpawnPoints[i];
+        }
+
+        for (int i = 0; i < SPAWN_TEST_ENEMIES.Count; i++)
+        {
+            SPAWN_TEST_ENEMIES[i].transform.position = enemySpawnPoints[i];
+        }
+    }
+    
+    private void CalculateSpawnPoints()
+    {
+        //I got tired of dealing with canvas positioning so now it just gets the 
+        //center of an area and calculates world coordinate offsets for each player/enemy
+
+        Vector3 center = cam.ScreenToWorldPoint(playerSpawnArea.position);
+        center.z = 0;
+
+        playerSpawnPoints = new List<Vector3>()
+        {
+            center + 0.6f * Vector3.up,     //Player 1's spawn point
+            center + 0.6f * Vector3.down,   //Player 2's ... etc
+            center + 1.0f * Vector3.right,
+            center + 1.0f * Vector3.left
+        };
+
+        center = cam.ScreenToWorldPoint(enemySpawnArea.position);
+        center.z = 0;
+        
+        enemySpawnPoints  = new List<Vector3>()
+        {
+            center + 1.5f * Vector3.left,
+            center + 0.5f * Vector3.left + 0.6f * Vector3.up,
+            center + 0.5f * Vector3.left + 0.6f * Vector3.down,
+            center + 0.5f * Vector3.right,
+            center + 1.5f * Vector3.right + 0.6f * Vector3.up,
+            center + 1.5f * Vector3.right + 0.6f * Vector3.down
+        };
     }
 
 	protected void Win()
@@ -68,15 +123,13 @@ public class BattleController : NetworkBehaviour
 			return;
 		}
 
-		//Spawn the next wave then
-		for (int i = 0; i < waves[waveIndex].Members.Length; i++)
-		{
-			Vector3 pos = cam.ScreenToWorldPoint(enemySpawnPoints[i].position);
-			pos.z = 0; //otherwise its on the same z as the camera and we cant see it
-			GameObject newEnemy = Instantiate(waves[waveIndex].Members[i], pos, Quaternion.identity);
-			enemies.Add(newEnemy.GetComponent<Enemy>());
-			NetworkServer.Spawn(newEnemy);
-		}
-		waveIndex++;
+        //Spawn the next wave then
+        for (int i = 0; i < waves[waveIndex].Members.Length; i++)
+        {
+            GameObject newEnemy = Instantiate(waves[waveIndex].Members[i], enemySpawnPoints[i], Quaternion.identity);
+            enemies.Add(newEnemy.GetComponent<Enemy>());
+            NetworkServer.Spawn(newEnemy);
+        }
+        waveIndex++;
 	}
 }

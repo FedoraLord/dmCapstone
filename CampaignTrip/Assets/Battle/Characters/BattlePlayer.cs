@@ -8,22 +8,23 @@ public class BattlePlayer : NetworkBehaviour
     [SyncVar(hook = "UpdateHealthUI")]
     public int health;
 
+    [SyncVar]
+    public int playerNum;
+
     public PersistentPlayer persistentPlayer;
 
-    public void Initialize()
+    public override void OnStartClient()
     {
-        int i = persistentPlayer.playerNum - 1;
+        StartCoroutine(Initialize());
+    }
 
-        Camera cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-        Vector3[] corners = new Vector3[4];
-        BattleController.Instance.spawnPoints[i].GetWorldCorners(corners);
+    private IEnumerator Initialize()
+    {
+        yield return new WaitUntil(() => BattleController.Instance != null);
 
-        Vector3 camPos = corners[0] + corners[1] + corners[2] + corners[3];
-        camPos /= 4;
-
-        Vector3 worldPosition = cam.ScreenToWorldPoint(camPos);
-        worldPosition.z = 0;
-        transform.position = worldPosition;
+        int i = playerNum - 1;
+        persistentPlayer = PersistentPlayer.players[i];
+        transform.position = BattleController.Instance.playerSpawnPoints[i];
     }
 
     private void UpdateHealthUI(int hp)
