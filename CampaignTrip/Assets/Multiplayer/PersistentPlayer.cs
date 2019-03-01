@@ -15,7 +15,7 @@ public class PersistentPlayer : NetworkBehaviour
 
 	public bool isReady;
 
-    [HideInInspector] public BattlePlayer combatPlayer;
+    [HideInInspector] public BattlePlayer battlePlayer;
     [HideInInspector] public PlayerPanel lobbyPanel;
 
 	[SerializeField] private NetworkIdentity networkIdentity;
@@ -130,7 +130,7 @@ public class PersistentPlayer : NetworkBehaviour
     {
         GameObject cp = Instantiate(characterPrefab);
         cp.GetComponent<BattlePlayer>().playerNum = playerNum;
-        NetworkServer.Spawn(cp);
+        NetworkServer.SpawnWithClientAuthority(cp, gameObject);
     }
 
     #endregion

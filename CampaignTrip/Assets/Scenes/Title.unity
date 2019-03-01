@@ -2066,6 +2066,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnerPrefab: {fileID: 5389947726256375910, guid: 5edbfece0d9fa46d1a5b13ea5ee779ee,
     type: 3}
+  currentScene: 0
 --- !u!4 &1122466934
 Transform:
   m_ObjectHideFlags: 0

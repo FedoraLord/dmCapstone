@@ -8,9 +8,11 @@ public class Enemy : NetworkBehaviour
     public int maxHealth = 100;
 
     [SyncVar]
-	protected int health;
+	public int health;
 
 	public bool isAlive { get { return health > 0; } }
+
+    [SerializeField] private SpriteRenderer tmpDamageIndicator;
 
     private void Start()
     {
@@ -22,27 +24,38 @@ public class Enemy : NetworkBehaviour
 
     private void OnMouseUpAsButton()
 	{
-		AdjustHealth(-20);
+        BattlePlayer.LocalAuthority.CmdAttack(gameObject);
 	}
-
-	public void AdjustHealth(int adjustment)
+    
+	public void TakeDamage(int damage)
 	{
-		health += adjustment;
-        if (!isAlive)
-            Destroy(gameObject);//CmdDie();
-	}
+        if (!isServer)
+            return;
 
-	[Command]
-	protected void CmdDie()
-	{
-		BattleController.Instance.CmdTryEndWave();
-		gameObject.SetActive(false);
-		RpcDie();
+		health -= damage;
+        RpcTakeDamage();
 	}
 
 	[ClientRpc]
-	protected void RpcDie()
+	protected void RpcTakeDamage()
 	{
-		gameObject.SetActive(false);
+        //play damage animation
+        
+        StartCoroutine(ShowDamageIndicator());
+
+        if (!isAlive)
+        {
+            Destroy(gameObject);
+        }
+
+  //      BattleController.Instance.CmdTryEndWave();
+		//gameObject.SetActive(false);
 	}
+
+    private IEnumerator ShowDamageIndicator()
+    {
+        tmpDamageIndicator.enabled = true;
+        yield return new WaitForSeconds(.3f);
+        tmpDamageIndicator.enabled = false;
+    }
 }
