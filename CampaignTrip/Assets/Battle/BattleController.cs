@@ -3,11 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 public class BattleController : NetworkBehaviour
 {
 	public static BattleController Instance;
 
+    [Header("UI")]
+    public List<EnemyUI> enemyUI;
+
+    [SerializeField] private RectTransform attackTimerBar;
+    [SerializeField] private Text attackTimerText;
+
+    private Coroutine attackTimerCountdown;
+
+    [Header("Spawning")]
     [Tooltip("Groups of enemies to spawn together.")]
 	public Wave[] waves;
 
@@ -17,9 +27,9 @@ public class BattleController : NetworkBehaviour
 
     [SerializeField] private RectTransform playerSpawnArea;
     [SerializeField] private RectTransform enemySpawnArea;
-    [SerializeField] private Camera cam;
+    [SerializeField] public Camera cam;
 
-	public int waveIndex = 0;
+	private int waveIndex = 0;
 
     [System.Serializable]
 	public class Wave
@@ -32,21 +42,33 @@ public class BattleController : NetworkBehaviour
         public GameObject enemy4;
     }
 
-	protected void Start()
+    protected void Start()
 	{
-        NetworkWrapper.Instance.currentScene = NetworkWrapper.Scene.Battle;
-        
         if (Instance)
 			throw new System.Exception("There can only be one BattleController.");
-        
 		Instance = this;
+        
+        NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
+
         CalculateSpawnPoints();
         //TestSpawnPoints();
-        PersistentPlayer.localAuthority.CmdSpawnCharacter();
-        
-        // spawn the first wave
-        CmdSpawnNewWave();
+        PersistentPlayer.localAuthority.CmdSpawnBattlePlayer();
     }
+
+    public EnemyUI ClaimEnemyUI(Enemy enemy)
+    {
+        foreach (EnemyUI ui in enemyUI)
+        {
+            if (!ui.claimed)
+            {
+                ui.Claim(enemy);
+                return ui;
+            }
+        }
+        return null;
+    }
+
+    #region Spawning
 
     public List<GameObject> SPAWN_TEST_PLAYERS;
     public List<GameObject> SPAWN_TEST_ENEMIES;
@@ -86,28 +108,14 @@ public class BattleController : NetworkBehaviour
         enemySpawnPoints  = new List<Vector3>()
         {
             center + 1.5f * Vector3.left,
-            center + 0.5f * Vector3.left + 0.6f * Vector3.up,
-            center + 0.5f * Vector3.left + 0.6f * Vector3.down,
+            center + 0.5f * Vector3.left + 0.7f * Vector3.up,
+            center + 0.5f * Vector3.left + 0.7f * Vector3.down,
             center + 0.5f * Vector3.right,
-            center + 1.5f * Vector3.right + 0.6f * Vector3.up,
-            center + 1.5f * Vector3.right + 0.6f * Vector3.down
+            center + 1.5f * Vector3.right + 0.7f * Vector3.up,
+            center + 1.5f * Vector3.right + 0.7f * Vector3.down
         };
     }
-
-	protected void Win()
-	{
-		//TODO
-	}
-
-	[Command]
-	public void CmdTryEndWave()
-	{
-		foreach (Enemy e in enemies)
-			if (e.isAlive)
-				return;
-		CmdSpawnNewWave();
-	}
-
+    
 	[Command]
 	public void CmdSpawnNewWave()
 	{
@@ -130,6 +138,55 @@ public class BattleController : NetworkBehaviour
             enemies.Add(newEnemy.GetComponent<Enemy>());
             NetworkServer.Spawn(newEnemy);
         }
+
+        RpcStartAttackTimer(10);
+
         waveIndex++;
 	}
+
+    [Command]
+    public void CmdTryEndWave()
+    {
+        foreach (Enemy e in enemies)
+            if (e.isAlive)
+                return;
+        CmdSpawnNewWave();
+    }
+
+    #endregion
+
+    [ClientRpc]
+    public void RpcStartAttackTimer(float time)
+    {
+        if (attackTimerCountdown != null)
+        {
+            StopCoroutine(attackTimerCountdown);
+        }
+        attackTimerCountdown = StartCoroutine(AttackTimerCountdown(time));
+    }
+
+    private IEnumerator AttackTimerCountdown(float totalTime)
+    {
+        float timeRemaining = totalTime;
+        while (true)
+        {
+            //update UI
+            attackTimerBar.localScale = new Vector3(timeRemaining / totalTime, 1);
+            attackTimerText.text = timeRemaining.ToString(" 0.0");
+            
+            //decrement timer
+            timeRemaining -= Time.deltaTime;
+
+            if (timeRemaining < 0)
+                break;
+
+            yield return new WaitForEndOfFrame();
+        }
+        attackTimerCountdown = null;
+    }
+
+    protected void Win()
+    {
+        //TODO
+    }
 }

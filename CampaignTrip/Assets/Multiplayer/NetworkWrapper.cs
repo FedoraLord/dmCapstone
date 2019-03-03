@@ -19,7 +19,7 @@ public class NetworkWrapper : MonoBehaviour
 
     public GameObject spawnerPrefab;
 
-    [HideInInspector] public Scene currentScene;
+    public static Scene currentScene;
     public enum Scene
     {
         MainMenu,
@@ -46,6 +46,21 @@ public class NetworkWrapper : MonoBehaviour
         manager.networkAddress = ipAddress;
         manager.StartClient();
         IsHost = false;
+    }
+
+    public static void OnEnterScene(Scene scene)
+    {
+        currentScene = scene;
+        switch (scene)
+        {
+            case Scene.MainMenu:
+                break;
+            case Scene.Battle:
+                PersistentPlayer.OnEnterBattleScene();
+                break;
+            default:
+                break;
+        }
     }
 
     public static void StartServer(string roomName)

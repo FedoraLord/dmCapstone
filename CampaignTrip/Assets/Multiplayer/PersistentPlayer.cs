@@ -61,14 +61,14 @@ public class PersistentPlayer : NetworkBehaviour
         {
             for (int i = playerNum; i < players.Count; i++)
             {
-                if (NetworkWrapper.Instance.currentScene == NetworkWrapper.Scene.MainMenu)
+                if (NetworkWrapper.currentScene == NetworkWrapper.Scene.MainMenu)
                     players[i].lobbyPanel.SetPlayerName(i);
                 if (NetworkWrapper.IsHost)
                     players[i].playerNum = i;
             }
         }
 
-        if (NetworkWrapper.Instance.currentScene == NetworkWrapper.Scene.MainMenu)
+        if (NetworkWrapper.currentScene == NetworkWrapper.Scene.MainMenu)
         {
             players.Remove(this);
             Destroy(lobbyPanel.gameObject);
@@ -125,12 +125,25 @@ public class PersistentPlayer : NetworkBehaviour
 
     #region Battle
 
+    private static int readyForBattle;
+
+    public static void OnEnterBattleScene()
+    {
+        readyForBattle = 0;
+    }
+
     [Command]
-    public void CmdSpawnCharacter()
+    public void CmdSpawnBattlePlayer()
     {
         GameObject cp = Instantiate(characterPrefab);
         cp.GetComponent<BattlePlayer>().playerNum = playerNum;
         NetworkServer.SpawnWithClientAuthority(cp, gameObject);
+
+        readyForBattle++;
+        if (readyForBattle == players.Count)
+        {
+            BattleController.Instance.CmdSpawnNewWave();
+        }
     }
 
     #endregion

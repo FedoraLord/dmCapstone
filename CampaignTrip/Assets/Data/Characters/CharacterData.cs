@@ -4,6 +4,7 @@
 public class CharacterData : ScriptableObject
 {
 	public string flavorText;
-	public Sprite icon;
+	public Sprite sprite;
+    public Sprite icon;
 	public GameObject characterPrefab;
 }
