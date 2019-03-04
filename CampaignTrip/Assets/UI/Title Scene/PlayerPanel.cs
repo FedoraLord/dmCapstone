@@ -44,7 +44,7 @@ public class PlayerPanel : MonoBehaviour
     public void UpdateUI(int characterIndex, bool isReady)
     {
         CharacterData data = TitleUIManager.RoomSessionMenu.characters[characterIndex];
-        selectedClass.sprite = data.sprite;
+        selectedClass.sprite = data.Sprite;
         readyState.enabled = isReady;
     }
 }

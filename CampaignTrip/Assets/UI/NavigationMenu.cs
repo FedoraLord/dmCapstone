@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+#pragma warning disable CS0618
 /// <summary>
 /// Make your menu scripts inherit from this. (see HostJoinRoomMenu.cs and RoomSessionMenu.cs)
 /// UIManager.cs calls NavigateTo() and NavigateFrom() when switching menus.
@@ -25,3 +26,4 @@ public class NavigationMenu : NetworkBehaviour
         gameObject.SetActive(false);
     }
 }
+#pragma warning restore CS0618

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+#pragma warning disable CS0618
 public class BattlePlayer : NetworkBehaviour
 {
     public static BattlePlayer LocalAuthority { get { return PersistentPlayer.localAuthority.battlePlayer; } }
@@ -44,3 +45,4 @@ public class BattlePlayer : NetworkBehaviour
 
     }
 }
+#pragma warning restore CS0618

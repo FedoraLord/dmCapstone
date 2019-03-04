@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+#pragma warning disable 0649
 /// <summary>
 /// Handles menu navigation in our Title Scene
 /// </summary>
@@ -43,3 +44,4 @@ public class TitleUIManager : UIManager
         Instance.Navigate(Instance.roomSessionMenu);
     }
 }
+#pragma warning restore 0649

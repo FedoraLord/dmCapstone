@@ -1,10 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
+#pragma warning disable CS0618, 0649
 public class BattleController : NetworkBehaviour
 {
 	public static BattleController Instance;
@@ -21,17 +23,19 @@ public class BattleController : NetworkBehaviour
     [Tooltip("Groups of enemies to spawn together.")]
 	public Wave[] waves;
 
+    [HideInInspector] public List<Enemy> aliveEnemies;
     [HideInInspector] public List<Vector3> playerSpawnPoints;
     [HideInInspector] public List<Vector3> enemySpawnPoints;
-    [HideInInspector] public List<Enemy> enemies;
 
+    [SerializeField] public Camera cam;
     [SerializeField] private RectTransform playerSpawnArea;
     [SerializeField] private RectTransform enemySpawnArea;
-    [SerializeField] public Camera cam;
 
-	private int waveIndex = 0;
+    private int enemiesReady;
+    private int playersReady;
+	private int waveIndex;
 
-    [System.Serializable]
+    [Serializable]
 	public class Wave
 	{
 		public GameObject[] Members { get { return new GameObject[] { enemy1, enemy2, enemy4, enemy4 }; } }
@@ -42,50 +46,64 @@ public class BattleController : NetworkBehaviour
         public GameObject enemy4;
     }
 
+    #region Initialization
+
     protected void Start()
 	{
         if (Instance)
-			throw new System.Exception("There can only be one BattleController.");
+			throw new Exception("There can only be one BattleController.");
 		Instance = this;
         
         NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
 
         CalculateSpawnPoints();
-        //TestSpawnPoints();
         PersistentPlayer.localAuthority.CmdSpawnBattlePlayer();
     }
 
-    public EnemyUI ClaimEnemyUI(Enemy enemy)
+    public void OnPlayerReady()
     {
-        foreach (EnemyUI ui in enemyUI)
+        if (!isServer)
+            return;
+
+        playersReady++;
+        if (playersReady == PersistentPlayer.players.Count)
         {
-            if (!ui.claimed)
-            {
-                ui.Claim(enemy);
-                return ui;
-            }
+            CmdSpawnNewWave();
         }
-        return null;
     }
+
+    public void OnEnemyReady()
+    {
+        if (!isServer)
+            return;
+
+        enemiesReady++;
+        if (enemiesReady == waves[0].Members.Length)
+        {
+            StartCoroutine(DelayExecution(2, StartBattle));
+        }
+    }
+
+    private void StartBattle()
+    {
+        RpcStartAttackTimer(5);
+
+        foreach (Enemy e in aliveEnemies)
+        {
+            e.OnAttackTimerBegin();
+        }
+    }
+
+    private IEnumerator DelayExecution(float time, Action callback)
+    {
+        yield return new WaitForSeconds(time);
+        callback();
+    }
+
+    #endregion
 
     #region Spawning
 
-    public List<GameObject> SPAWN_TEST_PLAYERS;
-    public List<GameObject> SPAWN_TEST_ENEMIES;
-
-    private void TestSpawnPoints()
-    {
-        for (int i = 0; i < SPAWN_TEST_PLAYERS.Count; i++)
-        {
-            SPAWN_TEST_PLAYERS[i].transform.position = playerSpawnPoints[i];
-        }
-
-        for (int i = 0; i < SPAWN_TEST_ENEMIES.Count; i++)
-        {
-            SPAWN_TEST_ENEMIES[i].transform.position = enemySpawnPoints[i];
-        }
-    }
-    
     private void CalculateSpawnPoints()
     {
         //I got tired of dealing with canvas positioning so now it just gets the 
@@ -119,11 +137,6 @@ public class BattleController : NetworkBehaviour
 	[Command]
 	public void CmdSpawnNewWave()
 	{
-		//clear old wave(this will be destroyed on the clients too automatically)
-		foreach (Enemy e in enemies)
-			Destroy(e.gameObject);
-		enemies.Clear();
-
 		//Are all the waves done with?
 		if (waveIndex == waves.Length)
 		{
@@ -135,25 +148,37 @@ public class BattleController : NetworkBehaviour
         for (int i = 0; i < waves[waveIndex].Members.Length; i++)
         {
             GameObject newEnemy = Instantiate(waves[waveIndex].Members[i], enemySpawnPoints[i], Quaternion.identity);
-            enemies.Add(newEnemy.GetComponent<Enemy>());
+            aliveEnemies.Add(newEnemy.GetComponent<Enemy>());
             NetworkServer.Spawn(newEnemy);
         }
-
-        RpcStartAttackTimer(10);
 
         waveIndex++;
 	}
 
     [Command]
-    public void CmdTryEndWave()
+    public void CmdEndWave()
     {
-        foreach (Enemy e in enemies)
-            if (e.isAlive)
-                return;
+        //TODO small break before next wave starts
+
         CmdSpawnNewWave();
     }
 
     #endregion
+
+    #region Enemy
+
+    public EnemyUI ClaimEnemyUI(Enemy enemy)
+    {
+        foreach (EnemyUI ui in enemyUI)
+        {
+            if (!ui.claimed)
+            {
+                ui.Claim(enemy);
+                return ui;
+            }
+        }
+        return null;
+    }
 
     [ClientRpc]
     public void RpcStartAttackTimer(float time)
@@ -185,8 +210,20 @@ public class BattleController : NetworkBehaviour
         attackTimerCountdown = null;
     }
 
+    public void OnEnemyDeath(Enemy dead)
+    {
+        aliveEnemies.Remove(dead);
+        if (aliveEnemies.Count == 0)
+        {
+            CmdEndWave();
+        }
+    }
+
+    #endregion
+
     protected void Win()
     {
         //TODO
     }
 }
+#pragma warning restore CS0618, 0649 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+#pragma warning disable 0649
 public class EnemyUI : MonoBehaviour
 {
     [HideInInspector] public bool claimed;
@@ -15,7 +16,9 @@ public class EnemyUI : MonoBehaviour
     [SerializeField] private RectTransform healthBar;
     [SerializeField] private Text healthText;
 
-    private Action healthBarCallback;
+    private bool IsDead { get { return health == 0; } }
+
+    private Action<bool> healthBarCallback;
     private Coroutine animateHealthBar;
     private int health;
     private int maxHealth;
@@ -46,18 +49,26 @@ public class EnemyUI : MonoBehaviour
         transform.position = camPosition;
 
         InitHealth(enemy.health);
-        SetTargets(new List<CharacterData>());
+        SetTargets(new int[0]);
     }
 
-    public void SetTargets(List<CharacterData> characters)
+    public void Unclaim()
     {
-        for (int i = 0; i < characters.Count; i++)
+        claimed = false;
+        gameObject.SetActive(false);
+    }
+
+    public void SetTargets(int[] playerTargets)
+    {
+        for (int i = 0; i < playerTargets.Length; i++)
         {
-            Targets[i].sprite = characters[i].icon;
+            int playerIndex = playerTargets[i];
+            CharacterData character = PersistentPlayer.players[playerIndex].character;
+            Targets[i].sprite = character.Icon;
             Targets[i].enabled = true;
         }
-
-        for (int i = characters.Count; i < 4; i++)
+        
+        for (int i = playerTargets.Length; i < 4; i++)
         {
             Targets[i].enabled = false;
         }
@@ -71,15 +82,16 @@ public class EnemyUI : MonoBehaviour
         UpdateHealthUI(health);
     }
 
-    public void SetHealth(int newHeath, bool animate = true, Action animCallback = null)
+    public void SetHealth(int newHeath, Action<bool> animCallback = null, bool animate = true)
     {
         if (animateHealthBar != null)
         {
-            healthBarCallback?.Invoke();
+            healthBarCallback?.Invoke(IsDead);
             StopCoroutine(animateHealthBar);
             animateHealthBar = null;
         }
 
+        healthBarCallback = animCallback;
         int prevHealth = health;
         health = Mathf.Clamp(newHeath, 0, maxHealth);
 
@@ -90,7 +102,7 @@ public class EnemyUI : MonoBehaviour
         else
         {
             UpdateHealthUI(health);
-            healthBarCallback?.Invoke();
+            healthBarCallback?.Invoke(IsDead);
         }
     }
 
@@ -109,7 +121,8 @@ public class EnemyUI : MonoBehaviour
         }
 
         animateHealthBar = null;
-        healthBarCallback?.Invoke();
+        healthBarCallback?.Invoke(IsDead);
+        healthBarCallback = null;
     }
 
     private void UpdateHealthUI(float currentHealth)
@@ -121,3 +134,4 @@ public class EnemyUI : MonoBehaviour
         healthBar.localScale = scale;
     }
 }
+#pragma warning restore 0649

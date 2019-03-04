@@ -81,8 +81,8 @@ public class RoomSessionMenu : NavigationMenu
 	public void UpdateCharacterPanel()
 	{
         className.text = characters[characterIndex].name;
-		flavorText.text = characters[characterIndex].flavorText;
-		characterImage.sprite = characters[characterIndex].sprite;
+		flavorText.text = characters[characterIndex].FlavorText;
+		characterImage.sprite = characters[characterIndex].Sprite;
 
         PersistentPlayer.localAuthority.CmdUpdatePanel(characterIndex, PersistentPlayer.localAuthority.isReady);
 	}

@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
+#pragma warning disable CS0618, 0649
 public class PersistentPlayer : NetworkBehaviour
 {
     public static PersistentPlayer localAuthority;
@@ -17,8 +18,9 @@ public class PersistentPlayer : NetworkBehaviour
 
     [HideInInspector] public BattlePlayer battlePlayer;
     [HideInInspector] public PlayerPanel lobbyPanel;
+    [HideInInspector] public CharacterData character;
 
-	[SerializeField] private NetworkIdentity networkIdentity;
+    [SerializeField] private NetworkIdentity networkIdentity;
 
     private bool gameplayInitialized;
     private GameObject characterPrefab;
@@ -88,7 +90,7 @@ public class PersistentPlayer : NetworkBehaviour
     [Command]
     public void CmdUpdatePanel(int characterIndex, bool isReadyNow)
 	{
-		characterPrefab = TitleUIManager.RoomSessionMenu.characters[characterIndex].characterPrefab;
+		characterPrefab = TitleUIManager.RoomSessionMenu.characters[characterIndex].CharacterPrefab;
 		isReady = isReadyNow;
 		RpcUpdatePanel(characterIndex, isReadyNow);
 		TryStart();
@@ -97,7 +99,8 @@ public class PersistentPlayer : NetworkBehaviour
     [ClientRpc]
     public void RpcUpdatePanel(int characterIndex, bool isReadyNow)
     {
-		characterPrefab = TitleUIManager.RoomSessionMenu.characters[characterIndex].characterPrefab;
+        character = TitleUIManager.RoomSessionMenu.characters[characterIndex];
+        characterPrefab = character.CharacterPrefab;
 		isReady = isReadyNow;
         lobbyPanel.UpdateUI(characterIndex, isReady);
 	}
@@ -125,11 +128,9 @@ public class PersistentPlayer : NetworkBehaviour
 
     #region Battle
 
-    private static int readyForBattle;
-
     public static void OnEnterBattleScene()
     {
-        readyForBattle = 0;
+        
     }
 
     [Command]
@@ -138,13 +139,9 @@ public class PersistentPlayer : NetworkBehaviour
         GameObject cp = Instantiate(characterPrefab);
         cp.GetComponent<BattlePlayer>().playerNum = playerNum;
         NetworkServer.SpawnWithClientAuthority(cp, gameObject);
-
-        readyForBattle++;
-        if (readyForBattle == players.Count)
-        {
-            BattleController.Instance.CmdSpawnNewWave();
-        }
+        BattleController.Instance.OnPlayerReady();
     }
 
     #endregion
 }
+#pragma warning restore CS0618, 0649
