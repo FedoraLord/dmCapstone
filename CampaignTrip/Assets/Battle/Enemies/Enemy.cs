@@ -6,11 +6,13 @@ using UnityEngine.Networking;
 #pragma warning disable CS0618, 0649
 public class Enemy : NetworkBehaviour
 {
-    public int maxHealth = 100;
-    public Transform uiTransform;
-
     [SyncVar(hook = "OnHealthChanged")]
     public int health;
+
+    public int numTargets = 1;
+    public int basicDamage = 5;
+    public int maxHealth = 100;
+    public Transform uiTransform;
 
 	public bool isAlive { get { return health > 0; } }
 
@@ -24,13 +26,13 @@ public class Enemy : NetworkBehaviour
 
     private void Start()
     {
-        if (NetworkWrapper.IsHost)
+        if (isServer)
         {
             health = maxHealth;
+            BattleController.Instance.OnEnemyReady();
         }
 
         UI = BattleController.Instance.ClaimEnemyUI(this);
-        BattleController.Instance.OnEnemyReady();
         initialized = true;
     }
 
@@ -45,12 +47,10 @@ public class Enemy : NetworkBehaviour
             BattlePlayer.LocalAuthority.CmdAttack(gameObject);
         }
 	}
-    
-	public void TakeDamage(int damage)
-	{
-        if (!isServer)
-            return;
 
+    [Server]
+    public void TakeDamage(int damage)
+	{
 		health -= damage;
 	}
     
@@ -85,7 +85,6 @@ public class Enemy : NetworkBehaviour
         //TODO play death animation
 
         UI.Unclaim();
-        gameObject.SetActive(false);
         
         if (isServer)
         {
@@ -96,7 +95,7 @@ public class Enemy : NetworkBehaviour
 
     #endregion
 
-    #region Attacking
+    #region Attack
 
     public void OnAttackTimerBegin()
     {
@@ -106,9 +105,8 @@ public class Enemy : NetworkBehaviour
 
     protected virtual void ChooseTargets()
     {
-        //by default, picks a random player 0-3
-        int choice = Random.Range(0, PersistentPlayer.players.Count);
-        targets = new int[] { choice };
+        //picks targets randomly unless overridden
+        targets = GetRandomNPlayers(numTargets);
     }
 
     [ClientRpc]
@@ -118,7 +116,7 @@ public class Enemy : NetworkBehaviour
         UI.SetTargets(targets);
     }
 
-    protected void GetRandomNPlayers(int n)
+    protected int[] GetRandomNPlayers(int n)
     {
         Mathf.Clamp(n, 0, PersistentPlayer.players.Count);
         List<int> choices = new List<int>();
@@ -134,6 +132,17 @@ public class Enemy : NetworkBehaviour
             result.Add(choices[i]);
             choices.RemoveAt(i);
             n--;
+        }
+
+        return result.ToArray();
+    }
+    
+    [Server]
+    public void Attack()
+    {
+        foreach (int t in targets)
+        {
+            PersistentPlayer.players[t].battlePlayer.AccumulateDamage(this);
         }
     }
 
