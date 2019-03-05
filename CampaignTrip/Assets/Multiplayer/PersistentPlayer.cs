@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
+#pragma warning disable CS0618, 0649
 public class PersistentPlayer : NetworkBehaviour
 {
     public static PersistentPlayer localAuthority;
@@ -15,10 +16,11 @@ public class PersistentPlayer : NetworkBehaviour
 
 	public bool isReady;
 
-    [HideInInspector] public BattlePlayer combatPlayer;
+    [HideInInspector] public BattlePlayer battlePlayer;
     [HideInInspector] public PlayerPanel lobbyPanel;
+    [HideInInspector] public CharacterData character;
 
-	[SerializeField] private NetworkIdentity networkIdentity;
+    [SerializeField] private NetworkIdentity networkIdentity;
 
     private bool gameplayInitialized;
     private GameObject characterPrefab;
@@ -61,14 +63,14 @@ public class PersistentPlayer : NetworkBehaviour
         {
             for (int i = playerNum; i < players.Count; i++)
             {
-                if (NetworkWrapper.Instance.currentScene == NetworkWrapper.Scene.MainMenu)
+                if (NetworkWrapper.currentScene == NetworkWrapper.Scene.MainMenu)
                     players[i].lobbyPanel.SetPlayerName(i);
                 if (NetworkWrapper.IsHost)
                     players[i].playerNum = i;
             }
         }
 
-        if (NetworkWrapper.Instance.currentScene == NetworkWrapper.Scene.MainMenu)
+        if (NetworkWrapper.currentScene == NetworkWrapper.Scene.MainMenu)
         {
             players.Remove(this);
             Destroy(lobbyPanel.gameObject);
@@ -88,7 +90,7 @@ public class PersistentPlayer : NetworkBehaviour
     [Command]
     public void CmdUpdatePanel(int characterIndex, bool isReadyNow)
 	{
-		characterPrefab = TitleUIManager.RoomSessionMenu.characters[characterIndex].characterPrefab;
+		characterPrefab = TitleUIManager.RoomSessionMenu.characters[characterIndex].CharacterPrefab;
 		isReady = isReadyNow;
 		RpcUpdatePanel(characterIndex, isReadyNow);
 		TryStart();
@@ -97,7 +99,8 @@ public class PersistentPlayer : NetworkBehaviour
     [ClientRpc]
     public void RpcUpdatePanel(int characterIndex, bool isReadyNow)
     {
-		characterPrefab = TitleUIManager.RoomSessionMenu.characters[characterIndex].characterPrefab;
+        character = TitleUIManager.RoomSessionMenu.characters[characterIndex];
+        characterPrefab = character.CharacterPrefab;
 		isReady = isReadyNow;
         lobbyPanel.UpdateUI(characterIndex, isReady);
 	}
@@ -125,13 +128,20 @@ public class PersistentPlayer : NetworkBehaviour
 
     #region Battle
 
+    public static void OnEnterBattleScene()
+    {
+        
+    }
+
     [Command]
-    public void CmdSpawnCharacter()
+    public void CmdSpawnBattlePlayer()
     {
         GameObject cp = Instantiate(characterPrefab);
         cp.GetComponent<BattlePlayer>().playerNum = playerNum;
-        NetworkServer.Spawn(cp);
+        NetworkServer.SpawnWithClientAuthority(cp, gameObject);
+        BattleController.Instance.OnPlayerReady();
     }
 
     #endregion
 }
+#pragma warning restore CS0618, 0649

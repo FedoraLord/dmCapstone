@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+#pragma warning disable CS0618
 public class SM_Player : NetworkBehaviour
 {
     public float speed = 3;
@@ -88,3 +89,4 @@ public class SM_Player : NetworkBehaviour
         }
     }
 }
+#pragma warning restore CS0618
