@@ -15,9 +15,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Battle.unity
     guid: de5115eb129d1404a8ad791d34989ec0
   - enabled: 1
-    path: Assets/Scenes/SwitchMaze.unity
-    guid: 30641b38b4a9f4633aa1285d8e9ca752
-  - enabled: 1
-    path: Assets/Scenes/Battle.unity
-    guid: de5115eb129d1404a8ad791d34989ec0
+    path: Assets/Scenes/Minigame Prefabs/SwitchMaze.unity
+    guid: 9ad4b74b56c7e884393f990b813353e6
   m_configObjects: {}

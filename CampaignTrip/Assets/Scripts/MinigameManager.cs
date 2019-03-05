@@ -14,6 +14,7 @@ public class MinigameManager : MonoBehaviour
 
     public int numPlayersInWinArea;
     public Text winText;
+	public bool IsDone { get { return numPlayersInWinArea == 4; } }
 
     private void Start()
     {
@@ -32,7 +33,7 @@ public class MinigameManager : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (numPlayersInWinArea == 4)
+        if (IsDone)
         {
             winText.text = "Success!";
         }

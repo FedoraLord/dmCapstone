@@ -18,7 +18,8 @@ public class BattleController : NetworkBehaviour
     private bool AllPlayersReady { get { return playersReady == PersistentPlayer.players.Count; } }
     private bool AllEnemiesReady { get { return enemiesReady == waves[0].Members.Length; } }
 
-    [Header("UI")]
+	[Header("UI")]
+	public GameObject battleUI;
     public List<EnemyUI> enemyUI;
     public List<HealthBarUI> playerHealthBars;
 
@@ -27,6 +28,9 @@ public class BattleController : NetworkBehaviour
     [SerializeField] private Text attackTimerText;
 
     private Coroutine attackTimerCountdown;
+
+	[Header("Minigames")]
+	[SerializeField] private List<GameObject> minigames;
 
     [Header("Spawning")]
     [Tooltip("Groups of enemies to spawn together.")]
@@ -160,15 +164,30 @@ public class BattleController : NetworkBehaviour
 
     private IEnumerator ExecuteEnemyPhase()
     {
-        foreach (Enemy e in aliveEnemies)
-        {
-            e.Attack();
-        }
+		//is it time for a minigame?
+		if (true)
+		{
+			GameObject minigame = Instantiate(minigames[0]);
+			RpcDisableUI();
+			NetworkServer.Spawn(minigame);
+			MinigameManager mm = minigame.GetComponent<MinigameManager>();
+			yield return new WaitUntil(() => mm.IsDone);
+			Destroy(minigame);
+			RpcEnableUI();
+		}
+		//else do a simple attack
+		else
+		{
+			foreach (Enemy e in aliveEnemies)
+			{
+				e.Attack();
+			}
 
-        foreach (PersistentPlayer p in PersistentPlayer.players)
-        {
-            p.battlePlayer.TakeAccumulatedDamage();
-        }
+			foreach (PersistentPlayer p in PersistentPlayer.players)
+			{
+				p.battlePlayer.TakeAccumulatedDamage();
+			}
+		}
 
         //simulate a pause where something will happen
         yield return new WaitForSeconds(1);
@@ -176,11 +195,25 @@ public class BattleController : NetworkBehaviour
         StartPlayerPhase();
     }
 
-    #endregion
+	//hide the HP bars
+	[ClientRpc]
+	private void RpcDisableUI()
+	{
+		battleUI.SetActive(false);
+	}
 
-    #region Spawning
+	//return the HP bars
+	[ClientRpc]
+	private void RpcEnableUI()
+	{
+		battleUI.SetActive(true);
+	}
 
-    private void CalculateSpawnPoints()
+	#endregion
+
+	#region Spawning
+
+	private void CalculateSpawnPoints()
     {
         //I got tired of dealing with canvas positioning so now it just gets the 
         //center of an area and calculates world coordinate offsets for each player/enemy
