@@ -48,7 +48,9 @@ public class SM_Player : NetworkBehaviour
                 velocity += -transform.up;
             }
 
-            velocity = velocity.normalized * speed;
+            velocity = new Vector3(Mathf.RoundToInt((velocity.normalized * speed).x),
+                                   Mathf.RoundToInt((velocity.normalized * speed).y),
+                                   Mathf.RoundToInt((velocity.normalized * speed).z));
             rb.velocity = velocity;
 
             CmdUpdatePosition(velocity, this.transform.position);
