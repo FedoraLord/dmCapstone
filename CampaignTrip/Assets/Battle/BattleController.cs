@@ -1,70 +1,317 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 
+#pragma warning disable CS0618, 0649
 public class BattleController : NetworkBehaviour
 {
 	public static BattleController Instance;
 
+    public bool IsEnemyPhase { get { return battlePhase == Phase.Enemy; } }
+    public bool IsPlayerPhase { get { return battlePhase == Phase.Player; } }
+    public bool IsWaitingPhase { get { return !IsEnemyPhase && !IsPlayerPhase; } }
+
+    private bool AllPlayersReady { get { return playersReady == PersistentPlayer.players.Count; } }
+    private bool AllEnemiesReady { get { return enemiesReady == waves[0].Members.Length; } }
+
+    [Header("UI")]
+    public List<EnemyUI> enemyUI;
+    public List<HealthBarUI> playerHealthBars;
+
+    [SerializeField] private int totalAttackTime = 5;
+    [SerializeField] private RectTransform attackTimerBar;
+    [SerializeField] private Text attackTimerText;
+
+    private Coroutine attackTimerCountdown;
+
+    [Header("Spawning")]
     [Tooltip("Groups of enemies to spawn together.")]
-	public List<Enemy> enemies;
-    public List<RectTransform> spawnPoints;
 	public Wave[] waves;
+    public Camera cam;
 
-    protected int waveIndex = 0;
+    [HideInInspector] public List<Enemy> aliveEnemies;
+    [HideInInspector] public List<Vector3> playerSpawnPoints;
+    [HideInInspector] public List<Vector3> enemySpawnPoints;
 
-    [System.Serializable]
-	public struct Wave
+    [SerializeField] private RectTransform playerSpawnArea;
+    [SerializeField] private RectTransform enemySpawnArea;
+
+    private int enemiesReady;
+    private int playersReady;
+	private int waveIndex;
+    private Phase battlePhase;
+
+    [Serializable]
+	public class Wave
 	{
-		public GameObject[] members;
-	}
-
-	protected void Start()
-	{
-		CmdSpawnNewWave();
-		if (Instance)
-			throw new System.Exception("There can only be one BattleController.");
-		Instance = this;
-        PersistentPlayer.localAuthority.CmdSpawnCharacter();
+		public GameObject[] Members { get { return new GameObject[] { enemy1, enemy2, enemy4, enemy4 }; } }
+               
+        public GameObject enemy1;
+        public GameObject enemy2;
+        public GameObject enemy3;
+        public GameObject enemy4;
     }
 
-	protected void Win()
-	{
-		//TODO
-	}
+    private enum Phase { StartingBattle, Player, Enemy }
 
-	[Command]
-	public void CmdTryEndWave()
-	{
-		foreach (Enemy e in enemies)
-			if (e.isAlive)
-				return;
-		CmdSpawnNewWave();
-	}
+    #region Initialization
 
-	[Command]
-	public void CmdSpawnNewWave()
+    protected void Start()
 	{
-		//clear old wave(this will be destroyed on the clients too automatically)
-		foreach (Enemy e in enemies)
-			Destroy(e.gameObject);
-		enemies.Clear();
+        if (Instance)
+			throw new Exception("There can only be one BattleController.");
+		Instance = this;
+        
+        NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
 
+        StartBattle();
+        CalculateSpawnPoints();
+        PersistentPlayer.localAuthority.CmdSpawnBattlePlayer();
+    }
+
+    public HealthBarUI ClaimPlayerUI(BattlePlayer player)
+    {
+        foreach (HealthBarUI ui in playerHealthBars)
+        {
+            if (!ui.isClaimed)
+            {
+                ui.Claim(player.uiTransform.position, player.maxHealth, cam);
+                return ui;
+            }
+        }
+        Debug.LogError("Could not claim HealthBarUI because all HealthBarUI are already claimed.");
+        return null;
+    }
+
+    [Server]
+    public void OnPlayerReady()
+    {
+        playersReady++;
+    }
+
+    [Server]
+    public void OnEnemyReady()
+    {
+        enemiesReady++;
+    }
+
+    private IEnumerator DelayExecution(float time, Action callback)
+    {
+        yield return new WaitForSeconds(time);
+        callback();
+    }
+
+    #endregion
+
+    #region Flow
+
+    [Server]
+    public void StartBattle()
+    {
+        battlePhase = Phase.StartingBattle;
+        //playersReady = 0;
+        enemiesReady = 0;
+        StartCoroutine(ExecuteStartingBattlePhase());
+    }
+
+    private IEnumerator ExecuteStartingBattlePhase()
+    {
+        yield return new WaitUntil(() => AllPlayersReady);
+
+        //simulate a pause where something will happen
+        yield return new WaitForSeconds(1);
+
+        SpawnWave();
+        yield return new WaitUntil(() => AllEnemiesReady);
+
+        //simulate a pause where something will happen
+        yield return new WaitForSeconds(1);
+
+        StartPlayerPhase();
+    }
+
+    [Server]
+    public void StartPlayerPhase()
+    {
+        battlePhase = Phase.Player;
+
+        foreach (PersistentPlayer p in PersistentPlayer.players)
+        {
+            p.battlePlayer.OnPlayerPhaseStart();
+        }
+
+        foreach (Enemy e in aliveEnemies)
+        {
+            e.OnAttackTimerBegin();
+        }
+        RpcStartAttackTimer(totalAttackTime);
+    }
+    
+    [Server]
+    public void StartEnemyPhase()
+    {
+        battlePhase = Phase.Enemy;
+        StartCoroutine(ExecuteEnemyPhase());
+    }
+
+    private IEnumerator ExecuteEnemyPhase()
+    {
+        foreach (Enemy e in aliveEnemies)
+        {
+            e.Attack();
+        }
+
+        foreach (PersistentPlayer p in PersistentPlayer.players)
+        {
+            p.battlePlayer.TakeAccumulatedDamage();
+        }
+
+        //simulate a pause where something will happen
+        yield return new WaitForSeconds(1);
+
+        StartPlayerPhase();
+    }
+
+    #endregion
+
+    #region Spawning
+
+    private void CalculateSpawnPoints()
+    {
+        //I got tired of dealing with canvas positioning so now it just gets the 
+        //center of an area and calculates world coordinate offsets for each player/enemy
+
+        Vector3 center = cam.ScreenToWorldPoint(playerSpawnArea.position);
+        center.z = 0;
+
+        playerSpawnPoints = new List<Vector3>()
+        {
+            center + 0.6f * Vector3.up,     //Player 1's spawn point
+            center + 0.6f * Vector3.down,   //Player 2's ... etc
+            center + 1.0f * Vector3.right,
+            center + 1.0f * Vector3.left
+        };
+
+        center = cam.ScreenToWorldPoint(enemySpawnArea.position);
+        center.z = 0;
+        
+        enemySpawnPoints  = new List<Vector3>()
+        {
+            center + 1.5f * Vector3.left,
+            center + 0.5f * Vector3.left + 0.7f * Vector3.up,
+            center + 0.5f * Vector3.left + 0.7f * Vector3.down,
+            center + 0.5f * Vector3.right,
+            center + 1.5f * Vector3.right + 0.7f * Vector3.up,
+            center + 1.5f * Vector3.right + 0.7f * Vector3.down
+        };
+    }
+    
+	[Server]
+	public void SpawnWave()
+	{
 		//Are all the waves done with?
-		if(waveIndex == waves.Length)
+		if (waveIndex == waves.Length)
 		{
 			Win();
 			return;
 		}
 
-		//Spawn the next wave then
-		foreach(GameObject g in waves[waveIndex].members)
-		{
-			GameObject newEnemy = Instantiate(g);
-			enemies.Add(newEnemy.GetComponent<Enemy>());
-			NetworkServer.Spawn(newEnemy);
-		}
-		waveIndex++;
+        //Spawn the next wave then
+        for (int i = 0; i < waves[waveIndex].Members.Length; i++)
+        {
+            GameObject newEnemy = Instantiate(waves[waveIndex].Members[i], enemySpawnPoints[i], Quaternion.identity);
+            aliveEnemies.Add(newEnemy.GetComponent<Enemy>());
+            NetworkServer.Spawn(newEnemy);
+        }
+
+        waveIndex++;
 	}
+
+    [Server]
+    public void EndWave()
+    {
+        RpcStopAttackTimer();
+        StartBattle();
+    }
+
+    [ClientRpc]
+    private void RpcStopAttackTimer()
+    {
+        StopCoroutine(attackTimerCountdown);
+    }
+
+    #endregion
+
+    #region Enemy
+
+    public EnemyUI ClaimEnemyUI(Enemy enemy)
+    {
+        foreach (EnemyUI ui in enemyUI)
+        {
+            if (!ui.isClaimed)
+            {
+                ui.Claim(enemy.uiTransform.position, enemy.maxHealth, cam);
+                return ui;
+            }
+        }
+        Debug.LogError("Could not claim EnemyUI because all EnemyUI are already claimed.");
+        return null;
+    }
+
+    [ClientRpc]
+    public void RpcStartAttackTimer(float time)
+    {
+        if (attackTimerCountdown != null)
+        {
+            StopCoroutine(attackTimerCountdown);
+        }
+        attackTimerCountdown = StartCoroutine(AttackTimerCountdown(time));
+    }
+
+    private IEnumerator AttackTimerCountdown(float totalTime)
+    {
+        float timeRemaining = totalTime;
+        while (true)
+        {
+            //update UI
+            attackTimerBar.localScale = new Vector3(timeRemaining / totalTime, 1);
+            attackTimerText.text = timeRemaining.ToString(" 0.0");
+            
+            //decrement timer
+            timeRemaining -= Time.deltaTime;
+
+            if (timeRemaining < 0)
+                break;
+
+            yield return new WaitForEndOfFrame();
+        }
+
+        attackTimerCountdown = null;
+
+        if (isServer)
+        {
+            StartEnemyPhase();
+        }
+    }
+
+    public void OnEnemyDeath(Enemy dead)
+    {
+        aliveEnemies.Remove(dead);
+        if (aliveEnemies.Count == 0)
+        {
+            EndWave();
+        }
+    }
+
+    #endregion
+
+    protected void Win()
+    {
+        //TODO
+    }
 }
+#pragma warning restore CS0618, 0649 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+#pragma warning disable CS0618
 public class NetworkSpawner : NetworkBehaviour
 {
     public static NetworkSpawner Instance;
@@ -29,3 +30,4 @@ public class NetworkSpawner : NetworkBehaviour
         NetworkServer.SpawnWithClientAuthority(obj, player);
     }
 }
+#pragma warning restore CS0618
