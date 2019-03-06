@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
@@ -155,7 +156,21 @@ public class BattleController : NetworkBehaviour
     public void StartEnemyPhase()
     {
         battlePhase = Phase.Enemy;
-        StartCoroutine(ExecuteEnemyPhase());
+        //StartCoroutine(ExecuteEnemyPhase()); 
+        RpcLoadSwitchMaze();
+    }
+
+    [ClientRpc]
+    private void RpcLoadSwitchMaze()
+    {
+        SceneManager.LoadScene("SwitchMaze", LoadSceneMode.Additive);
+        StartCoroutine(UnloadSwitchMaze());
+    }
+
+    private IEnumerator UnloadSwitchMaze()
+    {
+        yield return new WaitForSeconds(3);
+        SceneManager.UnloadScene("SwitchMaze");
     }
 
     private IEnumerator ExecuteEnemyPhase()
@@ -275,21 +290,19 @@ public class BattleController : NetworkBehaviour
     private IEnumerator AttackTimerCountdown(float totalTime)
     {
         float timeRemaining = totalTime;
-        while (true)
+        do
         {
             //update UI
             attackTimerBar.localScale = new Vector3(timeRemaining / totalTime, 1);
             attackTimerText.text = timeRemaining.ToString(" 0.0");
-            
+
             //decrement timer
             timeRemaining -= Time.deltaTime;
 
-            if (timeRemaining < 0)
-                break;
-
             yield return new WaitForEndOfFrame();
         }
-
+        while (timeRemaining < 0);
+        
         attackTimerCountdown = null;
 
         if (isServer)

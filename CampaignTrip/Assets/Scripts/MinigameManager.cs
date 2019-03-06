@@ -18,15 +18,11 @@ public class MinigameManager : MonoBehaviour
     private void Start()
     {
         Instance = this;
-
         numPlayersInWinArea = 0;
-
-        //winText.text = "";
 
         if (NetworkWrapper.IsHost && playerPrefab != null)
         {
-            //SpawnPlayers();
-            StartCoroutine(_SpawnPlayers());
+            StartCoroutine(SpawnPlayers());
         }
     }
 
@@ -43,7 +39,7 @@ public class MinigameManager : MonoBehaviour
         Instance = null;
     }
 
-    private IEnumerator _SpawnPlayers()
+    private IEnumerator SpawnPlayers()
     {
         for (int i = 0; i < PersistentPlayer.players.Count; i++)
         {
@@ -52,25 +48,6 @@ public class MinigameManager : MonoBehaviour
 
             GameObject obj = Instantiate(playerPrefab);
             obj.transform.position = spawnPoints[i].position;
-
-            obj.GetComponent<SM_Player>().playernum = p.playerNum;
-            NetworkSpawner.Instance.NetworkSpawn(obj, p.gameObject);
-        }
-    }
-
-    public virtual void SpawnPlayers()
-    {
-        for (int i = 0; i < PersistentPlayer.players.Count; i++)
-        {
-            GameObject obj = Instantiate(playerPrefab);
-            obj.transform.position = spawnPoints[i].position;
-
-            PersistentPlayer p = PersistentPlayer.players[i];
-
-            if (p.connectionToClient.isReady)
-            {
-
-            }
 
             obj.GetComponent<SM_Player>().playernum = p.playerNum;
             NetworkSpawner.Instance.NetworkSpawn(obj, p.gameObject);
