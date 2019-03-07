@@ -156,8 +156,8 @@ public class BattleController : NetworkBehaviour
     public void StartEnemyPhase()
     {
         battlePhase = Phase.Enemy;
-        //StartCoroutine(ExecuteEnemyPhase()); 
-        RpcLoadSwitchMaze();
+        StartCoroutine(ExecuteEnemyPhase());
+        //RpcLoadSwitchMaze();
     }
 
     [ClientRpc]
@@ -293,7 +293,7 @@ public class BattleController : NetworkBehaviour
         do
         {
             //update UI
-            attackTimerBar.localScale = new Vector3(timeRemaining / totalTime, 1);
+            attackTimerBar.localScale = new Vector3(timeRemaining / totalTime, 1, 1);
             attackTimerText.text = timeRemaining.ToString(" 0.0");
 
             //decrement timer
@@ -301,7 +301,7 @@ public class BattleController : NetworkBehaviour
 
             yield return new WaitForEndOfFrame();
         }
-        while (timeRemaining < 0);
+        while (timeRemaining > 0);
         
         attackTimerCountdown = null;
 

@@ -23,6 +23,8 @@ public class BattlePlayer : NetworkBehaviour
     [HideInInspector]
     public PersistentPlayer persistentPlayer;
 
+    [SerializeField] private Animator animator;
+
     private bool initialized;
     private int damageToTake;
     private int attacksRemaining;
@@ -67,10 +69,16 @@ public class BattlePlayer : NetworkBehaviour
         if (attacksRemaining > 0 && BattleController.Instance.IsPlayerPhase)
         {
             attacksRemaining--;
-            //play attack animation on clients
+            RpcTriggerAttackAnimation();
             Enemy enemy = target.GetComponent<Enemy>();
             enemy.TakeDamage(basicDamage);
         }
+    }
+
+    [ClientRpc]
+    private void RpcTriggerAttackAnimation()
+    {
+        animator.SetTrigger("Attack");
     }
 
     #endregion

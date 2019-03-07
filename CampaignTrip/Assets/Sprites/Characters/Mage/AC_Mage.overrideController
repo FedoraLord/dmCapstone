@@ -9,5 +9,7 @@ AnimatorOverrideController:
   m_Name: AC_Mage
   m_Controller: {fileID: 9100000, guid: 541feaa2189f8bb47a2ef11b3dbcae76, type: 2}
   m_Clips:
-  - m_OriginalClip: {fileID: 7400000, guid: 2d46775d9eef0174bb60e9218f08a5a5, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: c1ea8768f4219ae408a4910ac7479547, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 66574e863789c1d48ba31209b11218ba, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 880e708095d859d48924893224354678, type: 2}
     m_OverrideClip: {fileID: 7400000, guid: 76530c8ec1ee12542b04320696f6d38b, type: 2}

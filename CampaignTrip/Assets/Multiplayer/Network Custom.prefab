@@ -75,13 +75,13 @@ MonoBehaviour:
   m_OfflineScene: 
   m_OnlineScene: 
   m_SpawnPrefabs:
-  - {fileID: 28, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
-  - {fileID: 25, guid: 5b89cd150dc3ded4ca7504bc91fe44ff, type: 3}
-  - {fileID: 30, guid: 84e6f5bde7c85af41a7e6734f429e0cc, type: 3}
-  - {fileID: 29, guid: 5e646b3db82f7834ba1be3b32c8d30d8, type: 3}
   - {fileID: 5389947726256375910, guid: 5edbfece0d9fa46d1a5b13ea5ee779ee, type: 3}
+  - {fileID: 28, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
+  - {fileID: 8458088793063255136, guid: d1d4135aeebf79d42a00a5bd414fbaef, type: 3}
+  - {fileID: 5365767304399832582, guid: 2160ec161c577fd45bf809abbc9b19e1, type: 3}
+  - {fileID: 3126196965850195258, guid: efe228486430c6e48b9bdcd8d1726a5f, type: 3}
+  - {fileID: 3291355430086226004, guid: 4ab14dd3fb4643b49889b005e10b15ee, type: 3}
   - {fileID: 1269885308792982226, guid: 722416cb1d3dffb409b806446c11cabe, type: 3}
-  - {fileID: 4067962840783838190, guid: f529b25efb5113e408e71585c87493b7, type: 3}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:
