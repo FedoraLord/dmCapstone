@@ -19,7 +19,8 @@ public class BattleController : NetworkBehaviour
     private bool AllPlayersReady { get { return playersReady == PersistentPlayer.players.Count; } }
     private bool AllEnemiesReady { get { return enemiesReady == waves[0].Members.Length; } }
 
-    [Header("UI")]
+	[Header("UI")]
+	public GameObject battleCanvas;
     public List<EnemyUI> enemyUI;
     public List<HealthBarUI> playerHealthBars;
 
@@ -156,7 +157,7 @@ public class BattleController : NetworkBehaviour
     public void StartEnemyPhase()
     {
         battlePhase = Phase.Enemy;
-        //StartCoroutine(ExecuteEnemyPhase()); 
+		//StartCoroutine(ExecuteEnemyPhase()); 
         RpcLoadSwitchMaze();
     }
 
@@ -164,6 +165,7 @@ public class BattleController : NetworkBehaviour
     private void RpcLoadSwitchMaze()
     {
         SceneManager.LoadScene("SwitchMaze", LoadSceneMode.Additive);
+		battleCanvas.SetActive(false);
         StartCoroutine(UnloadSwitchMaze());
     }
 
@@ -171,7 +173,8 @@ public class BattleController : NetworkBehaviour
     {
         yield return new WaitForSeconds(3);
         SceneManager.UnloadScene("SwitchMaze");
-    }
+		battleCanvas.SetActive(true);
+	}
 
     private IEnumerator ExecuteEnemyPhase()
     {
