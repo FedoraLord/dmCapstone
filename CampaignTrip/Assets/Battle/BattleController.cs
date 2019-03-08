@@ -19,6 +19,8 @@ public class BattleController : NetworkBehaviour
     private bool AllPlayersReady { get { return playersReady == PersistentPlayer.players.Count; } }
     private bool AllEnemiesReady { get { return enemiesReady == waves[0].Members.Length; } }
 
+	private string homeSceneName; // we need this because you can only find the active scene, not the scene the object is in with Scene Manager
+
 	[Header("UI")]
 	public GameObject battleCanvas;
     public List<EnemyUI> enemyUI;
@@ -67,7 +69,9 @@ public class BattleController : NetworkBehaviour
         if (Instance)
 			throw new Exception("There can only be one BattleController.");
 		Instance = this;
-        
+
+		homeSceneName = SceneManager.GetActiveScene().name;
+
         NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
 
         StartBattle();
@@ -165,14 +169,22 @@ public class BattleController : NetworkBehaviour
     private void RpcLoadSwitchMaze()
     {
         SceneManager.LoadScene("SwitchMaze", LoadSceneMode.Additive);
+		StartCoroutine(SetActiveSceneDelayed("SwitchMaze"));
 		battleCanvas.SetActive(false);
         StartCoroutine(UnloadSwitchMaze());
     }
 
-    private IEnumerator UnloadSwitchMaze()
+	private IEnumerator SetActiveSceneDelayed(string sceneName)
+	{
+		yield return 0; //makes it wait a single frame since scenes loaded additivly always load on the next frame
+		SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName)); // https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.SetActiveScene.html
+	}
+
+	private IEnumerator UnloadSwitchMaze()
     {
         yield return new WaitForSeconds(3);
-        SceneManager.UnloadScene("SwitchMaze");
+		SceneManager.SetActiveScene(SceneManager.GetSceneByName(homeSceneName)); // can't find the scene were in, only the active scene
+		SceneManager.UnloadScene("SwitchMaze");
 		battleCanvas.SetActive(true);
 	}
 
