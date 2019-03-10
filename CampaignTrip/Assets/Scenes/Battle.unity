@@ -1870,6 +1870,8 @@ MonoBehaviour:
   totalAttackTime: 5
   attackTimerBar: {fileID: 101991433}
   attackTimerText: {fileID: 659661823}
+  minigameSceneNames:
+  - SwitchMaze
   waves:
   - enemy1: {fileID: 3291355430086226004, guid: 4ab14dd3fb4643b49889b005e10b15ee,
       type: 3}

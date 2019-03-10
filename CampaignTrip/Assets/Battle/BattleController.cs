@@ -32,6 +32,11 @@ public class BattleController : NetworkBehaviour
 
     private Coroutine attackTimerCountdown;
 
+	[Header("Minigames")]
+	public List<string> minigameSceneNames;
+
+	private string currentMinigame;
+
     [Header("Spawning")]
     [Tooltip("Groups of enemies to spawn together.")]
 	public Wave[] waves;
@@ -161,17 +166,18 @@ public class BattleController : NetworkBehaviour
     public void StartEnemyPhase()
     {
         battlePhase = Phase.Enemy;
-        StartCoroutine(ExecuteEnemyPhase());
-        //RpcLoadSwitchMaze();
-    }
+        //StartCoroutine(ExecuteEnemyPhase());
+		RpcLoadMinigame(UnityEngine.Random.Range(0, minigameSceneNames.Count));
+	}
 
-    [ClientRpc]
-    private void RpcLoadSwitchMaze()
+	[ClientRpc]
+    private void RpcLoadMinigame(int minigameNumber)
     {
-        SceneManager.LoadScene("SwitchMaze", LoadSceneMode.Additive);
-		StartCoroutine(SetActiveSceneDelayed("SwitchMaze"));
+		cam.enabled = false;
+		currentMinigame = minigameSceneNames[minigameNumber];
+        SceneManager.LoadScene(currentMinigame, LoadSceneMode.Additive);
+		StartCoroutine(SetActiveSceneDelayed(currentMinigame));
 		battleCanvas.SetActive(false);
-        StartCoroutine(UnloadSwitchMaze());
     }
 
 	private IEnumerator SetActiveSceneDelayed(string sceneName)
@@ -180,12 +186,17 @@ public class BattleController : NetworkBehaviour
 		SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName)); // https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.SetActiveScene.html
 	}
 
-	private IEnumerator UnloadSwitchMaze()
+	public void UnloadMinigame()
     {
-        yield return new WaitForSeconds(3);
-		SceneManager.SetActiveScene(SceneManager.GetSceneByName(homeSceneName)); // can't find the scene were in, only the active scene
-		SceneManager.UnloadScene("SwitchMaze");
-		battleCanvas.SetActive(true);
+		if (!(currentMinigame == ""))
+		{
+			SceneManager.SetActiveScene(SceneManager.GetSceneByName(homeSceneName)); // can't find the scene were in, only the active scene
+			SceneManager.UnloadScene(currentMinigame);
+			battleCanvas.SetActive(true);
+			cam.enabled = true;
+		}
+		else
+			throw new Exception("There is no Minigame in scene however one it trying to be removed");
 	}
 
     private IEnumerator ExecuteEnemyPhase()
