@@ -159,9 +159,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a08a80a4560d23b48a31b81431d7c5e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  health: 100
+  numTargets: 1
+  basicDamage: 5
   maxHealth: 100
   uiTransform: {fileID: 9024917114008458154}
-  health: 100
   tmpDamageIndicator: {fileID: 3710919564909576933}
 --- !u!61 &6596556092980879836
 BoxCollider2D:
@@ -173,7 +175,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -265,6 +267,6 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
