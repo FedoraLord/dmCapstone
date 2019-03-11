@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
@@ -18,7 +19,10 @@ public class BattleController : NetworkBehaviour
     private bool AllPlayersReady { get { return playersReady == PersistentPlayer.players.Count; } }
     private bool AllEnemiesReady { get { return enemiesReady == waves[0].Members.Length; } }
 
-    [Header("UI")]
+	private string homeSceneName; // we need this because you can only find the active scene, not the scene the object is in with Scene Manager
+
+	[Header("UI")]
+	public GameObject battleCanvas;
     public List<EnemyUI> enemyUI;
     public List<HealthBarUI> playerHealthBars;
 
@@ -27,6 +31,11 @@ public class BattleController : NetworkBehaviour
     [SerializeField] private Text attackTimerText;
 
     private Coroutine attackTimerCountdown;
+
+	[Header("Minigames")]
+	public List<string> minigameSceneNames;
+
+	private string currentMinigame;
 
     [Header("Spawning")]
     [Tooltip("Groups of enemies to spawn together.")]
@@ -65,7 +74,9 @@ public class BattleController : NetworkBehaviour
         if (Instance)
 			throw new Exception("There can only be one BattleController.");
 		Instance = this;
-        
+
+		homeSceneName = SceneManager.GetActiveScene().name;
+
         NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
 
         StartBattle();
@@ -155,8 +166,38 @@ public class BattleController : NetworkBehaviour
     public void StartEnemyPhase()
     {
         battlePhase = Phase.Enemy;
-        StartCoroutine(ExecuteEnemyPhase());
+        //StartCoroutine(ExecuteEnemyPhase());
+		RpcLoadMinigame(UnityEngine.Random.Range(0, minigameSceneNames.Count));
+	}
+
+	[ClientRpc]
+    private void RpcLoadMinigame(int minigameNumber)
+    {
+		cam.enabled = false;
+		currentMinigame = minigameSceneNames[minigameNumber];
+        SceneManager.LoadScene(currentMinigame, LoadSceneMode.Additive);
+		StartCoroutine(SetActiveSceneDelayed(currentMinigame));
+		battleCanvas.SetActive(false);
     }
+
+	private IEnumerator SetActiveSceneDelayed(string sceneName)
+	{
+		yield return 0; //makes it wait a single frame since scenes loaded additivly always load on the next frame
+		SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName)); // https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.SetActiveScene.html
+	}
+
+	public void UnloadMinigame()
+    {
+		if (!(currentMinigame == ""))
+		{
+			SceneManager.SetActiveScene(SceneManager.GetSceneByName(homeSceneName)); // can't find the scene were in, only the active scene
+			SceneManager.UnloadScene(currentMinigame);
+			battleCanvas.SetActive(true);
+			cam.enabled = true;
+		}
+		else
+			throw new Exception("There is no Minigame in scene however one it trying to be removed");
+	}
 
     private IEnumerator ExecuteEnemyPhase()
     {
@@ -275,21 +316,19 @@ public class BattleController : NetworkBehaviour
     private IEnumerator AttackTimerCountdown(float totalTime)
     {
         float timeRemaining = totalTime;
-        while (true)
+        do
         {
             //update UI
-            attackTimerBar.localScale = new Vector3(timeRemaining / totalTime, 1);
+            attackTimerBar.localScale = new Vector3(timeRemaining / totalTime, 1, 1);
             attackTimerText.text = timeRemaining.ToString(" 0.0");
-            
+
             //decrement timer
             timeRemaining -= Time.deltaTime;
 
-            if (timeRemaining < 0)
-                break;
-
             yield return new WaitForEndOfFrame();
         }
-
+        while (timeRemaining > 0);
+        
         attackTimerCountdown = null;
 
         if (isServer)

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657856, g: 0.49641234, b: 0.57481724, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -48640,19 +48640,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1236481849}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98db1c0e8f024eb41a0437250754b8f8, type: 3}
+  m_Script: {fileID: 11500000, guid: 69008d88ad9889043bc9d0961fad6175, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 1269885308792982226, guid: 722416cb1d3dffb409b806446c11cabe,
-    type: 3}
   spawnPoints:
   - {fileID: 367174624}
   - {fileID: 1073647834}
   - {fileID: 587035174}
   - {fileID: 1619044743}
-  mainCamera: {fileID: 135471625}
-  numPlayersInWinArea: 0
+  numPlayersWon: 0
   winText: {fileID: 1988921208}
+  playerPrefab: {fileID: 1269885308792982226, guid: 722416cb1d3dffb409b806446c11cabe,
+    type: 3}
 --- !u!4 &1236481851
 Transform:
   m_ObjectHideFlags: 0

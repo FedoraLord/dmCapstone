@@ -21,8 +21,8 @@ public class SM_Player : NetworkBehaviour
         if (playernum == PersistentPlayer.localAuthority.playerNum)
         {
             localAuthority = true;
-            MinigameManager.Instance.mainCamera.transform.parent = gameObject.transform;
-            MinigameManager.Instance.mainCamera.transform.localPosition = new Vector3(0, 0, -10f);
+            Camera.main.transform.parent = gameObject.transform;
+			Camera.main.transform.localPosition = new Vector3(0, 0, -10f);
         }
     }
 
@@ -63,7 +63,7 @@ public class SM_Player : NetworkBehaviour
     {
         if (collision.gameObject.CompareTag("WinArea"))
         {
-            MinigameManager.Instance.numPlayersInWinArea++;
+            MinigameManager.Instance.numPlayersWon++;
         }
     }
     
@@ -71,7 +71,7 @@ public class SM_Player : NetworkBehaviour
     {
         if (collision.gameObject.CompareTag("WinArea"))
         {
-            MinigameManager.Instance.numPlayersInWinArea--;
+            MinigameManager.Instance.numPlayersWon--;
         }
     }
 

@@ -147,5 +147,15 @@ public class Enemy : NetworkBehaviour
     }
 
     #endregion
+
+    public virtual void OnMinigameSuccess()
+    {
+
+    }
+
+    public virtual void OnMinigameFailed()
+    {
+
+    }
 }
 #pragma warning restore CS0618, 0649
