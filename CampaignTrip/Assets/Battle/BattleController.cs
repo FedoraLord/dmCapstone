@@ -30,6 +30,8 @@ public class BattleController : NetworkBehaviour
     [SerializeField] private int totalAttackTime = 5;
     [SerializeField] private RectTransform attackTimerBar;
     [SerializeField] private Text attackTimerText;
+    [SerializeField] private Text attacksLeftText;
+    [SerializeField] private Text blockText;
 
     private Coroutine attackTimerCountdown;
 
@@ -139,7 +141,7 @@ public class BattleController : NetworkBehaviour
 
         foreach (Enemy e in aliveEnemies)
         {
-            e.OnPlayerPhaseBegin();
+            e.OnPlayerPhaseStart();
         }
         RpcStartAttackTimer(totalAttackTime);
     }
@@ -176,17 +178,15 @@ public class BattleController : NetworkBehaviour
 
     private IEnumerator ExecuteEnemyPhase()
     {
+        yield return new WaitForSeconds(0.5f);
+
         foreach (Enemy e in aliveEnemies)
         {
             if (e.isAlive)
             {
                 e.Attack();
+                yield return new WaitForSeconds(1);
             }
-        }
-
-        foreach (PersistentPlayer p in PersistentPlayer.players)
-        {
-            p.battlePlayer.TakeAccumulatedDamage();
         }
 
         //simulate a pause where something will happen
@@ -353,6 +353,12 @@ public class BattleController : NetworkBehaviour
         }
         Debug.LogError("Could not claim DamagePopup because all EnemyUI are already claimed.");
         return null;
+    }
+
+    public void UpdateAttackBlockUI(int attacks, int block)
+    {
+        attacksLeftText.text = attacks.ToString();
+        blockText.text = string.Format("{0}%", block);
     }
 
     public void OnAbilityButtonClicked(int i)

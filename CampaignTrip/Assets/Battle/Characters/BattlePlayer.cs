@@ -26,8 +26,8 @@ public class BattlePlayer : NetworkBehaviour
 
     private bool initialized;
     private DamagePopup damagePopup;
-    private int damageToTake;
     private int attacksRemaining;
+    private int blockAmount;
     private HealthBarUI healthBar;
 
     #region Initialization
@@ -58,7 +58,7 @@ public class BattlePlayer : NetworkBehaviour
 
     public void OnPlayerPhaseStart()
     {
-        attacksRemaining = attacksPerTurn;
+        UpdateAttackBlock(attacksPerTurn);
     }
 
     [Command]
@@ -66,17 +66,28 @@ public class BattlePlayer : NetworkBehaviour
     {
         if (attacksRemaining > 0 && BattleController.Instance.IsPlayerPhase)
         {
-            attacksRemaining--;
-            RpcTriggerAttackAnimation();
+            RpcAttack();
             Enemy enemy = target.GetComponent<Enemy>();
             enemy.TakeDamage(basicDamage);
         }
     }
 
     [ClientRpc]
-    private void RpcTriggerAttackAnimation()
+    private void RpcAttack()
     {
+        UpdateAttackBlock(attacksRemaining - 1);
         animator.SetTrigger("Attack");
+    }
+
+    private void UpdateAttackBlock(int newAttacksRemaining)
+    {
+        attacksRemaining = newAttacksRemaining;
+        blockAmount = (int)Mathf.Min((float)attacksRemaining / attacksPerTurn * 100f, 90);
+
+        if (this == LocalAuthority)
+        {
+            BattleController.Instance.UpdateAttackBlockUI(attacksRemaining, blockAmount);
+        }
     }
 
     #endregion
@@ -84,31 +95,20 @@ public class BattlePlayer : NetworkBehaviour
     #region Damage
 
     [Server]
-    public void AccumulateDamage(Enemy e)
+    public void TakeDamage(Enemy e)
     {
-        damageToTake += e.basicDamage;
-    }
-
-    [Server]
-    public void TakeAccumulatedDamage()
-    {
-        if (damageToTake > 0)
-        {
-            int newHealth = health - damageToTake;
-            newHealth = Mathf.Clamp(newHealth, 0, maxHealth);
-            damageToTake = 0;
-            RpcTakeDamage(newHealth);
-        }
+        int blocked = e.basicDamage * blockAmount / 100;
+        int damageTaken = e.basicDamage - blocked;
+        RpcTakeDamage(damageTaken, blocked);
     }
 
     [ClientRpc]
-    private void RpcTakeDamage(int newHealth)
+    private void RpcTakeDamage(int damageTaken, int blocked)
     {
-        //test
-        damagePopup.Display(health - newHealth, 0, uiTransform.position);
+        damagePopup.Display(damageTaken, blocked, uiTransform.position);
 
-        health = newHealth;
-        healthBar.SetHealth(newHealth);
+        health = Math.Max(health - damageTaken, 0);
+        healthBar.SetHealth(health);
     }
 
     #endregion

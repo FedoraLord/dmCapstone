@@ -1015,11 +1015,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 34, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.106
+      value: -3.48
       objectReference: {fileID: 0}
     - target: {fileID: 34, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.5
+      value: -1.33
       objectReference: {fileID: 0}
     - target: {fileID: 34, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1056,6 +1056,14 @@ PrefabInstance:
     - target: {fileID: 34, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 34, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 34, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
@@ -3328,6 +3336,8 @@ MonoBehaviour:
   totalAttackTime: 5
   attackTimerBar: {fileID: 101991433}
   attackTimerText: {fileID: 659661823}
+  attacksLeftText: {fileID: 1592376332}
+  blockText: {fileID: 1576852670}
   waves:
   - enemy1: {fileID: 3291355430086226004, guid: 4ab14dd3fb4643b49889b005e10b15ee,
       type: 3}

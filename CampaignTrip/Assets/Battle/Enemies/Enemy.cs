@@ -16,8 +16,6 @@ public class Enemy : NetworkBehaviour
 
 	public bool isAlive { get { return health > 0; } }
 
-    [SerializeField] private SpriteRenderer tmpDamageIndicator;
-
     private DamagePopup damagePopup;
     private EnemyUI healthBar;
     private int[] targets;
@@ -86,13 +84,6 @@ public class Enemy : NetworkBehaviour
         }
     }
 
-    //private IEnumerator ShowDamageIndicator()
-    //{
-    //    tmpDamageIndicator.enabled = true;
-    //    yield return new WaitForSeconds(.3f);
-    //    tmpDamageIndicator.enabled = false;
-    //}
-
     private void Die()
     {
         //TODO play death animation
@@ -110,7 +101,7 @@ public class Enemy : NetworkBehaviour
 
     #region Attack
 
-    public void OnPlayerPhaseBegin()
+    public void OnPlayerPhaseStart()
     {
         remainingBlock = damageBlockedPerTurn;
         ChooseTargets();
@@ -156,7 +147,7 @@ public class Enemy : NetworkBehaviour
     {
         foreach (int t in targets)
         {
-            PersistentPlayer.players[t].battlePlayer.AccumulateDamage(this);
+            PersistentPlayer.players[t].battlePlayer.TakeDamage(this);
         }
     }
 
