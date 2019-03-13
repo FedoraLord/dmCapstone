@@ -337,6 +337,15 @@ public class BattleController : NetworkBehaviour
 
     #endregion
 
+    #region UI
+
+    public void OnAbilityButtonClicked(int i)
+    {
+
+    }
+
+    #endregion
+
     protected void Win()
     {
         //TODO

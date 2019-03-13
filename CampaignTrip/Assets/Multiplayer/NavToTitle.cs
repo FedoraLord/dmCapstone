@@ -6,13 +6,13 @@ using UnityEngine.UI;
 
 public class NavToTitle : MonoBehaviour
 {
-    public Button button;
+    public Canvas canvas;
 
     private void Start()
     {
         if (NetworkWrapper.Instance == null)
         {
-            button.gameObject.SetActive(true);
+            canvas.gameObject.SetActive(true);
         }
     }
 
