@@ -139,7 +139,7 @@ public class BattleController : NetworkBehaviour
 
         foreach (Enemy e in aliveEnemies)
         {
-            e.OnAttackTimerBegin();
+            e.OnPlayerPhaseBegin();
         }
         RpcStartAttackTimer(totalAttackTime);
     }
@@ -149,7 +149,6 @@ public class BattleController : NetworkBehaviour
     {
         battlePhase = Phase.Enemy;
         StartCoroutine(ExecuteEnemyPhase());
-        //RpcLoadSwitchMaze();
     }
 
     [ClientRpc]
@@ -179,7 +178,10 @@ public class BattleController : NetworkBehaviour
     {
         foreach (Enemy e in aliveEnemies)
         {
-            e.Attack();
+            if (e.isAlive)
+            {
+                e.Attack();
+            }
         }
 
         foreach (PersistentPlayer p in PersistentPlayer.players)

@@ -9,7 +9,6 @@ public class BattlePlayer : NetworkBehaviour
 {
     public static BattlePlayer LocalAuthority { get { return PersistentPlayer.localAuthority.battlePlayer; } }
 
-    [SyncVar(hook = "UpdateHealthUI")]
     public int health;
 
     [SyncVar]
@@ -48,11 +47,8 @@ public class BattlePlayer : NetworkBehaviour
         transform.position = BattleController.Instance.playerSpawnPoints[i];
         healthBar = BattleController.Instance.ClaimPlayerUI(this);
         damagePopup = BattleController.Instance.ClaimDamagePopup();
-
-        if (isServer)
-        {
-            health = maxHealth;
-        }
+        
+        health = maxHealth;
         initialized = true;
     }
 
@@ -100,17 +96,19 @@ public class BattlePlayer : NetworkBehaviour
         {
             int newHealth = health - damageToTake;
             newHealth = Mathf.Clamp(newHealth, 0, maxHealth);
-            health = newHealth;
             damageToTake = 0;
+            RpcTakeDamage(newHealth);
         }
     }
 
-    private void UpdateHealthUI(int hp)
+    [ClientRpc]
+    private void RpcTakeDamage(int newHealth)
     {
-        if (!initialized)
-            return;
+        //test
+        damagePopup.Display(health - newHealth, 0, uiTransform.position);
 
-        healthBar.SetHealth(hp);
+        health = newHealth;
+        healthBar.SetHealth(newHealth);
     }
 
     #endregion

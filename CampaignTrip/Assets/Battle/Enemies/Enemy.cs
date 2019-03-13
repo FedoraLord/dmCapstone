@@ -10,7 +10,7 @@ public class Enemy : NetworkBehaviour
 
     public int numTargets = 1;
     public int basicDamage = 5;
-    public int maxBlock;
+    public int damageBlockedPerTurn;
     public int maxHealth = 100;
     public Transform uiTransform;
 
@@ -36,12 +36,7 @@ public class Enemy : NetworkBehaviour
         healthBar = BattleController.Instance.ClaimEnemyUI(this);
         damagePopup = BattleController.Instance.ClaimDamagePopup();
     }
-
-    public void OnStartPlayerPhase()
-    {
-        remainingBlock = maxBlock;
-    }
-
+    
     #endregion
 
     #region Damage
@@ -60,6 +55,7 @@ public class Enemy : NetworkBehaviour
         RpcTakeDamage(damage);
 	}
     
+    [ClientRpc]
 	private void RpcTakeDamage(int damage)
 	{
         //TODO: play damage animation
@@ -114,8 +110,9 @@ public class Enemy : NetworkBehaviour
 
     #region Attack
 
-    public void OnAttackTimerBegin()
+    public void OnPlayerPhaseBegin()
     {
+        remainingBlock = damageBlockedPerTurn;
         ChooseTargets();
         RpcUpdateTargets(targets);
     }
