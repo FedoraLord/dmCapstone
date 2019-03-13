@@ -6,11 +6,11 @@ using UnityEngine.Networking;
 #pragma warning disable CS0618, 0649
 public class Enemy : NetworkBehaviour
 {
-    [SyncVar(hook = "OnHealthChanged")]
     public int health;
 
     public int numTargets = 1;
     public int basicDamage = 5;
+    public int maxBlock;
     public int maxHealth = 100;
     public Transform uiTransform;
 
@@ -18,9 +18,10 @@ public class Enemy : NetworkBehaviour
 
     [SerializeField] private SpriteRenderer tmpDamageIndicator;
 
-    private bool initialized;
-    private EnemyUI UI;
+    private DamagePopup damagePopup;
+    private EnemyUI healthBar;
     private int[] targets;
+    private int remainingBlock;
 
     #region Initialization
 
@@ -28,12 +29,17 @@ public class Enemy : NetworkBehaviour
     {
         if (isServer)
         {
-            health = maxHealth;
             BattleController.Instance.OnEnemyReady();
         }
 
-        UI = BattleController.Instance.ClaimEnemyUI(this);
-        initialized = true;
+        health = maxHealth;
+        healthBar = BattleController.Instance.ClaimEnemyUI(this);
+        damagePopup = BattleController.Instance.ClaimDamagePopup();
+    }
+
+    public void OnStartPlayerPhase()
+    {
+        remainingBlock = maxBlock;
     }
 
     #endregion
@@ -51,18 +57,29 @@ public class Enemy : NetworkBehaviour
     [Server]
     public void TakeDamage(int damage)
 	{
-		health -= damage;
+        RpcTakeDamage(damage);
 	}
     
-	private void OnHealthChanged(int hp)
+	private void RpcTakeDamage(int damage)
 	{
-        if (!initialized)
-            return;
-        
         //TODO: play damage animation
 
-        UI.SetHealth(hp, OnHealthBarAnimComplete);
-        StartCoroutine(ShowDamageIndicator());
+        int damageTaken = damage;
+        int initialBlock = remainingBlock;
+
+        if (remainingBlock > 0)
+        {
+            remainingBlock = Mathf.Max(remainingBlock - damage, 0);
+            damageTaken = damage - remainingBlock;
+        }
+
+        if (damageTaken > 0)
+        {
+            health = Mathf.Max(health - damageTaken, 0);
+            healthBar.SetHealth(health, OnHealthBarAnimComplete);
+        }
+
+        damagePopup.Display(damageTaken, initialBlock - remainingBlock, uiTransform.position);
 	}
     
     private void OnHealthBarAnimComplete(bool isDead)
@@ -73,18 +90,18 @@ public class Enemy : NetworkBehaviour
         }
     }
 
-    private IEnumerator ShowDamageIndicator()
-    {
-        tmpDamageIndicator.enabled = true;
-        yield return new WaitForSeconds(.3f);
-        tmpDamageIndicator.enabled = false;
-    }
+    //private IEnumerator ShowDamageIndicator()
+    //{
+    //    tmpDamageIndicator.enabled = true;
+    //    yield return new WaitForSeconds(.3f);
+    //    tmpDamageIndicator.enabled = false;
+    //}
 
     private void Die()
     {
         //TODO play death animation
 
-        UI.Unclaim();
+        healthBar.Unclaim();
         
         if (isServer)
         {
@@ -113,7 +130,7 @@ public class Enemy : NetworkBehaviour
     private void RpcUpdateTargets(int[] newTargets)
     {
         targets = newTargets;
-        UI.SetTargets(targets);
+        healthBar.SetTargets(targets);
     }
 
     protected int[] GetRandomNPlayers(int n)

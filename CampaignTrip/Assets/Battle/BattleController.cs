@@ -25,6 +25,7 @@ public class BattleController : NetworkBehaviour
 	public GameObject battleCanvas;
     public List<EnemyUI> enemyUI;
     public List<HealthBarUI> playerHealthBars;
+    public List<DamagePopup> damagePopups;
 
     [SerializeField] private int totalAttackTime = 5;
     [SerializeField] private RectTransform attackTimerBar;
@@ -77,20 +78,6 @@ public class BattleController : NetworkBehaviour
         StartBattle();
         CalculateSpawnPoints();
         PersistentPlayer.localAuthority.CmdSpawnBattlePlayer();
-    }
-
-    public HealthBarUI ClaimPlayerUI(BattlePlayer player)
-    {
-        foreach (HealthBarUI ui in playerHealthBars)
-        {
-            if (!ui.isClaimed)
-            {
-                ui.Claim(player.uiTransform.position, player.maxHealth, cam);
-                return ui;
-            }
-        }
-        Debug.LogError("Could not claim HealthBarUI because all HealthBarUI are already claimed.");
-        return null;
     }
 
     [Server]
@@ -277,21 +264,7 @@ public class BattleController : NetworkBehaviour
     #endregion
 
     #region Enemy
-
-    public EnemyUI ClaimEnemyUI(Enemy enemy)
-    {
-        foreach (EnemyUI ui in enemyUI)
-        {
-            if (!ui.isClaimed)
-            {
-                ui.Claim(enemy.uiTransform.position, enemy.maxHealth, cam);
-                return ui;
-            }
-        }
-        Debug.LogError("Could not claim EnemyUI because all EnemyUI are already claimed.");
-        return null;
-    }
-
+    
     [ClientRpc]
     public void RpcStartAttackTimer(float time)
     {
@@ -338,6 +311,47 @@ public class BattleController : NetworkBehaviour
     #endregion
 
     #region UI
+
+    public HealthBarUI ClaimPlayerUI(BattlePlayer player)
+    {
+        foreach (HealthBarUI ui in playerHealthBars)
+        {
+            if (!ui.isClaimed)
+            {
+                ui.Claim(player.uiTransform.position, player.maxHealth, cam);
+                return ui;
+            }
+        }
+        Debug.LogError("Could not claim HealthBarUI because all HealthBarUI are already claimed.");
+        return null;
+    }
+
+    public EnemyUI ClaimEnemyUI(Enemy enemy)
+    {
+        foreach (EnemyUI ui in enemyUI)
+        {
+            if (!ui.isClaimed)
+            {
+                ui.Claim(enemy.uiTransform.position, enemy.maxHealth, cam);
+                return ui;
+            }
+        }
+        Debug.LogError("Could not claim EnemyUI because all EnemyUI are already claimed.");
+        return null;
+    }
+
+    public DamagePopup ClaimDamagePopup()
+    {
+        foreach (DamagePopup ui in damagePopups)
+        {
+            if (ui.TryClaim())
+            {
+                return ui;
+            }
+        }
+        Debug.LogError("Could not claim DamagePopup because all EnemyUI are already claimed.");
+        return null;
+    }
 
     public void OnAbilityButtonClicked(int i)
     {

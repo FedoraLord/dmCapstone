@@ -26,6 +26,7 @@ public class BattlePlayer : NetworkBehaviour
     [SerializeField] private Animator animator;
 
     private bool initialized;
+    private DamagePopup damagePopup;
     private int damageToTake;
     private int attacksRemaining;
     private HealthBarUI healthBar;
@@ -46,6 +47,7 @@ public class BattlePlayer : NetworkBehaviour
         persistentPlayer.battlePlayer = this;
         transform.position = BattleController.Instance.playerSpawnPoints[i];
         healthBar = BattleController.Instance.ClaimPlayerUI(this);
+        damagePopup = BattleController.Instance.ClaimDamagePopup();
 
         if (isServer)
         {
