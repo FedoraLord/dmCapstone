@@ -11,6 +11,9 @@ public class PersistentPlayer : NetworkBehaviour
     public static PersistentPlayer localAuthority;
     public static List<PersistentPlayer> players = new List<PersistentPlayer>();
 
+    public enum Character { Warrior, Rogue, Alchemist, Mage };
+    public Character characterType;
+
     [SyncVar]
     public int playerNum;
 
