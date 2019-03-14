@@ -8,6 +8,7 @@ public class SM_Player : NetworkBehaviour
 {
     public float speed = 3;
     public bool localAuthority;
+    public Vector3 velocity;
 
     [SyncVar]
     public int playernum;
@@ -17,12 +18,14 @@ public class SM_Player : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        velocity = new Vector3(0, 0, 0);
         rb = GetComponent<Rigidbody2D>();
         if (playernum == PersistentPlayer.localAuthority.playerNum)
         {
             localAuthority = true;
             Camera.main.transform.parent = gameObject.transform;
 			Camera.main.transform.localPosition = new Vector3(0, 0, -10f);
+            testuibutton.Instance.Setup(this);
         }
     }
 
@@ -30,31 +33,13 @@ public class SM_Player : NetworkBehaviour
     {
         if (localAuthority)
         {
-            Vector3 velocity = new Vector3();
-
-            if (Input.GetKey(KeyCode.W))
+            if (velocity != Vector3.zero)
             {
-                velocity += transform.up;
-            }
-            if (Input.GetKey(KeyCode.D))
-            {
-                velocity += transform.right;
-            }
-            if (Input.GetKey(KeyCode.A))
-            {
-                velocity += -transform.right;
-            }
-            if (Input.GetKey(KeyCode.S))
-            {
-                velocity += -transform.up;
+                rb.velocity = velocity;
+                
+                CmdUpdatePosition(velocity, this.transform.position);
             }
 
-            velocity = new Vector3(Mathf.RoundToInt((velocity.normalized * speed).x),
-                                   Mathf.RoundToInt((velocity.normalized * speed).y),
-                                   Mathf.RoundToInt((velocity.normalized * speed).z));
-            rb.velocity = velocity;
-
-            CmdUpdatePosition(velocity, this.transform.position);
         }
 
     }
