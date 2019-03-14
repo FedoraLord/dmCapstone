@@ -56,9 +56,10 @@ public class BattlePlayer : NetworkBehaviour
 
     #region Attack
 
+    [Server]
     public void OnPlayerPhaseStart()
     {
-        UpdateAttackBlock(attacksPerTurn);
+        RpcUpdateAttackBlock(attacksPerTurn);
     }
 
     [Command]
@@ -77,6 +78,12 @@ public class BattlePlayer : NetworkBehaviour
     {
         UpdateAttackBlock(attacksRemaining - 1);
         animator.SetTrigger("Attack");
+    }
+
+    [ClientRpc]
+    private void RpcUpdateAttackBlock(int newAttacksRemaining)
+    {
+        UpdateAttackBlock(newAttacksRemaining);
     }
 
     private void UpdateAttackBlock(int newAttacksRemaining)
