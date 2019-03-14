@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class testuibutton : MonoBehaviour, IPointerDownHandler
+public class DPad : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
 {
-    public static testuibutton Instance;
+    public static DPad Instance;
 
     private SM_Player localPlayer;
     public Camera mainCamera;
@@ -49,5 +49,15 @@ public class testuibutton : MonoBehaviour, IPointerDownHandler
 
             localPlayer.velocity = new Vector3(direction.x, direction.y, 0);
         }
+    }
+
+    public void OnPointerUp(PointerEventData ped)
+    {
+        localPlayer.velocity = new Vector2(0, 0);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        OnPointerDown(eventData);
     }
 }

@@ -186,7 +186,7 @@ public class BattleController : NetworkBehaviour
 		SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName)); // https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.SetActiveScene.html
 	}
 
-	public void UnloadMinigame()
+	public void UnloadMinigame(bool succ)
     {
 		if (!(currentMinigame == ""))
 		{

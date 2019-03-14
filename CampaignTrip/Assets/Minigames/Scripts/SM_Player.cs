@@ -25,7 +25,7 @@ public class SM_Player : NetworkBehaviour
             localAuthority = true;
             Camera.main.transform.parent = gameObject.transform;
 			Camera.main.transform.localPosition = new Vector3(0, 0, -10f);
-            testuibutton.Instance.Setup(this);
+            DPad.Instance.Setup(this);
         }
     }
 
@@ -33,11 +33,11 @@ public class SM_Player : NetworkBehaviour
     {
         if (localAuthority)
         {
-            if (velocity != Vector3.zero)
+            if (rb.velocity != Vector2.zero || velocity != Vector3.zero)
             {
-                rb.velocity = velocity;
+                rb.velocity = velocity.normalized * speed;
                 
-                CmdUpdatePosition(velocity, this.transform.position);
+                CmdUpdatePosition(rb.velocity, this.transform.position);
             }
 
         }
