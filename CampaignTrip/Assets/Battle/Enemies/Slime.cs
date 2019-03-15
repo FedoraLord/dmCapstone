@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Slime : Enemy
+public class Slime : EnemyBase
 {
     public override void OnMinigameFailed()
     {

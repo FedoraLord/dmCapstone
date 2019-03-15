@@ -25,10 +25,13 @@ public class BattleController : NetworkBehaviour
 	public GameObject battleCanvas;
     public List<EnemyUI> enemyUI;
     public List<HealthBarUI> playerHealthBars;
+    public List<DamagePopup> damagePopups;
 
     [SerializeField] private int totalAttackTime = 5;
     [SerializeField] private RectTransform attackTimerBar;
     [SerializeField] private Text attackTimerText;
+    [SerializeField] private Text attacksLeftText;
+    [SerializeField] private Text blockText;
 
     private Coroutine attackTimerCountdown;
 
@@ -42,7 +45,7 @@ public class BattleController : NetworkBehaviour
 	public Wave[] waves;
     public Camera cam;
 
-    [HideInInspector] public List<Enemy> aliveEnemies;
+    [HideInInspector] public List<EnemyBase> aliveEnemies;
     [HideInInspector] public List<Vector3> playerSpawnPoints;
     [HideInInspector] public List<Vector3> enemySpawnPoints;
 
@@ -82,20 +85,6 @@ public class BattleController : NetworkBehaviour
         StartBattle();
         CalculateSpawnPoints();
         PersistentPlayer.localAuthority.CmdSpawnBattlePlayer();
-    }
-
-    public HealthBarUI ClaimPlayerUI(BattlePlayer player)
-    {
-        foreach (HealthBarUI ui in playerHealthBars)
-        {
-            if (!ui.isClaimed)
-            {
-                ui.Claim(player.uiTransform.position, player.maxHealth, cam);
-                return ui;
-            }
-        }
-        Debug.LogError("Could not claim HealthBarUI because all HealthBarUI are already claimed.");
-        return null;
     }
 
     [Server]
@@ -155,9 +144,9 @@ public class BattleController : NetworkBehaviour
             p.battlePlayer.OnPlayerPhaseStart();
         }
 
-        foreach (Enemy e in aliveEnemies)
+        foreach (EnemyBase e in aliveEnemies)
         {
-            e.OnAttackTimerBegin();
+            e.OnPlayerPhaseStart();
         }
         RpcStartAttackTimer(totalAttackTime);
     }
@@ -166,8 +155,8 @@ public class BattleController : NetworkBehaviour
     public void StartEnemyPhase()
     {
         battlePhase = Phase.Enemy;
-        //StartCoroutine(ExecuteEnemyPhase());
-		RpcLoadMinigame(UnityEngine.Random.Range(0, minigameSceneNames.Count));
+        StartCoroutine(ExecuteEnemyPhase());
+		//RpcLoadMinigame(UnityEngine.Random.Range(0, minigameSceneNames.Count));
 	}
 
 	[ClientRpc]
@@ -201,14 +190,15 @@ public class BattleController : NetworkBehaviour
 
     private IEnumerator ExecuteEnemyPhase()
     {
-        foreach (Enemy e in aliveEnemies)
-        {
-            e.Attack();
-        }
+        yield return new WaitForSeconds(0.5f);
 
-        foreach (PersistentPlayer p in PersistentPlayer.players)
+        foreach (EnemyBase e in aliveEnemies)
         {
-            p.battlePlayer.TakeAccumulatedDamage();
+            if (e.isAlive)
+            {
+                e.Attack();
+                yield return new WaitForSeconds(1);
+            }
         }
 
         //simulate a pause where something will happen
@@ -265,7 +255,7 @@ public class BattleController : NetworkBehaviour
         for (int i = 0; i < waves[waveIndex].Members.Length; i++)
         {
             GameObject newEnemy = Instantiate(waves[waveIndex].Members[i], enemySpawnPoints[i], Quaternion.identity);
-            aliveEnemies.Add(newEnemy.GetComponent<Enemy>());
+            aliveEnemies.Add(newEnemy.GetComponent<EnemyBase>());
             NetworkServer.Spawn(newEnemy);
         }
 
@@ -288,21 +278,7 @@ public class BattleController : NetworkBehaviour
     #endregion
 
     #region Enemy
-
-    public EnemyUI ClaimEnemyUI(Enemy enemy)
-    {
-        foreach (EnemyUI ui in enemyUI)
-        {
-            if (!ui.isClaimed)
-            {
-                ui.Claim(enemy.uiTransform.position, enemy.maxHealth, cam);
-                return ui;
-            }
-        }
-        Debug.LogError("Could not claim EnemyUI because all EnemyUI are already claimed.");
-        return null;
-    }
-
+    
     [ClientRpc]
     public void RpcStartAttackTimer(float time)
     {
@@ -337,13 +313,69 @@ public class BattleController : NetworkBehaviour
         }
     }
 
-    public void OnEnemyDeath(Enemy dead)
+    public void OnEnemyDeath(EnemyBase dead)
     {
         aliveEnemies.Remove(dead);
         if (aliveEnemies.Count == 0)
         {
             EndWave();
         }
+    }
+
+    #endregion
+
+    #region UI
+
+    public HealthBarUI ClaimPlayerUI(BattlePlayerBase player)
+    {
+        foreach (HealthBarUI ui in playerHealthBars)
+        {
+            if (!ui.isClaimed)
+            {
+                ui.Claim(player.uiTransform.position, player.maxHealth, cam);
+                return ui;
+            }
+        }
+        Debug.LogError("Could not claim HealthBarUI because all HealthBarUI are already claimed.");
+        return null;
+    }
+
+    public EnemyUI ClaimEnemyUI(EnemyBase enemy)
+    {
+        foreach (EnemyUI ui in enemyUI)
+        {
+            if (!ui.isClaimed)
+            {
+                ui.Claim(enemy.uiTransform.position, enemy.maxHealth, cam);
+                return ui;
+            }
+        }
+        Debug.LogError("Could not claim EnemyUI because all EnemyUI are already claimed.");
+        return null;
+    }
+
+    public DamagePopup ClaimDamagePopup()
+    {
+        foreach (DamagePopup ui in damagePopups)
+        {
+            if (ui.TryClaim())
+            {
+                return ui;
+            }
+        }
+        Debug.LogError("Could not claim DamagePopup because all EnemyUI are already claimed.");
+        return null;
+    }
+
+    public void UpdateAttackBlockUI(int attacks, int block)
+    {
+        attacksLeftText.text = attacks.ToString();
+        blockText.text = string.Format("{0}%", block);
+    }
+
+    public void OnAbilityButtonClicked(int i)
+    {
+
     }
 
     #endregion
