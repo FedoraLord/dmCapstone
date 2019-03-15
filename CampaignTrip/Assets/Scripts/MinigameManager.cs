@@ -38,11 +38,6 @@ public abstract class MinigameManager : MonoBehaviour
         }
     }
 
-    private IEnumerator DecrementTimer()
-    {
-        
-    }
-
     private void LateUpdate()
     {
 		if (numPlayersWon != 0 && numPlayersWon == PersistentPlayer.players.Count)
