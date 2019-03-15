@@ -8,6 +8,7 @@ public class SM_Player : NetworkBehaviour
 {
     public float speed = 3;
     public bool localAuthority;
+    public Vector3 velocity;
 
     [SyncVar]
     public int playernum;
@@ -17,12 +18,14 @@ public class SM_Player : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        velocity = new Vector3(0, 0, 0);
         rb = GetComponent<Rigidbody2D>();
         if (playernum == PersistentPlayer.localAuthority.playerNum)
         {
             localAuthority = true;
-            MinigameManager.Instance.mainCamera.transform.parent = gameObject.transform;
-            MinigameManager.Instance.mainCamera.transform.localPosition = new Vector3(0, 0, -10f);
+            Camera.main.transform.parent = gameObject.transform;
+			Camera.main.transform.localPosition = new Vector3(0, 0, -10f);
+            DPad.Instance.Setup(this);
         }
     }
 
@@ -30,29 +33,13 @@ public class SM_Player : NetworkBehaviour
     {
         if (localAuthority)
         {
-            Vector3 velocity = new Vector3();
-
-            if (Input.GetKey(KeyCode.W))
+            if (rb.velocity != Vector2.zero || velocity != Vector3.zero)
             {
-                velocity += transform.up;
-            }
-            if (Input.GetKey(KeyCode.D))
-            {
-                velocity += transform.right;
-            }
-            if (Input.GetKey(KeyCode.A))
-            {
-                velocity += -transform.right;
-            }
-            if (Input.GetKey(KeyCode.S))
-            {
-                velocity += -transform.up;
+                rb.velocity = velocity.normalized * speed;
+                
+                CmdUpdatePosition(rb.velocity, this.transform.position);
             }
 
-            velocity = velocity.normalized * speed;
-            rb.velocity = velocity;
-
-            CmdUpdatePosition(velocity, this.transform.position);
         }
 
     }
@@ -61,7 +48,7 @@ public class SM_Player : NetworkBehaviour
     {
         if (collision.gameObject.CompareTag("WinArea"))
         {
-            MinigameManager.Instance.numPlayersInWinArea++;
+            MinigameManager.Instance.numPlayersWon++;
         }
     }
     
@@ -69,7 +56,7 @@ public class SM_Player : NetworkBehaviour
     {
         if (collision.gameObject.CompareTag("WinArea"))
         {
-            MinigameManager.Instance.numPlayersInWinArea--;
+            MinigameManager.Instance.numPlayersWon--;
         }
     }
 

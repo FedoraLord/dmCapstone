@@ -4,34 +4,47 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class MinigameManager : MonoBehaviour
+public abstract class MinigameManager : MonoBehaviour
 {
-    public GameObject playerPrefab;
-    public List<Transform> spawnPoints;
-
-    public Camera mainCamera;
     public static MinigameManager Instance;
 
-    public int numPlayersInWinArea;
-    public Text winText;
+    public List<Transform> spawnPoints;
 
-    private void Start()
+	public int numPlayersWon = 0;
+	public Text winText;
+
+    protected virtual void Start()
     {
         Instance = this;
-        numPlayersInWinArea = 0;
 
-        if (NetworkWrapper.IsHost && playerPrefab != null)
-        {
-            StartCoroutine(SpawnPlayers());
+		numPlayersWon = 0;
+
+        if (NetworkWrapper.IsHost)
+		{
+			List<PersistentPlayer> randomPlayers = new List<PersistentPlayer>(PersistentPlayer.players);
+			//Fisher-Yates Shuffle
+			for (var i = 0; i < randomPlayers.Count - 1; i++)
+			{
+				//using a range of i to the size avoids bias
+				int randomNum = Random.Range(i, randomPlayers.Count);
+				//now swap them
+				PersistentPlayer tmp = PersistentPlayer.players[i];
+				PersistentPlayer.players[i] = PersistentPlayer.players[randomNum];
+				PersistentPlayer.players[randomNum] = tmp;
+			}
+
+			StartCoroutine(HandlePlayers(randomPlayers));
         }
     }
 
     private void LateUpdate()
     {
-        if (numPlayersInWinArea == 4)
-        {
-            winText.text = "Success!";
-        }
+		if (numPlayersWon != 0 && numPlayersWon == PersistentPlayer.players.Count)
+		{
+            Win();
+            BattleController.Instance.UnloadMinigame(true);
+		}
+        // TODO Add timer for failure
     }
 
     private void OnDestroy()
@@ -39,18 +52,10 @@ public class MinigameManager : MonoBehaviour
         Instance = null;
     }
 
-    private IEnumerator SpawnPlayers()
+    protected virtual IEnumerator HandlePlayers(List<PersistentPlayer> randomPlayers)
     {
-        for (int i = 0; i < PersistentPlayer.players.Count; i++)
-        {
-            PersistentPlayer p = PersistentPlayer.players[i];
-            yield return new WaitUntil(() => p.connectionToClient.isReady);
+		yield return 0; //please override this, also we have to return something here
+	}
 
-            GameObject obj = Instantiate(playerPrefab);
-            obj.transform.position = spawnPoints[i].position;
-
-            obj.GetComponent<SM_Player>().playernum = p.playerNum;
-            NetworkSpawner.Instance.NetworkSpawn(obj, p.gameObject);
-        }
-    }
+    protected abstract void Win();
 }
