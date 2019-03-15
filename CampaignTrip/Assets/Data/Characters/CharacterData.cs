@@ -4,7 +4,13 @@
 [CreateAssetMenu(fileName = "NewCharacterClass", menuName = "Data Object/Character")]
 public class CharacterData : ScriptableObject
 {
-	public string FlavorText
+    public enum Character { Warrior, Rogue, Alchemist, Mage };
+
+    public Character CharacterName
+    {
+        get { return characterName; }
+    }
+    public string FlavorText
     {
         get { return flavorText; }
     }
@@ -24,6 +30,7 @@ public class CharacterData : ScriptableObject
         get { return characterPrefab; }
     }
 
+    [SerializeField] private Character characterName;
     [SerializeField] private string flavorText;
 	[SerializeField] private Sprite sprite;
     [SerializeField] private Sprite icon;

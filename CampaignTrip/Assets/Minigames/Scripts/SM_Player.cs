@@ -35,24 +35,26 @@ public class SM_Player : NetworkBehaviour
 			Camera.main.transform.localPosition = new Vector3(0, 0, -10f);
             DPad.Instance.Setup(this);
 
-            switch(PersistentPlayer.localAuthority.characterType)
+            switch(PersistentPlayer.localAuthority.character.CharacterName)
             {
-                case PersistentPlayer.Character.Warrior:
+                case CharacterData.Character.Warrior:
                     animator.runtimeAnimatorController = warriorController;
                     break;
 
-                case PersistentPlayer.Character.Rogue:
+                case CharacterData.Character.Rogue:
                     animator.runtimeAnimatorController = rogueController;
                     break;
 
-                case PersistentPlayer.Character.Alchemist:
+                case CharacterData.Character.Alchemist:
                     animator.runtimeAnimatorController = alchemistController;
                     break;
 
-                case PersistentPlayer.Character.Mage:
+                case CharacterData.Character.Mage:
                     animator.runtimeAnimatorController = mageController;
                     break;
             }
+            animator.SetBool("Moving", false);
+            animator.SetInteger("Direction", 0);
         }
     }
 
