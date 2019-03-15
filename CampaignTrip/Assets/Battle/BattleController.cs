@@ -40,7 +40,7 @@ public class BattleController : NetworkBehaviour
 	public Wave[] waves;
     public Camera cam;
 
-    [HideInInspector] public List<Enemy> aliveEnemies;
+    [HideInInspector] public List<EnemyBase> aliveEnemies;
     [HideInInspector] public List<Vector3> playerSpawnPoints;
     [HideInInspector] public List<Vector3> enemySpawnPoints;
 
@@ -139,7 +139,7 @@ public class BattleController : NetworkBehaviour
             p.battlePlayer.OnPlayerPhaseStart();
         }
 
-        foreach (Enemy e in aliveEnemies)
+        foreach (EnemyBase e in aliveEnemies)
         {
             e.OnPlayerPhaseStart();
         }
@@ -180,7 +180,7 @@ public class BattleController : NetworkBehaviour
     {
         yield return new WaitForSeconds(0.5f);
 
-        foreach (Enemy e in aliveEnemies)
+        foreach (EnemyBase e in aliveEnemies)
         {
             if (e.isAlive)
             {
@@ -243,7 +243,7 @@ public class BattleController : NetworkBehaviour
         for (int i = 0; i < waves[waveIndex].Members.Length; i++)
         {
             GameObject newEnemy = Instantiate(waves[waveIndex].Members[i], enemySpawnPoints[i], Quaternion.identity);
-            aliveEnemies.Add(newEnemy.GetComponent<Enemy>());
+            aliveEnemies.Add(newEnemy.GetComponent<EnemyBase>());
             NetworkServer.Spawn(newEnemy);
         }
 
@@ -301,7 +301,7 @@ public class BattleController : NetworkBehaviour
         }
     }
 
-    public void OnEnemyDeath(Enemy dead)
+    public void OnEnemyDeath(EnemyBase dead)
     {
         aliveEnemies.Remove(dead);
         if (aliveEnemies.Count == 0)
@@ -314,7 +314,7 @@ public class BattleController : NetworkBehaviour
 
     #region UI
 
-    public HealthBarUI ClaimPlayerUI(BattlePlayer player)
+    public HealthBarUI ClaimPlayerUI(BattlePlayerBase player)
     {
         foreach (HealthBarUI ui in playerHealthBars)
         {
@@ -328,7 +328,7 @@ public class BattleController : NetworkBehaviour
         return null;
     }
 
-    public EnemyUI ClaimEnemyUI(Enemy enemy)
+    public EnemyUI ClaimEnemyUI(EnemyBase enemy)
     {
         foreach (EnemyUI ui in enemyUI)
         {

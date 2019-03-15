@@ -5,9 +5,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 #pragma warning disable CS0618
-public class BattlePlayer : NetworkBehaviour
+public class BattlePlayerBase : NetworkBehaviour
 {
-    public static BattlePlayer LocalAuthority { get { return PersistentPlayer.localAuthority.battlePlayer; } }
+    public static BattlePlayerBase LocalAuthority { get { return PersistentPlayer.localAuthority.battlePlayer; } }
 
     public int health;
 
@@ -68,7 +68,7 @@ public class BattlePlayer : NetworkBehaviour
         if (attacksRemaining > 0 && BattleController.Instance.IsPlayerPhase)
         {
             RpcAttack();
-            Enemy enemy = target.GetComponent<Enemy>();
+            EnemyBase enemy = target.GetComponent<EnemyBase>();
             enemy.TakeDamage(basicDamage);
         }
     }
@@ -77,7 +77,10 @@ public class BattlePlayer : NetworkBehaviour
     private void RpcAttack()
     {
         UpdateAttackBlock(attacksRemaining - 1);
-        animator.SetTrigger("Attack");
+        if (localPlayerAuthority)
+        {
+            animator.SetTrigger("Attack");
+        }
     }
 
     [ClientRpc]
@@ -102,7 +105,7 @@ public class BattlePlayer : NetworkBehaviour
     #region Damage
 
     [Server]
-    public void TakeDamage(Enemy e)
+    public void TakeDamage(EnemyBase e)
     {
         int blocked = e.basicDamage * blockAmount / 100;
         int damageTaken = e.basicDamage - blocked;

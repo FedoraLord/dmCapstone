@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 #pragma warning disable CS0618, 0649
-public class Enemy : NetworkBehaviour
+public class EnemyBase : NetworkBehaviour
 {
     public int health;
 
@@ -43,7 +43,7 @@ public class Enemy : NetworkBehaviour
 	{
         if (isAlive)
         {
-            BattlePlayer.LocalAuthority.CmdAttack(gameObject);
+            BattlePlayerBase.LocalAuthority.CmdAttack(gameObject);
         }
 	}
 

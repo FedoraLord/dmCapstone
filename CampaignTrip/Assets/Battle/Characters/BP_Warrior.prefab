@@ -1,5 +1,25 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &4054668088557066297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3126196965850195258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ff5c9d0db398845aa69f95d1490acf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 0
+  playerNum: 0
+  uiTransform: {fileID: 931047358506064122}
+  attacksPerTurn: 2
+  basicDamage: 30
+  maxHealth: 250
+  persistentPlayer: {fileID: 0}
+  animator: {fileID: 2359621197488274220}
 --- !u!1001 &3126196965850195238
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -60,19 +80,36 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: b31054068891538479387b2d3a4941d7,
         type: 3}
-    - target: {fileID: 3718406984874502740, guid: 54e2aa1d050673e459432da61c3d9441,
-        type: 3}
-      propertyPath: uiTransform
-      value: 
-      objectReference: {fileID: 931047358506064122}
     - target: {fileID: 854968600512077322, guid: 54e2aa1d050673e459432da61c3d9441,
         type: 3}
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 22100000, guid: 5f45608f1db676a4d804d9a732aa37f6,
         type: 2}
+    - target: {fileID: 3718406984874502740, guid: 54e2aa1d050673e459432da61c3d9441,
+        type: 3}
+      propertyPath: uiTransform
+      value: 
+      objectReference: {fileID: 931047358506064122}
+    - target: {fileID: 424259247384908331, guid: 54e2aa1d050673e459432da61c3d9441,
+        type: 3}
+      propertyPath: m_Animator
+      value: 
+      objectReference: {fileID: 2359621197488274220}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
+--- !u!1 &3126196965850195258 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 28, guid: 54e2aa1d050673e459432da61c3d9441,
+    type: 3}
+  m_PrefabInstance: {fileID: 3126196965850195238}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &2359621197488274220 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 854968600512077322, guid: 54e2aa1d050673e459432da61c3d9441,
+    type: 3}
+  m_PrefabInstance: {fileID: 3126196965850195238}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &931047358506064122 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2849025051380317660, guid: 54e2aa1d050673e459432da61c3d9441,
