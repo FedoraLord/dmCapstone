@@ -12,12 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3e9e6e04f7fa1b48ade92fd22cf82bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 0
-  numTargets: 1
-  basicDamage: 5
-  damageBlockedPerTurn: 0
-  maxHealth: 100
+  animator: {fileID: 0}
   uiTransform: {fileID: 3989840763669419232}
+  attacksPerTurn: 1
+  basicDamage: 5
+  maxHealth: 100
 --- !u!1001 &5359337731261646666
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -84,6 +83,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6357449637621016870, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: m_Animator
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4ab14dd3fb4643b49889b005e10b15ee, type: 3}

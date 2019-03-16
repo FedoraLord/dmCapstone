@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using static EnemyPrefab;
 
 #pragma warning disable CS0618, 0649
 public class BattleController : NetworkBehaviour
@@ -17,7 +18,7 @@ public class BattleController : NetworkBehaviour
     public bool IsWaitingPhase { get { return !IsEnemyPhase && !IsPlayerPhase; } }
 
     private bool AllPlayersReady { get { return playersReady == PersistentPlayer.players.Count; } }
-    private bool AllEnemiesReady { get { return enemiesReady == waves[0].Members.Length; } }
+    private bool AllEnemiesReady { get { return enemiesReady == waves[waveIndex].Count; } }
 
 	private string homeSceneName; // we need this because you can only find the active scene, not the scene the object is in with Scene Manager
 
@@ -27,8 +28,11 @@ public class BattleController : NetworkBehaviour
     public List<HealthBarUI> playerHealthBars;
     public List<DamagePopup> damagePopups;
 
+    [SerializeField] private Camera cam;
     [SerializeField] private int totalAttackTime = 5;
     [SerializeField] private RectTransform attackTimerBar;
+    [SerializeField] private RectTransform playerSpawnArea;
+    [SerializeField] private RectTransform enemySpawnArea;
     [SerializeField] private Text attackTimerText;
     [SerializeField] private Text attacksLeftText;
     [SerializeField] private Text blockText;
@@ -42,30 +46,57 @@ public class BattleController : NetworkBehaviour
 
     [Header("Spawning")]
     [Tooltip("Groups of enemies to spawn together.")]
-	public Wave[] waves;
-    public Camera cam;
+    [SerializeField] private EnemyDataList enemyDataList;
+    [SerializeField] private Wave[] waves;
 
     [HideInInspector] public List<EnemyBase> aliveEnemies;
     [HideInInspector] public List<Vector3> playerSpawnPoints;
     [HideInInspector] public List<Vector3> enemySpawnPoints;
-
-    [SerializeField] private RectTransform playerSpawnArea;
-    [SerializeField] private RectTransform enemySpawnArea;
-
+    
     private int enemiesReady;
     private int playersReady;
-	private int waveIndex;
+	private int waveIndex = -1;
     private Phase battlePhase;
 
     [Serializable]
 	public class Wave
 	{
-		public GameObject[] Members { get { return new GameObject[] { enemy1, enemy2, enemy4, enemy4 }; } }
-               
-        public GameObject enemy1;
-        public GameObject enemy2;
-        public GameObject enemy3;
-        public GameObject enemy4;
+        public int Count
+        {
+            get
+            {
+                EnemyType[] enemies = new EnemyType[] { enemy1, enemy2, enemy3, enemy4, enemy5, enemy6 };
+                int count = 0;
+
+                for (int i = 0; i < enemies.Length; i++)
+                {
+                    if (enemies[i] != EnemyType.None)
+                        count++;
+                }
+
+                return count;
+            }
+        }
+
+        public EnemyType enemy1;
+        public EnemyType enemy2;
+        public EnemyType enemy3;
+        public EnemyType enemy4;
+        public EnemyType enemy5;
+        public EnemyType enemy6;
+
+        public GameObject[] GetEnemyPrefabs(EnemyDataList data)
+        {
+            return new GameObject[]
+            {
+                data.GetPrefab(enemy1),
+                data.GetPrefab(enemy2),
+                data.GetPrefab(enemy3),
+                data.GetPrefab(enemy4),
+                data.GetPrefab(enemy5),
+                data.GetPrefab(enemy6)
+            };
+        }
     }
 
     private enum Phase { StartingBattle, Player, Enemy }
@@ -125,13 +156,15 @@ public class BattleController : NetworkBehaviour
         //simulate a pause where something will happen
         yield return new WaitForSeconds(1);
 
-        SpawnWave();
-        yield return new WaitUntil(() => AllEnemiesReady);
+        if (SpawnWave())
+        {
+            yield return new WaitUntil(() => AllEnemiesReady);
 
-        //simulate a pause where something will happen
-        yield return new WaitForSeconds(1);
+            //simulate a pause where something will happen
+            yield return new WaitForSeconds(1);
 
-        StartPlayerPhase();
+            StartPlayerPhase();
+        }
     }
 
     [Server]
@@ -242,25 +275,32 @@ public class BattleController : NetworkBehaviour
     }
     
 	[Server]
-	public void SpawnWave()
+	public bool SpawnWave()
 	{
-		//Are all the waves done with?
-		if (waveIndex == waves.Length)
+        waveIndex++;
+
+        //Are all the waves done with?
+        if (waveIndex == waves.Length)
 		{
 			Win();
-			return;
+			return false;
 		}
 
         //Spawn the next wave then
-        for (int i = 0; i < waves[waveIndex].Members.Length; i++)
+        GameObject[] enemyPrefabs = waves[waveIndex].GetEnemyPrefabs(enemyDataList);
+
+        for (int i = 0; i < enemyPrefabs.Length; i++)
         {
-            GameObject newEnemy = Instantiate(waves[waveIndex].Members[i], enemySpawnPoints[i], Quaternion.identity);
+            if (enemyPrefabs[i] == null)
+                continue;
+
+            GameObject newEnemy = Instantiate(enemyPrefabs[i], enemySpawnPoints[i], Quaternion.identity);
             aliveEnemies.Add(newEnemy.GetComponent<EnemyBase>());
             NetworkServer.Spawn(newEnemy);
         }
 
-        waveIndex++;
-	}
+        return true;
+    }
 
     [Server]
     public void EndWave()
@@ -332,7 +372,7 @@ public class BattleController : NetworkBehaviour
         {
             if (!ui.isClaimed)
             {
-                ui.Claim(player.uiTransform.position, player.maxHealth, cam);
+                ui.Claim(player.UITransform.position, player.MaxHealth, cam);
                 return ui;
             }
         }
@@ -346,7 +386,7 @@ public class BattleController : NetworkBehaviour
         {
             if (!ui.isClaimed)
             {
-                ui.Claim(enemy.uiTransform.position, enemy.maxHealth, cam);
+                ui.Claim(enemy.UITransform.position, enemy.MaxHealth, cam);
                 return ui;
             }
         }

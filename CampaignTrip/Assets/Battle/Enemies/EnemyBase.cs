@@ -4,20 +4,12 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 #pragma warning disable CS0618, 0649
-public class EnemyBase : NetworkBehaviour
+public class EnemyBase : BattleActorBase
 {
-    public int health;
+    protected override HealthBarUI HealthBar { get { return enemyHealthBar; } set { enemyHealthBar = value as EnemyUI; } }
 
-    public int numTargets = 1;
-    public int basicDamage = 5;
-    public int damageBlockedPerTurn;
-    public int maxHealth = 100;
-    public Transform uiTransform;
-
-	public bool isAlive { get { return health > 0; } }
-
-    private DamagePopup damagePopup;
-    private EnemyUI healthBar;
+    private EnemyUI enemyHealthBar;
+    
     private int[] targets;
     private int remainingBlock;
 
@@ -30,8 +22,8 @@ public class EnemyBase : NetworkBehaviour
             BattleController.Instance.OnEnemyReady();
         }
 
-        health = maxHealth;
-        healthBar = BattleController.Instance.ClaimEnemyUI(this);
+        Health = maxHealth;
+        HealthBar = BattleController.Instance.ClaimEnemyUI(this);
         damagePopup = BattleController.Instance.ClaimDamagePopup();
     }
     
@@ -69,8 +61,8 @@ public class EnemyBase : NetworkBehaviour
 
         if (damageTaken > 0)
         {
-            health = Mathf.Max(health - damageTaken, 0);
-            healthBar.SetHealth(health, OnHealthBarAnimComplete);
+            Health = Mathf.Max(Health - damageTaken, 0);
+            HealthBar.SetHealth(Health, OnHealthBarAnimComplete);
         }
 
         damagePopup.Display(damageTaken, initialBlock - remainingBlock, uiTransform.position);
@@ -88,7 +80,7 @@ public class EnemyBase : NetworkBehaviour
     {
         //TODO play death animation
 
-        healthBar.Unclaim();
+        HealthBar.Unclaim();
         
         if (isServer)
         {
@@ -103,7 +95,7 @@ public class EnemyBase : NetworkBehaviour
 
     public void OnPlayerPhaseStart()
     {
-        remainingBlock = damageBlockedPerTurn;
+        remainingBlock = blockAmount;
         ChooseTargets();
         RpcUpdateTargets(targets);
     }
@@ -111,14 +103,14 @@ public class EnemyBase : NetworkBehaviour
     protected virtual void ChooseTargets()
     {
         //picks targets randomly unless overridden
-        targets = GetRandomNPlayers(numTargets);
+        targets = GetRandomNPlayers(attacksPerTurn);
     }
 
     [ClientRpc]
     private void RpcUpdateTargets(int[] newTargets)
     {
         targets = newTargets;
-        healthBar.SetTargets(targets);
+        enemyHealthBar.SetTargets(targets);
     }
 
     protected int[] GetRandomNPlayers(int n)

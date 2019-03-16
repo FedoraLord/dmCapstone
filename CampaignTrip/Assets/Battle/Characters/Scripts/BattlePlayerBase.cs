@@ -5,30 +5,13 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 #pragma warning disable CS0618
-public class BattlePlayerBase : NetworkBehaviour
+public abstract class BattlePlayerBase : BattleActorBase
 {
     public static BattlePlayerBase LocalAuthority { get { return PersistentPlayer.localAuthority.battlePlayer; } }
+    
+    [SyncVar] public int playerNum;
 
-    public int health;
-
-    [SyncVar]
-    public int playerNum;
-
-    public Transform uiTransform;
-    public int attacksPerTurn;
-    public int basicDamage;
-    public int maxHealth;
-
-    [HideInInspector]
-    public PersistentPlayer persistentPlayer;
-
-    [SerializeField] private Animator animator;
-
-    private bool initialized;
-    private DamagePopup damagePopup;
-    private int attacksRemaining;
-    private int blockAmount;
-    private HealthBarUI healthBar;
+    [HideInInspector] public PersistentPlayer persistentPlayer;
 
     #region Initialization
 
@@ -45,16 +28,18 @@ public class BattlePlayerBase : NetworkBehaviour
         persistentPlayer = PersistentPlayer.players[i];
         persistentPlayer.battlePlayer = this;
         transform.position = BattleController.Instance.playerSpawnPoints[i];
-        healthBar = BattleController.Instance.ClaimPlayerUI(this);
+        Health = maxHealth;
+        HealthBar = BattleController.Instance.ClaimPlayerUI(this);
         damagePopup = BattleController.Instance.ClaimDamagePopup();
-        
-        health = maxHealth;
-        initialized = true;
     }
 
     #endregion
 
     #region Attack
+
+    //public abstract void Ability1();
+    //public abstract void Ability2();
+    //public abstract void Ability3();
 
     [Server]
     public void OnPlayerPhaseStart()
@@ -107,8 +92,8 @@ public class BattlePlayerBase : NetworkBehaviour
     [Server]
     public void TakeDamage(EnemyBase e)
     {
-        int blocked = e.basicDamage * blockAmount / 100;
-        int damageTaken = e.basicDamage - blocked;
+        int blocked = e.BasicDamage * blockAmount / 100;
+        int damageTaken = e.BasicDamage - blocked;
         RpcTakeDamage(damageTaken, blocked);
     }
 
@@ -117,8 +102,8 @@ public class BattlePlayerBase : NetworkBehaviour
     {
         damagePopup.Display(damageTaken, blocked, uiTransform.position);
 
-        health = Math.Max(health - damageTaken, 0);
-        healthBar.SetHealth(health);
+        Health = Math.Max(Health - damageTaken, 0);
+        HealthBar.SetHealth(Health);
     }
 
     #endregion
