@@ -11,6 +11,7 @@ public abstract class MinigameManager : MonoBehaviour
     public List<Transform> spawnPoints;
 
 	public int numPlayersWon = 0;
+    public int timer = 30;
 	public Text winText;
 
     protected virtual void Start()
