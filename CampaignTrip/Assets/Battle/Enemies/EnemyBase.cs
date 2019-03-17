@@ -33,11 +33,24 @@ public class EnemyBase : BattleActorBase
 
     private void OnMouseUpAsButton()
 	{
-        if (isAlive)
+        if (IsAlive)
         {
-            BattlePlayerBase.LocalAuthority.CmdAttack(gameObject);
+            if (BattlePlayerBase.LocalAuthority.IsUsingAbility && BattlePlayerBase.SelectedAbility.Targets == BattlePlayerBase.TargetMode.Foe)
+            {
+                BattlePlayerBase.LocalAuthority.OnAbilityTargetChosen(this);
+            }
+            else
+            {
+                BattlePlayerBase.LocalAuthority.CmdAttack(gameObject);
+            }
         }
 	}
+
+    [Server]
+    public void ApplyStatusEffect()
+    {
+
+    }
 
     [Server]
     public void TakeDamage(int damage)

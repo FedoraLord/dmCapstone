@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-[CreateAssetMenu(fileName = "NewCharacterClass", menuName = "Data Object/EnemyList")]
+[CreateAssetMenu(fileName = "NewEnemyList", menuName = "Data Object/EnemyList")]
 public class EnemyDataList : ScriptableObject
 {
     public List<EnemyPrefab> EnemyPrefabList;

@@ -17,6 +17,7 @@ MonoBehaviour:
   attacksPerTurn: 1
   basicDamage: 5
   maxHealth: 100
+  tempAbilityTarget: {fileID: 4488493214754744244}
 --- !u!1001 &5359337731261646666
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -100,6 +101,12 @@ GameObject:
 --- !u!4 &3989840763669419232 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9024917114008458154, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+    type: 3}
+  m_PrefabInstance: {fileID: 5359337731261646666}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4488493214754744244 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8370614499677823230, guid: 4ab14dd3fb4643b49889b005e10b15ee,
     type: 3}
   m_PrefabInstance: {fileID: 5359337731261646666}
   m_PrefabAsset: {fileID: 0}

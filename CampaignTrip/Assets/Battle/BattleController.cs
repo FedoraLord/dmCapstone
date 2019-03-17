@@ -99,7 +99,7 @@ public class BattleController : NetworkBehaviour
         }
     }
 
-    private enum Phase { StartingBattle, Player, Enemy }
+    private enum Phase { StartingBattle, Player, Transition, Enemy }
 
     #region Initialization
 
@@ -168,7 +168,26 @@ public class BattleController : NetworkBehaviour
     }
 
     [Server]
-    public void StartPlayerPhase()
+    private void StartTransitionPhase()
+    {
+        battlePhase = Phase.Transition;
+        StartCoroutine(TransitionPhase());
+    }
+
+    private IEnumerator TransitionPhase()
+    {
+        float timeout = Time.time + 3;
+        yield return new WaitWhile(() => BattlePlayerBase.PlayersUsingAbility > 0 || Time.time > timeout);
+
+        if (Time.time > timeout)
+        {
+            Debug.LogError("TODO: Cancel abilities on timeout");
+        }
+        StartPlayerPhase();
+    }
+
+    [Server]
+    private void StartPlayerPhase()
     {
         battlePhase = Phase.Player;
 
@@ -185,7 +204,7 @@ public class BattleController : NetworkBehaviour
     }
     
     [Server]
-    public void StartEnemyPhase()
+    private void StartEnemyPhase()
     {
         battlePhase = Phase.Enemy;
         StartCoroutine(ExecuteEnemyPhase());
@@ -227,7 +246,7 @@ public class BattleController : NetworkBehaviour
 
         foreach (EnemyBase e in aliveEnemies)
         {
-            if (e.isAlive)
+            if (e.IsAlive)
             {
                 e.Attack();
                 yield return new WaitForSeconds(1);
@@ -415,7 +434,7 @@ public class BattleController : NetworkBehaviour
 
     public void OnAbilityButtonClicked(int i)
     {
-
+        BattlePlayerBase.LocalAuthority.AbilitySelected(i);
     }
 
     #endregion

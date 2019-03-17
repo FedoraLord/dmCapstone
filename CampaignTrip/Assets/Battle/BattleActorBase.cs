@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 #pragma warning disable CS0618, 0649
 public abstract class BattleActorBase : NetworkBehaviour
 {
-    public bool isAlive { get { return Health > 0; } }
+    public bool IsAlive { get { return Health > 0; } }
     public Transform UITransform { get { return uiTransform; } }
     public int BasicDamage { get { return basicDamage; } }
     public int Health { get; protected set; }
@@ -19,9 +19,12 @@ public abstract class BattleActorBase : NetworkBehaviour
     [SerializeField] protected int attacksPerTurn;
     [SerializeField] protected int basicDamage;
     [SerializeField] protected int maxHealth;
-    
+
     protected DamagePopup damagePopup;
     protected int attacksRemaining;
     protected int blockAmount;
+    
+    //TODO: REMOVE AND REPLACE
+    public GameObject tempAbilityTarget;
 }
 #pragma warning restore CS0618, 0649
