@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using static StatusEffect;
 
 #pragma warning disable CS0618, 0649
 public abstract class BattlePlayerBase : BattleActorBase
@@ -27,6 +28,8 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     protected List<Ability> Abilities;
 
+    private int attacksRemaining;
+
     public enum TargetMode { Auto, Friend, Foe }
 
     [Serializable]
@@ -36,18 +39,31 @@ public abstract class BattlePlayerBase : BattleActorBase
         public int Damage { get { return damage; } }
         public TargetMode Targets { get { return targets; } }
 
+        public StatusEffect StatusEffect
+        {
+            get
+            {
+                if (statusEffect == null)
+                    statusEffect = BattleController.Instance.GetStatusEffect(applies);
+                return statusEffect;
+            }
+        }
+
         [HideInInspector] public int RemainingCooldown;
 
+        [SerializeField] private string AbilityName;
         [SerializeField] private TargetMode targets;
-        [SerializeField] private int cooldown;
+        [SerializeField] private StatusEffectType applies;
         [Tooltip("Also used for heal amount")]
         [SerializeField] private int damage;
+        [SerializeField] private int cooldown;
+
+        private StatusEffect statusEffect;
 
         //TODO:
         [HideInInspector] public bool IsUpgraded;
 
         [SerializeField] private Sprite ButtonIcon;
-        [SerializeField] private string AbilityName;
         //END TODO
         
         public void Bind(Action<BattleActorBase> action)
@@ -67,10 +83,10 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     public override void OnStartClient()
     {
-        StartCoroutine(Initialize());
+        StartCoroutine(DelayInitialize());
     }
 
-    private IEnumerator Initialize()
+    private IEnumerator DelayInitialize()
     {
         yield return new WaitUntil(() => BattleController.Instance != null);
 
@@ -78,44 +94,20 @@ public abstract class BattlePlayerBase : BattleActorBase
         persistentPlayer = PersistentPlayer.players[i];
         persistentPlayer.battlePlayer = this;
 
-        transform.position = BattleController.Instance.playerSpawnPoints[i];
-
-        Health = maxHealth;
-        HealthBar = BattleController.Instance.ClaimPlayerUI(this);
-        damagePopup = BattleController.Instance.ClaimDamagePopup();
+        transform.position = BattleController.Instance.playerSpawnPoints[i].position;
         
         Abilities = new List<Ability>() { ability1, ability2, ability3 };
         ability1.Bind(Ability1);
         ability2.Bind(Ability2);
         ability3.Bind(Ability3);
+
+        Initialize();
     }
 
     #endregion
 
     #region Attack
-
-    //override these implementations if the ability is a little more complex than what CmdUseAbility handles
-    public virtual void Ability1(BattleActorBase target)
-    {
-        CmdUseAbility(target.gameObject, 0);
-    }
-
-    public virtual void Ability2(BattleActorBase target)
-    {
-        CmdUseAbility(target.gameObject, 1);
-    }
-
-    public virtual void Ability3(BattleActorBase target)
-    {
-        CmdUseAbility(target.gameObject, 2);
-    }
-
-    [Command] //This method is used for abilities with a simple setup (attack all/selected enemy(s)/player(s) and apply some status effect)
-    protected void CmdUseAbility(GameObject target, int i)
-    {
-        
-    }
-
+    
     private void OnMouseUpAsButton()
     {
         if (IsAlive && LocalAuthority.IsUsingAbility && SelectedAbility.Targets == TargetMode.Friend)
@@ -156,6 +148,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         {
             case TargetMode.Auto:
                 SelectedAbility.Use(null);
+                EndAbility();
                 break;
             case TargetMode.Friend:
                 ToggleTargetFriends(true);
@@ -187,12 +180,41 @@ public abstract class BattlePlayerBase : BattleActorBase
         SelectedAbility.Use(target);
         EndAbility();
     }
-    
-    protected void EndAbility()
+
+    //override these implementations if the ability is a little more complex than what CmdUseAbility handles
+    public virtual void Ability1(BattleActorBase target)
+    {
+        CmdUseAbility(target.gameObject, 0);
+    }
+
+    public virtual void Ability2(BattleActorBase target)
+    {
+        CmdUseAbility(target.gameObject, 1);
+    }
+
+    public virtual void Ability3(BattleActorBase target)
+    {
+        CmdUseAbility(target.gameObject, 2);
+    }
+
+    [Command] //This method is used for abilities with a simple setup (attack all/selected enemy(s)/player(s) and apply some status effect)
+    protected void CmdUseAbility(GameObject target, int i)
+    {
+        EnemyBase enemy = target.GetComponent<EnemyBase>();
+        if (enemy != null)
+        {
+            enemy.TakeDamage(Abilities[i].Damage);
+            enemy.AddStatusEffect(Abilities[i].StatusEffect);
+        }
+    }
+
+    public void EndAbility()
     {
         ToggleTargetFriends(false);
         ToggleTargetFoes(false);
         SelectedAbility = null;
+        IsUsingAbility = false;
+        PlayersUsingAbility--;
     }
 
     [Server]
@@ -255,10 +277,15 @@ public abstract class BattlePlayerBase : BattleActorBase
     [ClientRpc]
     private void RpcTakeDamage(int damageTaken, int blocked)
     {
-        damagePopup.Display(damageTaken, blocked, uiTransform.position);
+        damagePopup.Display(damageTaken, blocked);
 
-        Health = Math.Max(Health - damageTaken, 0);
+        Health -= damageTaken;
         HealthBar.SetHealth(Health);
+    }
+
+    protected override void Die()
+    {
+        
     }
 
     #endregion

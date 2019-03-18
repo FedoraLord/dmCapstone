@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c7cdb3a7754568488fe5725d2854f01, type: 3}
   m_Name: Bleed
   m_EditorClassIdentifier: 
-  duration: 0
-  effectAmount: 0
+  duration: 7
+  effectAmount: 5
   type: 0

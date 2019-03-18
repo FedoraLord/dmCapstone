@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 #pragma warning disable 0649
-public class HealthBarUI : MonoBehaviour
+public class HealthBarUI : BattleActorUI
 {
     [HideInInspector] public bool isClaimed;
 
@@ -14,48 +14,26 @@ public class HealthBarUI : MonoBehaviour
 
     private bool IsDead { get { return health == 0; } }
 
-    private Action<bool> healthBarCallback;
+    private Action healthBarCallback;
     private Coroutine animateHealthBar;
     private int health;
     private int maxHealth;
     private float currentDisplayedHP;
 
-    public void Claim(Vector3 worldPosition, int maxHp, Camera cam)
+    public override void Init(BattleActorBase actor)
     {
-        isClaimed = true;
-        gameObject.SetActive(true);
+        base.Init(actor);
 
-        Vector3 camPosition = cam.WorldToScreenPoint(worldPosition);
-        transform.position = camPosition;
-
-        InitHealth(maxHp);
-        OnClaim();
-    }
-
-    protected virtual void OnClaim()
-    {
-
-    }
-
-    public void Unclaim()
-    {
-        isClaimed = false;
-        gameObject.SetActive(false);
-    }
-
-    public void InitHealth(int maxHp)
-    {
-        health = maxHp;
-        maxHealth = maxHp;
-        currentDisplayedHP = maxHp;
+        SetTargets();
+        currentDisplayedHP = health = maxHealth = actor.MaxHealth;
         UpdateHealthUI(health);
     }
 
-    public void SetHealth(int newHeath, Action<bool> animCallback = null, bool animate = true)
+    public void SetHealth(int newHeath, Action animCallback = null, bool animate = true)
     {
         if (animateHealthBar != null)
         {
-            healthBarCallback?.Invoke(IsDead);
+            healthBarCallback?.Invoke();
             StopCoroutine(animateHealthBar);
             animateHealthBar = null;
         }
@@ -71,7 +49,7 @@ public class HealthBarUI : MonoBehaviour
         else
         {
             UpdateHealthUI(health);
-            healthBarCallback?.Invoke(IsDead);
+            healthBarCallback?.Invoke();
         }
     }
 
@@ -90,7 +68,7 @@ public class HealthBarUI : MonoBehaviour
         }
 
         animateHealthBar = null;
-        healthBarCallback?.Invoke(IsDead);
+        healthBarCallback?.Invoke();
         healthBarCallback = null;
     }
 
@@ -101,6 +79,46 @@ public class HealthBarUI : MonoBehaviour
         float percentageHealth = currentHealth / maxHealth;
         Vector3 scale = new Vector3(percentageHealth, 1, 1);
         healthBar.localScale = scale;
+    }
+
+    [SerializeField] private Image target1;
+    [SerializeField] private Image target2;
+    [SerializeField] private Image target3;
+    [SerializeField] private Image target4;
+
+    private List<Image> targets;
+    private List<Image> Targets
+    {
+        get
+        {
+            if (targets == null)
+            {
+                targets = new List<Image>()
+                {
+                    target1, target2, target3, target4
+                };
+            }
+            return targets;
+        }
+    }
+    
+    public void SetTargets(int[] playerTargets = null)
+    {
+        if (playerTargets == null)
+            playerTargets = new int[0];
+
+        for (int i = 0; i < playerTargets.Length; i++)
+        {
+            int playerIndex = playerTargets[i];
+            CharacterData character = PersistentPlayer.players[playerIndex].character;
+            Targets[i].sprite = character.Icon;
+            Targets[i].enabled = true;
+        }
+
+        for (int i = playerTargets.Length; i < 4; i++)
+        {
+            Targets[i].enabled = false;
+        }
     }
 }
 #pragma warning restore 0649

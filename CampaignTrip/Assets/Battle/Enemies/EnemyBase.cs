@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using static StatusEffect;
 
 #pragma warning disable CS0618, 0649
 public class EnemyBase : BattleActorBase
 {
-    protected override HealthBarUI HealthBar { get { return enemyHealthBar; } set { enemyHealthBar = value as EnemyUI; } }
+    public bool HasTargets { get { return targets != null && targets.Length > 0; } }
 
-    private EnemyUI enemyHealthBar;
-    
     private int[] targets;
     private int remainingBlock;
 
@@ -17,14 +16,8 @@ public class EnemyBase : BattleActorBase
 
     private void Start()
     {
-        if (isServer)
-        {
-            BattleController.Instance.OnEnemyReady();
-        }
-
-        Health = maxHealth;
-        HealthBar = BattleController.Instance.ClaimEnemyUI(this);
-        damagePopup = BattleController.Instance.ClaimDamagePopup();
+        BattleController.Instance.OnEnemySpawned(this);
+        Initialize();
     }
     
     #endregion
@@ -45,12 +38,6 @@ public class EnemyBase : BattleActorBase
             }
         }
 	}
-
-    [Server]
-    public void ApplyStatusEffect()
-    {
-
-    }
 
     [Server]
     public void TakeDamage(int damage)
@@ -74,32 +61,24 @@ public class EnemyBase : BattleActorBase
 
         if (damageTaken > 0)
         {
-            Health = Mathf.Max(Health - damageTaken, 0);
+            Health -= damageTaken;
             HealthBar.SetHealth(Health, OnHealthBarAnimComplete);
         }
 
-        damagePopup.Display(damageTaken, initialBlock - remainingBlock, uiTransform.position);
+        damagePopup.Display(damageTaken, initialBlock - remainingBlock);
 	}
     
-    private void OnHealthBarAnimComplete(bool isDead)
+    private void OnHealthBarAnimComplete()
     {
-        if (isDead)
+        if (isServer && !IsAlive)
         {
-            Die();
+            NetworkServer.Destroy(gameObject);
         }
     }
 
-    private void Die()
+    protected override void Die()
     {
-        //TODO play death animation
-
-        HealthBar.Unclaim();
-        
-        if (isServer)
-        {
-            BattleController.Instance.OnEnemyDeath(this);
-            NetworkServer.Destroy(gameObject);
-        }
+        BattleController.Instance.OnEnemyDeath(this);
     }
 
     #endregion
@@ -110,7 +89,11 @@ public class EnemyBase : BattleActorBase
     {
         remainingBlock = blockAmount;
         ChooseTargets();
-        RpcUpdateTargets(targets);
+
+        if (HasStatusEffect(StatusEffectType.Stun))
+            RpcUpdateTargets(new int[0]);
+        else
+            RpcUpdateTargets(targets);
     }
 
     protected virtual void ChooseTargets()
@@ -123,7 +106,7 @@ public class EnemyBase : BattleActorBase
     private void RpcUpdateTargets(int[] newTargets)
     {
         targets = newTargets;
-        enemyHealthBar.SetTargets(targets);
+        HealthBar.SetTargets(targets);
     }
 
     protected int[] GetRandomNPlayers(int n)
@@ -154,6 +137,17 @@ public class EnemyBase : BattleActorBase
         {
             PersistentPlayer.players[t].battlePlayer.TakeDamage(this);
         }
+    }
+
+    #endregion
+
+    #region StatusEffects
+
+    protected override void OnAddStun()
+    {
+        base.OnAddStun();
+        HealthBar.SetTargets();
+        RpcUpdateTargets(new int[0]);
     }
 
     #endregion
