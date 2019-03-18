@@ -13,9 +13,9 @@ public abstract class BattlePlayerBase : BattleActorBase
     /// This value is only maintained on the Server
     /// </summary>
     public static Ability SelectedAbility { get; private set; }
-    public static bool AbilityPlayedThisTurn { get; set; }
     public static int PlayersUsingAbility;
 
+    public bool AbilityPlayedThisTurn { get; set; }
     public bool IsUsingAbility { get; private set; }
     
     [SyncVar] public int playerNum;
@@ -73,7 +73,7 @@ public abstract class BattlePlayerBase : BattleActorBase
 
         public void Use(BattleActorBase target)
         {
-            AbilityPlayedThisTurn = true;
+            LocalAuthority.AbilityPlayedThisTurn = true;
             RemainingCooldown = cooldown;
             ExecuteAbility(target);
         }
@@ -133,7 +133,6 @@ public abstract class BattlePlayerBase : BattleActorBase
     {
         if (BattleController.Instance.IsPlayerPhase)
         {
-            IsUsingAbility = true;
             PlayersUsingAbility++;
             Target_UseAbilityConfirm(persistentPlayer.connectionToClient, i);
         }
@@ -143,6 +142,7 @@ public abstract class BattlePlayerBase : BattleActorBase
     private void Target_UseAbilityConfirm(NetworkConnection conn, int i)
     {
         SelectedAbility = Abilities[i];
+        IsUsingAbility = true;
 
         switch (SelectedAbility.Targets)
         {
@@ -214,6 +214,12 @@ public abstract class BattlePlayerBase : BattleActorBase
         ToggleTargetFoes(false);
         SelectedAbility = null;
         IsUsingAbility = false;
+        CmdEndAbility();
+    }
+
+    [Command]
+    private void CmdEndAbility()
+    {
         PlayersUsingAbility--;
     }
 
@@ -221,7 +227,13 @@ public abstract class BattlePlayerBase : BattleActorBase
     public void OnPlayerPhaseStart()
     {
         RpcUpdateAttackBlock(attacksPerTurn);
-        AbilityPlayedThisTurn = false;
+        RpcOnPlayerPhaseStart();
+    }
+
+    [ClientRpc]
+    private void RpcOnPlayerPhaseStart()
+    {
+        LocalAuthority.AbilityPlayedThisTurn = false;
     }
 
     [Command]

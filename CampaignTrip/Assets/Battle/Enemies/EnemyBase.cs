@@ -70,7 +70,7 @@ public class EnemyBase : BattleActorBase
     
     private void OnHealthBarAnimComplete()
     {
-        if (isServer && !IsAlive)
+        if (this != null && isServer && !IsAlive)
         {
             NetworkServer.Destroy(gameObject);
         }
@@ -147,7 +147,11 @@ public class EnemyBase : BattleActorBase
     {
         base.OnAddStun();
         HealthBar.SetTargets();
-        RpcUpdateTargets(new int[0]);
+
+        if (isServer)
+        {
+            RpcUpdateTargets(new int[0]);
+        }
     }
 
     #endregion

@@ -316,7 +316,10 @@ public class BattleController : NetworkBehaviour
     [ClientRpc]
     private void RpcStopAttackTimer()
     {
-        StopCoroutine(attackTimerCountdown);
+        if (attackTimerCountdown != null)
+        {
+            StopCoroutine(attackTimerCountdown);
+        }
     }
 
     #endregion
@@ -360,7 +363,7 @@ public class BattleController : NetworkBehaviour
     public void OnEnemyDeath(EnemyBase dead)
     {
         aliveEnemies.Remove(dead);
-        if (aliveEnemies.Count == 0)
+        if (isServer && aliveEnemies.Count == 0)
         {
             EndWave();
         }
