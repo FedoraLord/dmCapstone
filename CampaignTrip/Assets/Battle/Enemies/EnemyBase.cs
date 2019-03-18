@@ -2,22 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using static StatusEffect;
 
 #pragma warning disable CS0618, 0649
-public class EnemyBase : NetworkBehaviour
+public class EnemyBase : BattleActorBase
 {
-    public int health;
+    public bool HasTargets { get { return targets != null && targets.Length > 0; } }
 
-    public int numTargets = 1;
-    public int basicDamage = 5;
-    public int damageBlockedPerTurn;
-    public int maxHealth = 100;
-    public Transform uiTransform;
-
-	public bool isAlive { get { return health > 0; } }
-
-    private DamagePopup damagePopup;
-    private EnemyUI healthBar;
     private int[] targets;
     private int remainingBlock;
 
@@ -25,14 +16,8 @@ public class EnemyBase : NetworkBehaviour
 
     private void Start()
     {
-        if (isServer)
-        {
-            BattleController.Instance.OnEnemyReady();
-        }
-
-        health = maxHealth;
-        healthBar = BattleController.Instance.ClaimEnemyUI(this);
-        damagePopup = BattleController.Instance.ClaimDamagePopup();
+        BattleController.Instance.OnEnemySpawned(this);
+        Initialize();
     }
     
     #endregion
@@ -41,14 +26,21 @@ public class EnemyBase : NetworkBehaviour
 
     private void OnMouseUpAsButton()
 	{
-        if (isAlive)
+        if (IsAlive)
         {
-            BattlePlayerBase.LocalAuthority.CmdAttack(gameObject);
+            if (BattlePlayerBase.LocalAuthority.IsUsingAbility && BattlePlayerBase.SelectedAbility.Targets == BattlePlayerBase.TargetMode.Foe)
+            {
+                BattlePlayerBase.LocalAuthority.OnAbilityTargetChosen(this);
+            }
+            else
+            {
+                BattlePlayerBase.LocalAuthority.CmdAttack(gameObject);
+            }
         }
 	}
 
     [Server]
-    public void TakeDamage(int damage)
+    public void DispatchDamage(int damage)
 	{
         RpcTakeDamage(damage);
 	}
@@ -56,6 +48,11 @@ public class EnemyBase : NetworkBehaviour
     [ClientRpc]
 	private void RpcTakeDamage(int damage)
 	{
+        TakeDamage(damage);
+	}
+
+    public void TakeDamage(int damage)
+    {
         //TODO: play damage animation
 
         int damageTaken = damage;
@@ -69,30 +66,19 @@ public class EnemyBase : NetworkBehaviour
 
         if (damageTaken > 0)
         {
-            health = Mathf.Max(health - damageTaken, 0);
-            healthBar.SetHealth(health, OnHealthBarAnimComplete);
+            Health -= damageTaken;
+            HealthBar.SetHealth(Health);
         }
 
-        damagePopup.Display(damageTaken, initialBlock - remainingBlock, uiTransform.position);
-	}
-    
-    private void OnHealthBarAnimComplete(bool isDead)
-    {
-        if (isDead)
-        {
-            Die();
-        }
+        damagePopup.Display(damageTaken, initialBlock - remainingBlock);
     }
 
-    private void Die()
+    protected override void Die()
     {
-        //TODO play death animation
+        BattleController.Instance.OnEnemyDeath(this);
 
-        healthBar.Unclaim();
-        
         if (isServer)
         {
-            BattleController.Instance.OnEnemyDeath(this);
             NetworkServer.Destroy(gameObject);
         }
     }
@@ -103,22 +89,26 @@ public class EnemyBase : NetworkBehaviour
 
     public void OnPlayerPhaseStart()
     {
-        remainingBlock = damageBlockedPerTurn;
+        remainingBlock = blockAmount;
         ChooseTargets();
-        RpcUpdateTargets(targets);
+
+        if (HasStatusEffect(StatusEffectType.Stun))
+            RpcUpdateTargets(new int[0]);
+        else
+            RpcUpdateTargets(targets);
     }
 
     protected virtual void ChooseTargets()
     {
         //picks targets randomly unless overridden
-        targets = GetRandomNPlayers(numTargets);
+        targets = GetRandomNPlayers(attacksPerTurn);
     }
 
     [ClientRpc]
     private void RpcUpdateTargets(int[] newTargets)
     {
         targets = newTargets;
-        healthBar.SetTargets(targets);
+        HealthBar.SetTargets(targets);
     }
 
     protected int[] GetRandomNPlayers(int n)
@@ -148,6 +138,21 @@ public class EnemyBase : NetworkBehaviour
         foreach (int t in targets)
         {
             PersistentPlayer.players[t].battlePlayer.TakeDamage(this);
+        }
+    }
+
+    #endregion
+
+    #region StatusEffects
+
+    protected override void OnAddStun()
+    {
+        base.OnAddStun();
+        HealthBar.SetTargets();
+
+        if (isServer)
+        {
+            RpcUpdateTargets(new int[0]);
         }
     }
 

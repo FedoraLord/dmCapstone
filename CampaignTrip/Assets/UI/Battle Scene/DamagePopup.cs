@@ -3,25 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DamagePopup : MonoBehaviour
+public class DamagePopup : BattleActorUI
 {
     public Text damageText;
     public Text blockText;
     
-    private bool isClaimed;
     private Camera mainCamera;
     private Coroutine popupAnimation;
 
-    public bool TryClaim()
+    public override void Init(BattleActorBase actor)
     {
-        if (isClaimed)
-            return false;
-
-        isClaimed = true;
-        return true;
+        base.Init(actor);
+        gameObject.SetActive(false);
     }
 
-    public void Display(int damage, int blocked, Vector3 position)
+    public void Display(int damage, int blocked)
     {
         if (popupAnimation != null)
             StopCoroutine(popupAnimation);
@@ -32,7 +28,7 @@ public class DamagePopup : MonoBehaviour
         damageText.text = string.Format("-{0}", damage);
 
         mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-        transform.position = mainCamera.WorldToScreenPoint(position);
+        transform.position = mainCamera.WorldToScreenPoint(owner.UITransform.position);
 
         gameObject.SetActive(true);
         popupAnimation = StartCoroutine(Animate());
@@ -43,7 +39,7 @@ public class DamagePopup : MonoBehaviour
         float animTime = 0;
         float totalAnimTime = 0.3f;
         Vector3 start = transform.position;
-        Vector3 end = mainCamera.WorldToScreenPoint(mainCamera.ScreenToWorldPoint(transform.position) + Vector3.up * 0.5f);
+        Vector3 end = mainCamera.WorldToScreenPoint(mainCamera.ScreenToWorldPoint(transform.position) + Vector3.up * 0.3f);
 
         damageText.CrossFadeAlpha(0, 0, false);
         blockText.CrossFadeAlpha(0, 0, false);

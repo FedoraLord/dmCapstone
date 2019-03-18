@@ -4,15 +4,18 @@ using UnityEngine;
 
 public class BP_Mage : BattlePlayerBase
 {
-    // Start is called before the first frame update
-    void Start()
+    public override void Ability1(BattleActorBase target)
     {
-        
+        throw new System.NotImplementedException();
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void Ability2(BattleActorBase target)
     {
-        
+        throw new System.NotImplementedException();
+    }
+
+    public override void Ability3(BattleActorBase target)
+    {
+        throw new System.NotImplementedException();
     }
 }
