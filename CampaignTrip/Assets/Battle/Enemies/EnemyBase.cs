@@ -40,7 +40,7 @@ public class EnemyBase : BattleActorBase
 	}
 
     [Server]
-    public void TakeDamage(int damage)
+    public void DispatchDamage(int damage)
 	{
         RpcTakeDamage(damage);
 	}
@@ -48,6 +48,11 @@ public class EnemyBase : BattleActorBase
     [ClientRpc]
 	private void RpcTakeDamage(int damage)
 	{
+        TakeDamage(damage);
+	}
+
+    public void TakeDamage(int damage)
+    {
         //TODO: play damage animation
 
         int damageTaken = damage;
@@ -62,23 +67,20 @@ public class EnemyBase : BattleActorBase
         if (damageTaken > 0)
         {
             Health -= damageTaken;
-            HealthBar.SetHealth(Health, OnHealthBarAnimComplete);
+            HealthBar.SetHealth(Health);
         }
 
         damagePopup.Display(damageTaken, initialBlock - remainingBlock);
-	}
-    
-    private void OnHealthBarAnimComplete()
-    {
-        if (this != null && isServer && !IsAlive)
-        {
-            NetworkServer.Destroy(gameObject);
-        }
     }
 
     protected override void Die()
     {
         BattleController.Instance.OnEnemyDeath(this);
+
+        if (isServer)
+        {
+            NetworkServer.Destroy(gameObject);
+        }
     }
 
     #endregion

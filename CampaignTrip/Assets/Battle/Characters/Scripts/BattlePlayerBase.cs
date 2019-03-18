@@ -184,28 +184,43 @@ public abstract class BattlePlayerBase : BattleActorBase
     //override these implementations if the ability is a little more complex than what CmdUseAbility handles
     public virtual void Ability1(BattleActorBase target)
     {
-        CmdUseAbility(target.gameObject, 0);
+        CmdUseAbility(target?.gameObject, 0);
     }
 
     public virtual void Ability2(BattleActorBase target)
     {
-        CmdUseAbility(target.gameObject, 1);
+        CmdUseAbility(target?.gameObject, 1);
     }
 
     public virtual void Ability3(BattleActorBase target)
     {
-        CmdUseAbility(target.gameObject, 2);
+        CmdUseAbility(target?.gameObject, 2);
     }
 
     [Command] //This method is used for abilities with a simple setup (attack all/selected enemy(s)/player(s) and apply some status effect)
     protected void CmdUseAbility(GameObject target, int i)
     {
-        EnemyBase enemy = target.GetComponent<EnemyBase>();
-        if (enemy != null)
+        if (target == null)
         {
-            enemy.TakeDamage(Abilities[i].Damage);
-            enemy.AddStatusEffect(Abilities[i].StatusEffect);
+            foreach (EnemyBase e in BattleController.Instance.aliveEnemies)
+            {
+                UseAbility(e, Abilities[i]);
+            }
         }
+        else
+        {
+            EnemyBase enemy = target.GetComponent<EnemyBase>();
+            if (enemy != null)
+            {
+                UseAbility(enemy, Abilities[i]);
+            }
+        }
+    }
+
+    private void UseAbility(EnemyBase enemy, Ability ability)
+    {
+        enemy.DispatchDamage(ability.Damage);
+        enemy.AddStatusEffect(ability.StatusEffect);
     }
 
     public void EndAbility()
@@ -243,7 +258,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         {
             RpcAttack();
             EnemyBase enemy = target.GetComponent<EnemyBase>();
-            enemy.TakeDamage(basicDamage);
+            enemy.DispatchDamage(basicDamage);
         }
     }
 

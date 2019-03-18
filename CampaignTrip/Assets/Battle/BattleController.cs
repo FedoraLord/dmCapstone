@@ -222,12 +222,22 @@ public class BattleController : NetworkBehaviour
             }
         }
 
-        foreach (EnemyBase e in aliveEnemies)
+        for (int i = 0; i < aliveEnemies.Count; i++)
         {
+            EnemyBase e = aliveEnemies[i];
             yield return e.ApplySatusEffects();
+
+            if (i >= aliveEnemies.Count || e != aliveEnemies[i])
+            {
+                //enemy died and was removed from aliveEnemies
+                i--;
+            }
         }
 
-        StartPlayerPhase(); 
+        if (aliveEnemies.Count > 0 && IsEnemyPhase)
+        {
+            StartPlayerPhase();
+        }
     }
 
     #endregion
