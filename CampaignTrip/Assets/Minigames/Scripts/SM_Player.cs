@@ -54,6 +54,7 @@ public class SM_Player : NetworkBehaviour
                     break;
             }
             animator.SetBool("Moving", false);
+            animator.SetInteger("Direction", 2);
         }
     }
 
