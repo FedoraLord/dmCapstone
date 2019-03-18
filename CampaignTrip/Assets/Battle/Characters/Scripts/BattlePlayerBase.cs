@@ -8,11 +8,15 @@ using static StatusEffect;
 #pragma warning disable CS0618, 0649
 public abstract class BattlePlayerBase : BattleActorBase
 {
-    public static BattlePlayerBase LocalAuthority { get { return PersistentPlayer.localAuthority.battlePlayer; } }
     /// <summary>
     /// This value is only maintained on the Server
     /// </summary>
     public static Ability SelectedAbility { get; private set; }
+    public static BattlePlayerBase LocalAuthority { get { return PersistentPlayer.localAuthority.battlePlayer; } }
+    //public static BP_Mage Mage { get; protected set; }
+    //public static BP_Rogue Rogue { get; protected set; }
+    //public static BP_Warrior Warrior { get; protected set; }
+    //public static BP_Alchemist Alchemist { get; protected set; }
     public static int PlayersUsingAbility;
 
     public bool AbilityPlayedThisTurn { get; set; }
@@ -37,6 +41,7 @@ public abstract class BattlePlayerBase : BattleActorBase
     {
         public Action<BattleActorBase> ExecuteAbility { get; set; }
         public int Damage { get { return damage; } }
+        public int Duration { get { return duration; } }
         public TargetMode Targets { get { return targets; } }
 
         public StatusEffect StatusEffect
@@ -51,11 +56,12 @@ public abstract class BattlePlayerBase : BattleActorBase
 
         [HideInInspector] public int RemainingCooldown;
 
-        [SerializeField] private string AbilityName;
+        [SerializeField] private string abilityName;
         [SerializeField] private TargetMode targets;
         [SerializeField] private StatusEffectType applies;
         [Tooltip("Also used for heal amount")]
         [SerializeField] private int damage;
+        [SerializeField] private int duration;
         [SerializeField] private int cooldown;
 
         private StatusEffect statusEffect;
@@ -104,10 +110,23 @@ public abstract class BattlePlayerBase : BattleActorBase
         Initialize();
     }
 
+    [Server]
+    public void OnPlayerPhaseStart()
+    {
+        RpcUpdateAttackBlock(attacksPerTurn);
+        RpcOnPlayerPhaseStart();
+    }
+
+    [ClientRpc]
+    private void RpcOnPlayerPhaseStart()
+    {
+        LocalAuthority.AbilityPlayedThisTurn = false;
+    }
+
     #endregion
 
     #region Attack
-    
+
     private void OnMouseUpAsButton()
     {
         if (IsAlive && LocalAuthority.IsUsingAbility && SelectedAbility.Targets == TargetMode.Friend)
@@ -115,6 +134,48 @@ public abstract class BattlePlayerBase : BattleActorBase
             LocalAuthority.OnAbilityTargetChosen(this);
         }
     }
+    
+    [Command]
+    public void CmdAttack(GameObject target)
+    {
+        if (attacksRemaining > 0 && BattleController.Instance.IsPlayerPhase)
+        {
+            RpcAttack();
+            EnemyBase enemy = target.GetComponent<EnemyBase>();
+            enemy.DispatchDamage(basicDamage, true);
+        }
+    }
+
+    [ClientRpc]
+    private void RpcAttack()
+    {
+        UpdateAttackBlock(attacksRemaining - 1);
+        if (localPlayerAuthority)
+        {
+            animator.SetTrigger("Attack");
+        }
+    }
+
+    [ClientRpc]
+    private void RpcUpdateAttackBlock(int newAttacksRemaining)
+    {
+        UpdateAttackBlock(newAttacksRemaining);
+    }
+
+    private void UpdateAttackBlock(int newAttacksRemaining)
+    {
+        attacksRemaining = newAttacksRemaining;
+        blockAmount = (int)Mathf.Min((float)attacksRemaining / attacksPerTurn * 100f, 90);
+
+        if (this == LocalAuthority)
+        {
+            BattleController.Instance.UpdateAttackBlockUI(attacksRemaining, blockAmount);
+        }
+    }
+
+    #endregion
+
+    #region Abilities
 
     public void AbilitySelected(int i)
     {
@@ -137,7 +198,7 @@ public abstract class BattlePlayerBase : BattleActorBase
             Target_UseAbilityConfirm(persistentPlayer.connectionToClient, i);
         }
     }
-    
+
     [TargetRpc]
     private void Target_UseAbilityConfirm(NetworkConnection conn, int i)
     {
@@ -174,7 +235,7 @@ public abstract class BattlePlayerBase : BattleActorBase
             e.tempAbilityTarget.SetActive(active);
         }
     }
-    
+
     public void OnAbilityTargetChosen(BattleActorBase target)
     {
         SelectedAbility.Use(target);
@@ -209,18 +270,16 @@ public abstract class BattlePlayerBase : BattleActorBase
         }
         else
         {
-            EnemyBase enemy = target.GetComponent<EnemyBase>();
-            if (enemy != null)
-            {
-                UseAbility(enemy, Abilities[i]);
-            }
+            BattleActorBase actor = target.GetComponent<BattleActorBase>();
+            UseAbility(actor, Abilities[i]);
         }
     }
 
-    private void UseAbility(EnemyBase enemy, Ability ability)
+    [Server]
+    private void UseAbility(BattleActorBase target, Ability ability)
     {
-        enemy.DispatchDamage(ability.Damage);
-        enemy.AddStatusEffect(ability.StatusEffect);
+        target.DispatchDamage(ability.Damage, true);
+        target.AddStatusEffect(ability.StatusEffect, this, ability.Duration);
     }
 
     public void EndAbility()
@@ -238,76 +297,31 @@ public abstract class BattlePlayerBase : BattleActorBase
         PlayersUsingAbility--;
     }
 
-    [Server]
-    public void OnPlayerPhaseStart()
-    {
-        RpcUpdateAttackBlock(attacksPerTurn);
-        RpcOnPlayerPhaseStart();
-    }
-
-    [ClientRpc]
-    private void RpcOnPlayerPhaseStart()
-    {
-        LocalAuthority.AbilityPlayedThisTurn = false;
-    }
-
-    [Command]
-    public void CmdAttack(GameObject target)
-    {
-        if (attacksRemaining > 0 && BattleController.Instance.IsPlayerPhase)
-        {
-            RpcAttack();
-            EnemyBase enemy = target.GetComponent<EnemyBase>();
-            enemy.DispatchDamage(basicDamage);
-        }
-    }
-
-    [ClientRpc]
-    private void RpcAttack()
-    {
-        UpdateAttackBlock(attacksRemaining - 1);
-        if (localPlayerAuthority)
-        {
-            animator.SetTrigger("Attack");
-        }
-    }
-
-    [ClientRpc]
-    private void RpcUpdateAttackBlock(int newAttacksRemaining)
-    {
-        UpdateAttackBlock(newAttacksRemaining);
-    }
-
-    private void UpdateAttackBlock(int newAttacksRemaining)
-    {
-        attacksRemaining = newAttacksRemaining;
-        blockAmount = (int)Mathf.Min((float)attacksRemaining / attacksPerTurn * 100f, 90);
-
-        if (this == LocalAuthority)
-        {
-            BattleController.Instance.UpdateAttackBlockUI(attacksRemaining, blockAmount);
-        }
-    }
-
     #endregion
 
     #region Damage
 
     [Server]
-    public void TakeDamage(EnemyBase e)
+    public override void DispatchDamage(int damage, bool canBlock)
     {
-        int blocked = e.BasicDamage * blockAmount / 100;
-        int damageTaken = e.BasicDamage - blocked;
-        RpcTakeDamage(damageTaken, blocked);
-    }
-
-    [ClientRpc]
-    private void RpcTakeDamage(int damageTaken, int blocked)
-    {
-        damagePopup.Display(damageTaken, blocked);
-
-        Health -= damageTaken;
-        HealthBar.SetHealth(Health);
+        if (canBlock)
+        {
+            if (HasStatusEffect(StatusEffectType.Protected))
+            {
+                BattleActorBase protector = GetGivenBy(StatusEffectType.Protected);
+                protector.DispatchDamage(damage, canBlock);
+            }
+            else
+            {
+                int blocked = damage * blockAmount / 100;
+                int damageTaken = damage - blocked;
+                RpcTakeDamage(damageTaken, blocked);
+            }
+        }
+        else
+        {
+            RpcTakeDamage(damage, 0);
+        }
     }
 
     protected override void Die()

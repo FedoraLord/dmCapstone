@@ -40,45 +40,39 @@ public class EnemyBase : BattleActorBase
 	}
 
     [Server]
-    public void DispatchDamage(int damage)
-	{
-        RpcTakeDamage(damage);
-	}
-    
-    [ClientRpc]
-	private void RpcTakeDamage(int damage)
-	{
-        TakeDamage(damage);
-	}
-
-    public void TakeDamage(int damage)
+    public override void DispatchDamage(int damage, bool canBlock)
     {
-        //TODO: play damage animation
-
-        int damageTaken = damage;
-        int initialBlock = remainingBlock;
-
-        if (remainingBlock > 0)
+        if (canBlock)
         {
-            remainingBlock = Mathf.Max(remainingBlock - damage, 0);
-            damageTaken = damage - remainingBlock;
-        }
+            int damageTaken = damage;
+            int initialBlock = remainingBlock;
 
-        if (damageTaken > 0)
+            if (remainingBlock > 0)
+            {
+                remainingBlock = Mathf.Max(remainingBlock - damage, 0);
+                damageTaken = damage - remainingBlock;
+            }
+            
+            RpcTakeDamage(damage, initialBlock - remainingBlock);
+        }
+        else
         {
-            Health -= damageTaken;
-            HealthBar.SetHealth(Health);
+            RpcTakeDamage(damage, 0);
         }
-
-        damagePopup.Display(damageTaken, initialBlock - remainingBlock);
     }
 
     protected override void Die()
     {
         BattleController.Instance.OnEnemyDeath(this);
+        StartCoroutine(DelayDeath());
+    }
 
+    private IEnumerator DelayDeath()
+    {
+        //TODO: play death animation
         if (isServer)
         {
+            yield return new WaitForSeconds(0.5f);
             NetworkServer.Destroy(gameObject);
         }
     }
@@ -137,7 +131,7 @@ public class EnemyBase : BattleActorBase
     {
         foreach (int t in targets)
         {
-            PersistentPlayer.players[t].battlePlayer.TakeDamage(this);
+            PersistentPlayer.players[t].battlePlayer.DispatchDamage(basicDamage, true);
         }
     }
 
@@ -145,9 +139,9 @@ public class EnemyBase : BattleActorBase
 
     #region StatusEffects
 
-    protected override void OnAddStun()
+    protected override void OnStun()
     {
-        base.OnAddStun();
+        base.OnStun();
         HealthBar.SetTargets();
 
         if (isServer)
