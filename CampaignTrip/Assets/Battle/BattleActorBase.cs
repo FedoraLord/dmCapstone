@@ -40,7 +40,7 @@ public abstract class BattleActorBase : NetworkBehaviour
     protected int blockAmount;
 
     private int health;
-    private Dictionary<StatusEffectType, Stat> statusEffects;
+    private Dictionary<StatusEffectType, List<Stat>> statusEffects = new Dictionary<StatusEffectType, List<Stat>>();
 
     //TODO: REMOVE AND REPLACE
     public GameObject tempAbilityTarget;
@@ -48,14 +48,13 @@ public abstract class BattleActorBase : NetworkBehaviour
     private class Stat
     {
         public int RemainingDuration;
-        public int EffectAmount;
-        public StatusEffect Effect;
+
         public BattleActorBase GivenBy;
+        public StatusEffect Effect;
 
         public Stat(StatusEffect s, BattleActorBase givenBy, int duration)
         {
             Effect = s;
-            EffectAmount = s.EffectAmount;
             GivenBy = givenBy;
             RemainingDuration = duration;
         }
@@ -66,7 +65,6 @@ public abstract class BattleActorBase : NetworkBehaviour
         Health = maxHealth;
         healthBarUI.Init(this);
         damagePopup.Init(this);
-        statusEffects = new Dictionary<StatusEffectType, Stat>();
     }
 
     private void OnDestroy()
@@ -98,7 +96,9 @@ public abstract class BattleActorBase : NetworkBehaviour
 
     public BattleActorBase GetGivenBy(StatusEffectType type)
     {
-        return statusEffects[type].GivenBy;
+        if (statusEffects.ContainsKey(type))
+            return statusEffects[type][0].GivenBy;
+        return null;
     }
 
     [Server] //stacks the duration if it is already in the list
@@ -113,48 +113,79 @@ public abstract class BattleActorBase : NetworkBehaviour
         StatusEffect add = BattleController.Instance.GetStatusEffect(type);
         Stat s = new Stat(add, givenBy.GetComponent<BattleActorBase>(), duration);
 
-        if (TryAddStatusEffect(s))
-        {
-            statusEffects.Add(type, new Stat(add, givenBy.GetComponent<BattleActorBase>(), duration));
-        }
-    }
-
-    private bool TryAddStatusEffect(Stat s)
-    {
         RemoveOnAdd(s.Effect.Type);
-
-        bool exists = HasStatusEffect(s.Effect.Type);
-        if (exists)
-        {
-            Stack(s);
-        }
         
+        if (HasStatusEffect(s.Effect.Type))
+        {
+            AddStack(s);
+        }
+        else
+        {
+            statusEffects.Add(type, new List<Stat>() { s });
+        }
+
         switch (s.Effect.Type)
         {
             case StatusEffectType.Bleed:
-                return OnAddBleed(s) && !exists;
+                OnAddBleed(s);
+                break;
             case StatusEffectType.Blind:
-                return OnAddBlind(s) && !exists;
+                OnAddBlind(s);
+                break;
             case StatusEffectType.Burn:
-                return OnAddBurn(s) && !exists;
+                OnAddBurn(s);
+                break;
             case StatusEffectType.Focus:
-                return OnAddFocus(s) && !exists;
+                OnAddFocus(s);
+                break;
             case StatusEffectType.Freeze:
-                return OnAddFreeze(s) && !exists;
+                OnAddFreeze(s);
+                break;
             case StatusEffectType.Invisible:
-                return OnAddInvisible(s) && !exists;
+                OnAddInvisible(s);
+                break;
             case StatusEffectType.Poison:
-                return OnAddPoison(s) && !exists;
+                OnAddPoison(s);
+                break;
             case StatusEffectType.Protected:
-                return OnAddProtected(s) && !exists;
+                OnAddProtected(s);
+                break;
             case StatusEffectType.Reflect:
-                return OnAddReflect(s) && !exists;
+                OnAddReflect(s);
+                break;
             case StatusEffectType.Stun:
-                return OnAddStun(s) && !exists;
+                OnAddStun(s);
+                break;
             case StatusEffectType.Weak:
-                return OnAddWeak(s) && !exists;
+                OnAddWeak(s);
+                break;
             default:
-                return false;
+                break;
+        }
+    }
+
+    private void AddStack(Stat s)
+    {
+        int maxDuration = 10;
+        switch (s.Effect.Type)
+        {
+            case StatusEffectType.Bleed:
+                //stack damage
+                statusEffects[s.Effect.Type].Add(s);
+                break;
+            case StatusEffectType.Blind:
+            case StatusEffectType.Burn:
+            case StatusEffectType.Freeze:
+            case StatusEffectType.Poison:
+            case StatusEffectType.Stun:
+            case StatusEffectType.Weak:
+                //stack duration
+                int duration = statusEffects[s.Effect.Type][0].RemainingDuration + s.RemainingDuration;
+                statusEffects[s.Effect.Type][0].RemainingDuration += Mathf.Min(duration, maxDuration);
+                break;
+            default:
+                //dont stack
+                break;
         }
     }
 
@@ -175,30 +206,7 @@ public abstract class BattleActorBase : NetworkBehaviour
                 break;
         }
     }
-
-    private void Stack(Stat s)
-    {
-        switch (s.Effect.Type)
-        {
-            case StatusEffectType.Bleed:
-                //stack damage
-                statusEffects[s.Effect.Type].EffectAmount += s.EffectAmount;
-                break;
-            case StatusEffectType.Blind:
-            case StatusEffectType.Burn:
-            case StatusEffectType.Freeze:
-            case StatusEffectType.Poison:
-            case StatusEffectType.Stun:
-            case StatusEffectType.Weak:
-                //stack duration
-                statusEffects[s.Effect.Type].RemainingDuration += s.RemainingDuration;
-                break;
-            default:
-                //dont stack
-                break;
-        }
-    }
-
+    
     private bool OnAddBleed(Stat s)
     {
         return true;
@@ -267,34 +275,53 @@ public abstract class BattleActorBase : NetworkBehaviour
     {
         
     }
-
-    [Server]
+    
     public IEnumerator ApplySatusEffects()
     {
-        List<Stat> stats = new List<Stat>(statusEffects.Values);
-        for (int i = 0; i < stats.Count; i++)
+        List<StatusEffectType> types = new List<StatusEffectType>(statusEffects.Keys);
+        for (int i = 0; i < types.Count; i++)
         {
-            Stat s = stats[i];
+            List<Stat> s = statusEffects[types[i]];
             yield return DamageOverTime(s);
 
-            s.RemainingDuration -= 1;
-            if (s.RemainingDuration <= 0)
+            DecrementDuration(s[i].Effect.Type);
+        }
+    }
+    
+    private void DecrementDuration(StatusEffectType type)
+    {
+        List<Stat> s = statusEffects[type];
+        for (int i = 0; i < s.Count; i++)
+        {
+            s[i].RemainingDuration--;
+            if (s[i].RemainingDuration <= 0)
             {
-                statusEffects.Remove(s.Effect.Type);
+                s.RemoveAt(i);
+                i--;
             }
+        }
+
+        if (s.Count == 0)
+        {
+            statusEffects.Remove(type);
         }
     }
 
     [Server]
-    private IEnumerator DamageOverTime(Stat s)
+    private IEnumerator DamageOverTime(List<Stat> s)
     {
-        switch (s.Effect.Type)
+        switch (s[0].Effect.Type)
         {
             case StatusEffectType.Bleed:
             case StatusEffectType.Burn:
             case StatusEffectType.Freeze:
             case StatusEffectType.Poison:
-                DispatchDamage(s.EffectAmount, false);
+                int damage = 0;
+                for (int i = 0; i < s.Count; i++)
+                {
+                    damage += s[i].Effect.EffectAmount;
+                }
+                DispatchDamage(damage, false);
                 yield return new WaitForSeconds(0.5f);
                 break;
             case StatusEffectType.Blind:
