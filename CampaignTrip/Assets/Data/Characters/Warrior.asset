@@ -16,5 +16,5 @@ MonoBehaviour:
   flavorText: A big fellow that can take a lot of hits and deal a lot of damage
   sprite: {fileID: 21300000, guid: b31054068891538479387b2d3a4941d7, type: 3}
   icon: {fileID: 21300000, guid: a52cfc186aad169489e8594a2f3f39bb, type: 3}
-  characterPrefab: {fileID: 3126196965850195258, guid: efe228486430c6e48b9bdcd8d1726a5f,
+  characterPrefab: {fileID: 3126196965850195358, guid: efe228486430c6e48b9bdcd8d1726a5f,
     type: 3}
