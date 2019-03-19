@@ -127,37 +127,37 @@ public abstract class BattleActorBase : NetworkBehaviour
         switch (s.Effect.Type)
         {
             case StatusEffectType.Bleed:
-                OnAddBleed(s);
+                OnAddBleed();
                 break;
             case StatusEffectType.Blind:
-                OnAddBlind(s);
+                OnAddBlind();
                 break;
             case StatusEffectType.Burn:
-                OnAddBurn(s);
+                OnAddBurn();
                 break;
             case StatusEffectType.Focus:
-                OnAddFocus(s);
+                OnAddFocus();
                 break;
             case StatusEffectType.Freeze:
-                OnAddFreeze(s);
+                OnAddFreeze();
                 break;
             case StatusEffectType.Invisible:
-                OnAddInvisible(s);
+                OnAddInvisible();
                 break;
             case StatusEffectType.Poison:
-                OnAddPoison(s);
+                OnAddPoison();
                 break;
             case StatusEffectType.Protected:
-                OnAddProtected(s);
+                OnAddProtected();
                 break;
             case StatusEffectType.Reflect:
-                OnAddReflect(s);
+                OnAddReflect();
                 break;
             case StatusEffectType.Stun:
-                OnAddStun(s);
+                OnAddStun();
                 break;
             case StatusEffectType.Weak:
-                OnAddWeak(s);
+                OnAddWeak();
                 break;
             default:
                 break;
@@ -206,75 +206,18 @@ public abstract class BattleActorBase : NetworkBehaviour
                 break;
         }
     }
-    
-    private bool OnAddBleed(Stat s)
-    {
-        return true;
-    }
-            
-    private bool OnAddBlind(Stat s)
-    {
-        throw new NotImplementedException();
-    }
-            
-    private bool OnAddBurn(Stat s)
-    {
-        if (HasStatusEffect(StatusEffectType.Freeze))
-        {
-            statusEffects.Remove(StatusEffectType.Freeze);
-        }
-        throw new NotImplementedException();
-    }
-            
-    private bool OnAddFocus(Stat s)
-    {
-        throw new NotImplementedException();
-    }
-            
-    private bool OnAddFreeze(Stat s)
-    {
-        if (HasStatusEffect(StatusEffectType.Burn))
-        {
-            statusEffects.Remove(StatusEffectType.Burn);
-        }
-        throw new NotImplementedException();
-    }
-            
-    private bool OnAddInvisible(Stat s)
-    {
-        throw new NotImplementedException();
-    }
-            
-    private bool OnAddPoison(Stat s)
-    {
-        throw new NotImplementedException();
-    }
-            
-    private bool OnAddProtected(Stat s)
-    {
-        throw new NotImplementedException();
-    }
-            
-    private bool OnAddReflect(Stat s)
-    {
-        throw new NotImplementedException();
-    }
-            
-    private bool OnAddStun(Stat s)
-    {
-        OnStun();
-        return true;
-    }
-            
-    private bool OnAddWeak(Stat s)
-    {
-        throw new NotImplementedException();
-    }
 
-    protected virtual void OnStun()
-    {
-        
-    }
+    protected virtual void OnAddBleed() { }
+    protected virtual void OnAddBlind() { }
+    protected virtual void OnAddBurn() { }
+    protected virtual void OnAddFocus() { }
+    protected virtual void OnAddFreeze() { }
+    protected virtual void OnAddInvisible() { }
+    protected virtual void OnAddPoison() { }
+    protected virtual void OnAddProtected() { }
+    protected virtual void OnAddReflect() { }
+    protected virtual void OnAddWeak() { }
+    protected virtual void OnAddStun() { }
     
     public IEnumerator ApplySatusEffects()
     {
@@ -283,8 +226,7 @@ public abstract class BattleActorBase : NetworkBehaviour
         {
             List<Stat> s = statusEffects[types[i]];
             yield return DamageOverTime(s);
-
-            DecrementDuration(s[i].Effect.Type);
+            DecrementDuration(types[i]);
         }
     }
     

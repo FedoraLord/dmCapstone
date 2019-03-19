@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using static StatusEffect;
@@ -36,12 +37,33 @@ public abstract class BattlePlayerBase : BattleActorBase
     [SerializeField] protected Ability ability3;
 
     protected List<Ability> abilities;
-    protected List<BattleActorBase> validTargets;
+    protected List<BattleActorBase> ValidTargets
+    {
+        get
+        {
+            if (SelectedAbility == null || SelectedAbility.Targets == TargetMode.Enemy)
+            {
+                return new List<BattleActorBase>(BattleController.Instance.aliveEnemies);
+            }
+            else if (SelectedAbility.Targets == TargetMode.OverrideAuto || SelectedAbility.Targets == TargetMode.OverrideSelect)
+            {
+                return customTargets;
+            }
+            else
+            {
+                List<BattleActorBase> targets = PersistentPlayer.players.Select(x => x.battlePlayer).ToList<BattleActorBase>();
+                if (SelectedAbility.Targets == TargetMode.Ally)
+                    targets.Remove(this);
+                return targets;
+            }
+        }
+    }
+    protected List<BattleActorBase> customTargets;
     protected int selectedAbilityIndex = -1;
 
     private int attacksRemaining;
 
-    public enum TargetMode { Override, Ally, AllyAndSelf, Enemy }
+    public enum TargetMode { OverrideAuto, OverrideSelect, Ally, AllyAndSelf, Enemy }
 
     [Serializable]
     public class Ability
@@ -127,7 +149,7 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     private void OnMouseUpAsButton()
     {
-        if (IsAlive && IsValidTarget(this))
+        if (IsAlive && LocalAuthority.IsValidTarget(this))
         {
             if (LocalAuthority.SelectedAbility != null)
             {
@@ -184,38 +206,7 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     public bool IsValidTarget(BattleActorBase target)
     {
-        return validTargets.Contains(target);
-        //if (target is EnemyBase)
-        //{
-        //    if (SelectedAbility == null)
-        //    {
-        //        //regular attack
-        //        return true;
-        //    }
-        //    else if (SelectedAbility.Targets == TargetMode.Foe)
-        //    {
-        //        //offensive ability target
-        //        return true;
-        //    }
-        //}
-        //else if (target is BattlePlayerBase)
-        //{
-        //    if (SelectedAbility == null)
-        //    {
-        //        if (target.HasStatusEffect(StatusEffectType.Burn) || target.HasStatusEffect(StatusEffectType.Freeze))
-        //        {
-        //            return true;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        if (SelectedAbility.Targets == TargetMode.Friend)
-        //        {
-
-        //        }
-        //        else if (SelectedAbility.Targets == TargetMode.Team)
-        //    }
-        //}
+        return ValidTargets.Contains(target);
     }
 
     public void AbilitySelected(int i)
@@ -244,54 +235,42 @@ public abstract class BattlePlayerBase : BattleActorBase
     private void Target_UseAbilityConfirm(NetworkConnection conn, int i)
     {
         selectedAbilityIndex = i;
-
-        switch (SelectedAbility.Targets)
+        if (SelectedAbility.Targets == TargetMode.OverrideAuto)
         {
-            case TargetMode.Override:
-                SpecialTargeting();
-                break;
-            case TargetMode.Ally:
-                ShowTargetFriends(false);
-                break;
-            case TargetMode.AllyAndSelf:
-                ShowTargetFriends(true);
-                break;
-            case TargetMode.Enemy:
-                ShowTargetFoes();
-                break;
+            OnAbilityTargetChosen(null);
         }
-    }
-
-    protected abstract void SpecialTargeting();
-
-    private void ShowTargetFriends(bool canTargetSelf)
-    {
-        validTargets = new List<BattleActorBase>();
-        foreach (PersistentPlayer p in PersistentPlayer.players)
+        else
         {
-            if (canTargetSelf || p.battlePlayer != this)
+            if (SelectedAbility.Targets == TargetMode.OverrideSelect)
             {
-                validTargets.Add(p.battlePlayer);
+                CustomTargeting();
             }
+            ToggleTargetIndicators(true);
         }
-        ToggleTargetIndicators(true);
     }
 
-    private void ShowTargetFoes()
-    {
-        validTargets = new List<BattleActorBase>();
-        foreach (EnemyBase e in BattleController.Instance.aliveEnemies)
-        {
-            validTargets.Add(e);
-        }
-        ToggleTargetIndicators(true);
-    }
-
+    protected abstract void CustomTargeting();
+    
     protected void ToggleTargetIndicators(bool active)
     {
-        foreach (BattleActorBase target in validTargets)
+        if (active)
         {
-            target.tempAbilityTarget.SetActive(active);
+            foreach (BattleActorBase target in ValidTargets)
+            {
+                target.tempAbilityTarget.SetActive(true);
+            }
+        }
+        else
+        {
+            foreach (EnemyBase enemy in BattleController.Instance.aliveEnemies)
+            {
+                enemy.tempAbilityTarget.SetActive(false);
+            }
+
+            foreach (PersistentPlayer player in PersistentPlayer.players)
+            {
+                player.battlePlayer.tempAbilityTarget.SetActive(false);
+            }
         }
     }
 
@@ -305,11 +284,13 @@ public abstract class BattlePlayerBase : BattleActorBase
     [Command]
     protected void CmdUseAbility(GameObject target, int i)
     {
+        selectedAbilityIndex = i;
         if (target == null)
         {
-            foreach (EnemyBase e in BattleController.Instance.aliveEnemies)
+            CustomTargeting();
+            foreach (BattleActorBase actor in ValidTargets)
             {
-                UseAbility(e, abilities[i]);
+                UseAbility(actor, SelectedAbility);
             }
         }
         else
@@ -329,8 +310,8 @@ public abstract class BattlePlayerBase : BattleActorBase
     public void EndAbility()
     {
         ToggleTargetIndicators(false);
-        validTargets = new List<BattleActorBase>(BattleController.Instance.aliveEnemies);
         selectedAbilityIndex = -1;
+        customTargets = null;
         CmdEndAbility();
     }
 

@@ -6,11 +6,11 @@ using UnityEngine.Networking;
 #pragma warning disable CS0618, 0649
 public class BP_Warrior : BattlePlayerBase
 {
-    protected override void SpecialTargeting()
+    protected override void CustomTargeting()
     {
-        if (selectedAbilityIndex == 2)
+        if (selectedAbilityIndex == 1)
         {
-            OnAbilityTargetChosen(null);
+            customTargets = new List<BattleActorBase>(BattleController.Instance.aliveEnemies);
         }
         else
         {

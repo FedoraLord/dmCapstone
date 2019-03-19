@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BP_Rogue : BattlePlayerBase
 {
-    protected override void SpecialTargeting()
+    protected override void CustomTargeting()
     {
         throw new System.NotImplementedException();
     }

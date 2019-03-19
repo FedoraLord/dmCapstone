@@ -143,9 +143,9 @@ public class EnemyBase : BattleActorBase
 
     #region StatusEffects
 
-    protected override void OnStun()
+    protected override void OnAddStun()
     {
-        base.OnStun();
+        base.OnAddStun();
         HealthBar.SetTargets();
 
         if (isServer)
