@@ -30,6 +30,8 @@ public class BattleController : NetworkBehaviour
     [SerializeField] private Camera cam;
     [SerializeField] private int totalAttackTime = 5;
     [SerializeField] private RectTransform attackTimerBar;
+    [SerializeField] private Image[] abilityImages;
+    [SerializeField] private Text[] abilityTexts;
     [SerializeField] private Text attackTimerText;
     [SerializeField] private Text attacksLeftText;
     [SerializeField] private Text blockText;
@@ -108,16 +110,18 @@ public class BattleController : NetworkBehaviour
         }
     }
 
-    [Server]
-    public void OnPlayerReady()
+    public void OnBattlePlayerSpawned(List<BattlePlayerBase.Ability> abilities)
     {
-        playersReady++;
-    }
+        for (int i = 0; i < abilities.Count; i++)
+        {
+            abilityImages[i].sprite = abilities[i].ButtonIcon;
+            abilityTexts[i].text = abilities[i].Name;
+        }
 
-    private IEnumerator DelayExecution(float time, Action callback)
-    {
-        yield return new WaitForSeconds(time);
-        callback();
+        if (isServer)
+        {
+            playersReady++;
+        }
     }
 
     #endregion

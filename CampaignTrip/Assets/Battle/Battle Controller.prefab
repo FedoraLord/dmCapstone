@@ -1697,6 +1697,14 @@ MonoBehaviour:
   cam: {fileID: 1936290932}
   totalAttackTime: 5
   attackTimerBar: {fileID: 978044165425556926}
+  abilityImages:
+  - {fileID: 978044166578950863}
+  - {fileID: 978044166580943236}
+  - {fileID: 978044166838217289}
+  abilityTexts:
+  - {fileID: 978044165596891743}
+  - {fileID: 978044165752549409}
+  - {fileID: 978044166613152996}
   attackTimerText: {fileID: 978044165974690376}
   attacksLeftText: {fileID: 978044166622188987}
   blockText: {fileID: 978044166606812425}
@@ -1716,24 +1724,9 @@ MonoBehaviour:
   - {fileID: 1028508456}
   enemyDataList: {fileID: 11400000, guid: 444a86a589f7caf48beb2133db50fb0e, type: 2}
   waves:
-  - enemy1: 1
-    enemy2: 0
-    enemy3: 1
-    enemy4: 0
-    enemy5: 1
-    enemy6: 1
-  - enemy1: 0
-    enemy2: 0
-    enemy3: 1
-    enemy4: 0
-    enemy5: 0
-    enemy6: 0
-  - enemy1: 1
-    enemy2: 0
-    enemy3: 0
-    enemy4: 0
-    enemy5: 0
-    enemy6: 0
+  - members: 
+  - members: 
+  - members: 
   statusEffects:
   - {fileID: 11400000, guid: 8edb413a09d127b4593271bf0cb57354, type: 2}
   - {fileID: 11400000, guid: d06975a41c252d849a274029200483a6, type: 2}

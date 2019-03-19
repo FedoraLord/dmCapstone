@@ -68,9 +68,10 @@ public abstract class BattlePlayerBase : BattleActorBase
     [Serializable]
     public class Ability
     {
-        //public int AbilityIndex { get; set; }
         public int Damage { get { return damage; } }
         public int Duration { get { return duration; } }
+        public Sprite ButtonIcon { get { return buttonIcon; } }
+        public string Name { get { return abilityName; } }
         public TargetMode Targets { get { return targets; } }
         
         public StatusEffect StatusEffect
@@ -85,26 +86,30 @@ public abstract class BattlePlayerBase : BattleActorBase
 
         [HideInInspector] public int RemainingCooldown;
 
-        [SerializeField] private string abilityName;
-        [SerializeField] private TargetMode targets;
-        [SerializeField] private StatusEffectType applies;
         [Tooltip("Also used for heal amount")]
         [SerializeField] private int damage;
         [SerializeField] private int duration;
         [SerializeField] private int cooldown;
+        [SerializeField] private TargetMode targets;
+        [SerializeField] private StatusEffectType applies;
+        [SerializeField] private string abilityName;
+        [SerializeField] private Sprite buttonIcon;
 
         private StatusEffect statusEffect;
 
         //TODO:
         [HideInInspector] public bool IsUpgraded;
-
-        [SerializeField] private Sprite ButtonIcon;
-        //END TODO
-
+        
         public void Use()
         {
             LocalAuthority.AbilityPlayedThisTurn = true;
-            RemainingCooldown = cooldown;
+            RemainingCooldown = cooldown + 1;
+        }
+
+        public void DecrementCooldown()
+        {
+            if (RemainingCooldown > 0)
+                RemainingCooldown--;
         }
     }
 
@@ -124,16 +129,19 @@ public abstract class BattlePlayerBase : BattleActorBase
         persistentPlayer.battlePlayer = this;
 
         transform.position = BattleController.Instance.playerSpawnPoints[i].position;
-        
-        abilities = new List<Ability>() { ability1, ability2, ability3 };
 
+        abilities = new List<Ability>() { ability1, ability2, ability3 };
+        if (this == LocalAuthority)
+        {
+            BattleController.Instance.OnBattlePlayerSpawned(abilities);
+        }
+        
         Initialize();
     }
 
     [Server]
     public void OnPlayerPhaseStart()
     {
-        RpcUpdateAttackBlock(attacksPerTurn);
         RpcOnPlayerPhaseStart();
     }
 
@@ -141,6 +149,12 @@ public abstract class BattlePlayerBase : BattleActorBase
     private void RpcOnPlayerPhaseStart()
     {
         LocalAuthority.AbilityPlayedThisTurn = false;
+        UpdateAttackBlock(attacksPerTurn);
+
+        foreach (Ability a in abilities)
+        {
+            a.DecrementCooldown();
+        }
     }
 
     #endregion
@@ -182,13 +196,7 @@ public abstract class BattlePlayerBase : BattleActorBase
             animator.SetTrigger("Attack");
         }
     }
-
-    [ClientRpc]
-    private void RpcUpdateAttackBlock(int newAttacksRemaining)
-    {
-        UpdateAttackBlock(newAttacksRemaining);
-    }
-
+    
     private void UpdateAttackBlock(int newAttacksRemaining)
     {
         attacksRemaining = newAttacksRemaining;

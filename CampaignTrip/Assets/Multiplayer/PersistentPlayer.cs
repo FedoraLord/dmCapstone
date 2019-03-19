@@ -139,7 +139,6 @@ public class PersistentPlayer : NetworkBehaviour
         GameObject cp = Instantiate(characterPrefab);
         cp.GetComponent<BattlePlayerBase>().playerNum = playerNum;
         NetworkServer.SpawnWithClientAuthority(cp, gameObject);
-        BattleController.Instance.OnPlayerReady();
     }
 
     #endregion
