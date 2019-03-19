@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class BP_Mage : BattlePlayerBase
 {
-    //public override void OnStartClient()
-    //{
-    //    base.OnStartClient();
-    //    Mage = this;
-    //}
+    protected override void SpecialTargeting()
+    {
+        throw new System.NotImplementedException();
+    }
 }

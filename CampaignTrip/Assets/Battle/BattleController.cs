@@ -196,7 +196,7 @@ public class BattleController : NetworkBehaviour
     [ClientRpc]
     private void RpcForceCancelAbility()
     {
-        if (BattlePlayerBase.LocalAuthority.IsUsingAbility)
+        if (BattlePlayerBase.LocalAuthority.SelectedAbility != null)
         {
             BattlePlayerBase.LocalAuthority.EndAbility();
         }
@@ -209,6 +209,7 @@ public class BattleController : NetworkBehaviour
         StartCoroutine(ExecuteEnemyPhase());
 	}
 
+    [Server]
     private IEnumerator ExecuteEnemyPhase()
     {
         yield return new WaitForSeconds(0.5f);

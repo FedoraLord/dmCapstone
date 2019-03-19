@@ -8,10 +8,6 @@ using static StatusEffect;
 #pragma warning disable CS0618, 0649
 public abstract class BattlePlayerBase : BattleActorBase
 {
-    /// <summary>
-    /// This value is only maintained on the Server
-    /// </summary>
-    public static Ability SelectedAbility { get; private set; }
     public static BattlePlayerBase LocalAuthority { get { return PersistentPlayer.localAuthority.battlePlayer; } }
     //public static BP_Mage Mage { get; protected set; }
     //public static BP_Rogue Rogue { get; protected set; }
@@ -19,8 +15,17 @@ public abstract class BattlePlayerBase : BattleActorBase
     //public static BP_Alchemist Alchemist { get; protected set; }
     public static int PlayersUsingAbility;
 
+    public Ability SelectedAbility
+    {
+        get
+        {
+            if (selectedAbilityIndex < 0)
+                return null;
+            return abilities[selectedAbilityIndex];
+        }
+    }
+
     public bool AbilityPlayedThisTurn { get; set; }
-    public bool IsUsingAbility { get; private set; }
     
     [SyncVar] public int playerNum;
 
@@ -30,20 +35,22 @@ public abstract class BattlePlayerBase : BattleActorBase
     [SerializeField] protected Ability ability2;
     [SerializeField] protected Ability ability3;
 
-    protected List<Ability> Abilities;
+    protected List<Ability> abilities;
+    protected List<BattleActorBase> validTargets;
+    protected int selectedAbilityIndex = -1;
 
     private int attacksRemaining;
 
-    public enum TargetMode { Auto, Friend, Foe }
+    public enum TargetMode { Override, Ally, AllyAndSelf, Enemy }
 
     [Serializable]
     public class Ability
     {
-        public Action<BattleActorBase> ExecuteAbility { get; set; }
+        //public int AbilityIndex { get; set; }
         public int Damage { get { return damage; } }
         public int Duration { get { return duration; } }
         public TargetMode Targets { get { return targets; } }
-
+        
         public StatusEffect StatusEffect
         {
             get
@@ -71,17 +78,11 @@ public abstract class BattlePlayerBase : BattleActorBase
 
         [SerializeField] private Sprite ButtonIcon;
         //END TODO
-        
-        public void Bind(Action<BattleActorBase> action)
-        {
-            ExecuteAbility = action;
-        }
 
-        public void Use(BattleActorBase target)
+        public void Use()
         {
             LocalAuthority.AbilityPlayedThisTurn = true;
             RemainingCooldown = cooldown;
-            ExecuteAbility(target);
         }
     }
 
@@ -102,10 +103,7 @@ public abstract class BattlePlayerBase : BattleActorBase
 
         transform.position = BattleController.Instance.playerSpawnPoints[i].position;
         
-        Abilities = new List<Ability>() { ability1, ability2, ability3 };
-        ability1.Bind(Ability1);
-        ability2.Bind(Ability2);
-        ability3.Bind(Ability3);
+        abilities = new List<Ability>() { ability1, ability2, ability3 };
 
         Initialize();
     }
@@ -129,9 +127,16 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     private void OnMouseUpAsButton()
     {
-        if (IsAlive && LocalAuthority.IsUsingAbility && SelectedAbility.Targets == TargetMode.Friend)
+        if (IsAlive && IsValidTarget(this))
         {
-            LocalAuthority.OnAbilityTargetChosen(this);
+            if (LocalAuthority.SelectedAbility != null)
+            {
+                LocalAuthority.OnAbilityTargetChosen(this);
+            }
+            else
+            {
+                //TODO: help with fire and ice
+            }
         }
     }
     
@@ -177,13 +182,49 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     #region Abilities
 
+    public bool IsValidTarget(BattleActorBase target)
+    {
+        return validTargets.Contains(target);
+        //if (target is EnemyBase)
+        //{
+        //    if (SelectedAbility == null)
+        //    {
+        //        //regular attack
+        //        return true;
+        //    }
+        //    else if (SelectedAbility.Targets == TargetMode.Foe)
+        //    {
+        //        //offensive ability target
+        //        return true;
+        //    }
+        //}
+        //else if (target is BattlePlayerBase)
+        //{
+        //    if (SelectedAbility == null)
+        //    {
+        //        if (target.HasStatusEffect(StatusEffectType.Burn) || target.HasStatusEffect(StatusEffectType.Freeze))
+        //        {
+        //            return true;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (SelectedAbility.Targets == TargetMode.Friend)
+        //        {
+
+        //        }
+        //        else if (SelectedAbility.Targets == TargetMode.Team)
+        //    }
+        //}
+    }
+
     public void AbilitySelected(int i)
     {
         if (SelectedAbility != null)
         {
             EndAbility();
         }
-        else if (!AbilityPlayedThisTurn && Abilities[i].RemainingCooldown <= 0)
+        else if (!AbilityPlayedThisTurn && abilities[i].RemainingCooldown <= 0)
         {
             CmdUseAbilityRequest(i);
         }
@@ -202,76 +243,79 @@ public abstract class BattlePlayerBase : BattleActorBase
     [TargetRpc]
     private void Target_UseAbilityConfirm(NetworkConnection conn, int i)
     {
-        SelectedAbility = Abilities[i];
-        IsUsingAbility = true;
+        selectedAbilityIndex = i;
 
         switch (SelectedAbility.Targets)
         {
-            case TargetMode.Auto:
-                SelectedAbility.Use(null);
-                EndAbility();
+            case TargetMode.Override:
+                SpecialTargeting();
                 break;
-            case TargetMode.Friend:
-                ToggleTargetFriends(true);
+            case TargetMode.Ally:
+                ShowTargetFriends(false);
                 break;
-            case TargetMode.Foe:
-                ToggleTargetFoes(true);
+            case TargetMode.AllyAndSelf:
+                ShowTargetFriends(true);
+                break;
+            case TargetMode.Enemy:
+                ShowTargetFoes();
                 break;
         }
     }
 
-    private void ToggleTargetFriends(bool active)
+    protected abstract void SpecialTargeting();
+
+    private void ShowTargetFriends(bool canTargetSelf)
     {
+        validTargets = new List<BattleActorBase>();
         foreach (PersistentPlayer p in PersistentPlayer.players)
         {
-            p.battlePlayer.tempAbilityTarget.SetActive(active);
+            if (canTargetSelf || p.battlePlayer != this)
+            {
+                validTargets.Add(p.battlePlayer);
+            }
         }
+        ToggleTargetIndicators(true);
     }
 
-    private void ToggleTargetFoes(bool active)
+    private void ShowTargetFoes()
     {
+        validTargets = new List<BattleActorBase>();
         foreach (EnemyBase e in BattleController.Instance.aliveEnemies)
         {
-            e.tempAbilityTarget.SetActive(active);
+            validTargets.Add(e);
+        }
+        ToggleTargetIndicators(true);
+    }
+
+    protected void ToggleTargetIndicators(bool active)
+    {
+        foreach (BattleActorBase target in validTargets)
+        {
+            target.tempAbilityTarget.SetActive(active);
         }
     }
 
     public void OnAbilityTargetChosen(BattleActorBase target)
     {
-        SelectedAbility.Use(target);
+        CmdUseAbility(target?.gameObject, selectedAbilityIndex);
+        SelectedAbility.Use();
         EndAbility();
     }
-
-    //override these implementations if the ability is a little more complex than what CmdUseAbility handles
-    public virtual void Ability1(BattleActorBase target)
-    {
-        CmdUseAbility(target?.gameObject, 0);
-    }
-
-    public virtual void Ability2(BattleActorBase target)
-    {
-        CmdUseAbility(target?.gameObject, 1);
-    }
-
-    public virtual void Ability3(BattleActorBase target)
-    {
-        CmdUseAbility(target?.gameObject, 2);
-    }
-
-    [Command] //This method is used for abilities with a simple setup (attack all/selected enemy(s)/player(s) and apply some status effect)
+    
+    [Command]
     protected void CmdUseAbility(GameObject target, int i)
     {
         if (target == null)
         {
             foreach (EnemyBase e in BattleController.Instance.aliveEnemies)
             {
-                UseAbility(e, Abilities[i]);
+                UseAbility(e, abilities[i]);
             }
         }
         else
         {
             BattleActorBase actor = target.GetComponent<BattleActorBase>();
-            UseAbility(actor, Abilities[i]);
+            UseAbility(actor, abilities[i]);
         }
     }
 
@@ -284,10 +328,9 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     public void EndAbility()
     {
-        ToggleTargetFriends(false);
-        ToggleTargetFoes(false);
-        SelectedAbility = null;
-        IsUsingAbility = false;
+        ToggleTargetIndicators(false);
+        validTargets = new List<BattleActorBase>(BattleController.Instance.aliveEnemies);
+        selectedAbilityIndex = -1;
         CmdEndAbility();
     }
 

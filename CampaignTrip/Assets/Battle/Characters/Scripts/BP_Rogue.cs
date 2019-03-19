@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class BP_Rogue : BattlePlayerBase
 {
-    //public override void OnStartClient()
-    //{
-    //    base.OnStartClient();
-    //    Rogue = this;
-    //}
+    protected override void SpecialTargeting()
+    {
+        throw new System.NotImplementedException();
+    }
 }

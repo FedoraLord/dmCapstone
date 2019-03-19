@@ -28,16 +28,20 @@ public class EnemyBase : BattleActorBase
 	{
         if (IsAlive)
         {
-            if (BattlePlayerBase.LocalAuthority.IsUsingAbility && BattlePlayerBase.SelectedAbility.Targets == BattlePlayerBase.TargetMode.Foe)
+            BattlePlayerBase localPlayer = BattlePlayerBase.LocalAuthority;
+            if (localPlayer.IsValidTarget(this))
             {
-                BattlePlayerBase.LocalAuthority.OnAbilityTargetChosen(this);
-            }
-            else
-            {
-                BattlePlayerBase.LocalAuthority.CmdAttack(gameObject);
+                if (localPlayer.SelectedAbility != null)
+                {
+                    localPlayer.OnAbilityTargetChosen(this);
+                }
+                else
+                {
+                    localPlayer.CmdAttack(gameObject);
+                }
             }
         }
-	}
+    }
 
     [Server]
     public override void DispatchDamage(int damage, bool canBlock)

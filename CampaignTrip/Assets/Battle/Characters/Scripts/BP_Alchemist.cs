@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class BP_Alchemist : BattlePlayerBase
 {
-    //public override void OnStartClient()
-    //{
-    //    base.OnStartClient();
-    //    Alchemist = this;
-    //}
+    protected override void SpecialTargeting()
+    {
+        throw new System.NotImplementedException();
+    }
 }
