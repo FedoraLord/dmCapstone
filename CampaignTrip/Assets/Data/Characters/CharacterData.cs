@@ -27,7 +27,12 @@ public class CharacterData : ScriptableObject
 
     public GameObject CharacterPrefab
     {
-        get { return characterPrefab; }
+        get
+        {
+            if (characterPrefab == null)
+                GetTheFuckingPrefab();
+            return characterPrefab;
+        }
     }
 
     [SerializeField] private Character characterName;
@@ -35,5 +40,12 @@ public class CharacterData : ScriptableObject
 	[SerializeField] private Sprite sprite;
     [SerializeField] private Sprite icon;
     [SerializeField] private GameObject characterPrefab;
+
+    private void GetTheFuckingPrefab()
+    {
+#if UNITY_EDITOR
+        characterPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(string.Format("Assets/Battle/Characters/BP_{0}.prefab", characterName.ToString()));
+#endif
+    }
 }
 #pragma warning restore 0649
