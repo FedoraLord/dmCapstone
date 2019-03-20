@@ -128,7 +128,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         persistentPlayer = PersistentPlayer.players[i];
         persistentPlayer.battlePlayer = this;
 
-        transform.position = BattleController.Instance.playerSpawnPoints[i].position;
+        transform.position = BattleController.Instance.battleCam.PlayerSpawnPoints[i].position;
 
         abilities = new List<Ability>() { ability1, ability2, ability3 };
         if (this == LocalAuthority)
