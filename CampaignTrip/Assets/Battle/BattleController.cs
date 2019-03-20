@@ -106,12 +106,15 @@ public class BattleController : NetworkBehaviour
         }
     }
 
-    public void OnBattlePlayerSpawned(List<BattlePlayerBase.Ability> abilities)
+    public void OnBattlePlayerSpawned(BattlePlayerBase player)
     {
-        for (int i = 0; i < abilities.Count; i++)
+        if (player == BattlePlayerBase.LocalAuthority)
         {
-            abilityImages[i].sprite = abilities[i].ButtonIcon;
-            abilityTexts[i].text = abilities[i].Name;
+            for (int i = 0; i < player.Abilities.Count; i++)
+            {
+                abilityImages[i].sprite = player.Abilities[i].ButtonIcon;
+                abilityTexts[i].text = player.Abilities[i].Name;
+            }
         }
 
         if (isServer)

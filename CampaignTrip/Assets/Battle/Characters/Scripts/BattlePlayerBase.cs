@@ -16,17 +16,18 @@ public abstract class BattlePlayerBase : BattleActorBase
     //public static BP_Alchemist Alchemist { get; protected set; }
     public static int PlayersUsingAbility;
 
+    public bool AbilityPlayedThisTurn { get; set; }
+    public List<Ability> Abilities { get; private set; }
+
     public Ability SelectedAbility
     {
         get
         {
             if (selectedAbilityIndex < 0)
                 return null;
-            return abilities[selectedAbilityIndex];
+            return Abilities[selectedAbilityIndex];
         }
     }
-
-    public bool AbilityPlayedThisTurn { get; set; }
     
     [SyncVar] public int playerNum;
 
@@ -36,7 +37,6 @@ public abstract class BattlePlayerBase : BattleActorBase
     [SerializeField] protected Ability ability2;
     [SerializeField] protected Ability ability3;
 
-    protected List<Ability> abilities;
     protected List<BattleActorBase> ValidTargets
     {
         get
@@ -130,12 +130,9 @@ public abstract class BattlePlayerBase : BattleActorBase
 
         transform.position = BattleController.Instance.battleCam.PlayerSpawnPoints[i].position;
 
-        abilities = new List<Ability>() { ability1, ability2, ability3 };
-        if (this == LocalAuthority)
-        {
-            BattleController.Instance.OnBattlePlayerSpawned(abilities);
-        }
-        
+        Abilities = new List<Ability>() { ability1, ability2, ability3 };
+        BattleController.Instance.OnBattlePlayerSpawned(this);
+
         Initialize();
     }
 
@@ -151,7 +148,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         LocalAuthority.AbilityPlayedThisTurn = false;
         UpdateAttackBlock(attacksPerTurn);
 
-        foreach (Ability a in abilities)
+        foreach (Ability a in Abilities)
         {
             a.DecrementCooldown();
         }
@@ -223,7 +220,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         {
             EndAbility();
         }
-        else if (!AbilityPlayedThisTurn && abilities[i].RemainingCooldown <= 0)
+        else if (!AbilityPlayedThisTurn && Abilities[i].RemainingCooldown <= 0)
         {
             CmdUseAbilityRequest(i);
         }
@@ -304,7 +301,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         else
         {
             BattleActorBase actor = target.GetComponent<BattleActorBase>();
-            UseAbility(actor, abilities[i]);
+            UseAbility(actor, Abilities[i]);
         }
     }
 
@@ -341,19 +338,24 @@ public abstract class BattlePlayerBase : BattleActorBase
             if (HasStatusEffect(StatusEffectType.Protected))
             {
                 BattleActorBase protector = GetGivenBy(StatusEffectType.Protected);
-                protector.DispatchDamage(damage, canBlock);
+                protector.TakeBlockedDamage(damage);
             }
             else
             {
-                int blocked = damage * blockAmount / 100;
-                int damageTaken = damage - blocked;
-                RpcTakeDamage(damageTaken, blocked);
+                TakeBlockedDamage(damage);
             }
         }
         else
         {
             RpcTakeDamage(damage, 0);
         }
+    }
+
+    public override void TakeBlockedDamage(int damage)
+    {
+        int blocked = damage * blockAmount / 100;
+        int damageTaken = damage - blocked;
+        RpcTakeDamage(damageTaken, blocked);
     }
 
     protected override void Die()

@@ -78,6 +78,8 @@ public abstract class BattleActorBase : NetworkBehaviour
     [Server]
     public abstract void DispatchDamage(int damage, bool canBlock);
 
+    public abstract void TakeBlockedDamage(int damage);
+
     [ClientRpc]
     protected void RpcTakeDamage(int damageTaken, int blocked)
     {
