@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class MinigameManager : MonoBehaviour
+public class MinigameManager : NetworkBehaviour
 {
     public static MinigameManager Instance;
 
@@ -59,5 +59,18 @@ public class MinigameManager : MonoBehaviour
 	protected virtual void Win()
 	{
 		//do something when you win, or not
+	}
+
+	[Command]
+	public void CmdWin()
+	{
+		Win();
+		RpcWin();
+	}
+
+	[ClientRpc]
+	public void RpcWin()
+	{
+		Win();
 	}
 }

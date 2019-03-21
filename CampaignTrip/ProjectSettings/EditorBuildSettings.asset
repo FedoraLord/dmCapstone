@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Battle.unity
     guid: de5115eb129d1404a8ad791d34989ec0
+  - enabled: 1
+    path: Assets/Scenes/CardFlip.unity
+    guid: 3822c416ac214634984711aa150134fe
   m_configObjects: {}
