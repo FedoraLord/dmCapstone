@@ -42,27 +42,18 @@ public class EnemyBase : BattleActorBase
             }
         }
     }
-
-    [Server]
-    public override void DispatchDamage(int damage, bool canBlock)
+    
+    public override void TakeBlockedDamage(int damage)
     {
-        if (canBlock)
-        {
-            int damageTaken = damage;
-            int initialBlock = remainingBlock;
+        int initialBlock = remainingBlock;
 
-            if (remainingBlock > 0)
-            {
-                remainingBlock = Mathf.Max(remainingBlock - damage, 0);
-                damageTaken = damage - remainingBlock;
-            }
-            
-            RpcTakeDamage(damage, initialBlock - remainingBlock);
-        }
-        else
+        if (remainingBlock > 0)
         {
-            RpcTakeDamage(damage, 0);
+            remainingBlock = Mathf.Max(remainingBlock - damage, 0);
+            damage -= remainingBlock;
         }
+
+        RpcTakeDamage(damage, initialBlock - remainingBlock);
     }
 
     protected override void Die()

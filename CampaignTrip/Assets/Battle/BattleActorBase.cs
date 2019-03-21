@@ -76,7 +76,25 @@ public abstract class BattleActorBase : NetworkBehaviour
     }
 
     [Server]
-    public abstract void DispatchDamage(int damage, bool canBlock);
+    public void DispatchDamage(int damage, bool canBlock)
+    {
+        if (canBlock)
+        {
+            if (HasStatusEffect(StatusEffectType.Protected))
+            {
+                BattleActorBase protector = GetGivenBy(StatusEffectType.Protected);
+                protector.TakeBlockedDamage(damage);
+            }
+            else
+            {
+                TakeBlockedDamage(damage);
+            }
+        }
+        else
+        {
+            RpcTakeDamage(damage, 0);
+        }
+    }
 
     public abstract void TakeBlockedDamage(int damage);
 

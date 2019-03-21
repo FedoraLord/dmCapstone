@@ -330,27 +330,6 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     #region Damage
 
-    [Server]
-    public override void DispatchDamage(int damage, bool canBlock)
-    {
-        if (canBlock)
-        {
-            if (HasStatusEffect(StatusEffectType.Protected))
-            {
-                BattleActorBase protector = GetGivenBy(StatusEffectType.Protected);
-                protector.TakeBlockedDamage(damage);
-            }
-            else
-            {
-                TakeBlockedDamage(damage);
-            }
-        }
-        else
-        {
-            RpcTakeDamage(damage, 0);
-        }
-    }
-
     public override void TakeBlockedDamage(int damage)
     {
         int blocked = damage * blockAmount / 100;
