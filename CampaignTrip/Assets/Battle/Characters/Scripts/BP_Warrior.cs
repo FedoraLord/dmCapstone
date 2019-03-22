@@ -6,16 +6,16 @@ using UnityEngine.Networking;
 #pragma warning disable CS0618, 0649
 public class BP_Warrior : BattlePlayerBase
 {
-    public override void Ability3(BattleActorBase target)
+    protected override void CustomTargeting()
     {
-        CmdProtect(target.gameObject);
-    }
-    
-    [Command]
-    private void CmdProtect(GameObject target)
-    {
-        BattlePlayerBase player = target.GetComponent<BattlePlayerBase>();
-        //...
+        if (selectedAbilityIndex == 1)
+        {
+            customTargets = new List<BattleActorBase>(BattleController.Instance.aliveEnemies);
+        }
+        else
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
 #pragma warning restore CS0618, 0649

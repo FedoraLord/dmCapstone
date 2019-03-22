@@ -28,57 +28,46 @@ public class EnemyBase : BattleActorBase
 	{
         if (IsAlive)
         {
-            if (BattlePlayerBase.LocalAuthority.IsUsingAbility && BattlePlayerBase.SelectedAbility.Targets == BattlePlayerBase.TargetMode.Foe)
+            BattlePlayerBase localPlayer = BattlePlayerBase.LocalAuthority;
+            if (localPlayer.IsValidTarget(this))
             {
-                BattlePlayerBase.LocalAuthority.OnAbilityTargetChosen(this);
-            }
-            else
-            {
-                BattlePlayerBase.LocalAuthority.CmdAttack(gameObject);
+                if (localPlayer.SelectedAbility != null)
+                {
+                    localPlayer.OnAbilityTargetChosen(this);
+                }
+                else
+                {
+                    localPlayer.CmdAttack(gameObject);
+                }
             }
         }
-	}
-
-    [Server]
-    public void DispatchDamage(int damage)
-	{
-        RpcTakeDamage(damage);
-	}
+    }
     
-    [ClientRpc]
-	private void RpcTakeDamage(int damage)
-	{
-        TakeDamage(damage);
-	}
-
-    public void TakeDamage(int damage)
+    public override void TakeBlockedDamage(int damage)
     {
-        //TODO: play damage animation
-
-        int damageTaken = damage;
         int initialBlock = remainingBlock;
 
         if (remainingBlock > 0)
         {
             remainingBlock = Mathf.Max(remainingBlock - damage, 0);
-            damageTaken = damage - remainingBlock;
+            damage -= remainingBlock;
         }
 
-        if (damageTaken > 0)
-        {
-            Health -= damageTaken;
-            HealthBar.SetHealth(Health);
-        }
-
-        damagePopup.Display(damageTaken, initialBlock - remainingBlock);
+        RpcTakeDamage(damage, initialBlock - remainingBlock);
     }
 
     protected override void Die()
     {
         BattleController.Instance.OnEnemyDeath(this);
+        StartCoroutine(DelayDeath());
+    }
 
+    private IEnumerator DelayDeath()
+    {
+        //TODO: play death animation
         if (isServer)
         {
+            yield return new WaitForSeconds(0.5f);
             NetworkServer.Destroy(gameObject);
         }
     }
@@ -137,7 +126,7 @@ public class EnemyBase : BattleActorBase
     {
         foreach (int t in targets)
         {
-            PersistentPlayer.players[t].battlePlayer.TakeDamage(this);
+            PersistentPlayer.players[t].battlePlayer.DispatchDamage(basicDamage, true);
         }
     }
 

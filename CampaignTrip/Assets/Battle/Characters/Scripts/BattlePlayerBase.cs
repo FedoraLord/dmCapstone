@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using static StatusEffect;
@@ -9,14 +10,24 @@ using static StatusEffect;
 public abstract class BattlePlayerBase : BattleActorBase
 {
     public static BattlePlayerBase LocalAuthority { get { return PersistentPlayer.localAuthority.battlePlayer; } }
-    /// <summary>
-    /// This value is only maintained on the Server
-    /// </summary>
-    public static Ability SelectedAbility { get; private set; }
+    //public static BP_Mage Mage { get; protected set; }
+    //public static BP_Rogue Rogue { get; protected set; }
+    //public static BP_Warrior Warrior { get; protected set; }
+    //public static BP_Alchemist Alchemist { get; protected set; }
     public static int PlayersUsingAbility;
 
     public bool AbilityPlayedThisTurn { get; set; }
-    public bool IsUsingAbility { get; private set; }
+    public List<Ability> Abilities { get; private set; }
+
+    public Ability SelectedAbility
+    {
+        get
+        {
+            if (selectedAbilityIndex < 0)
+                return null;
+            return Abilities[selectedAbilityIndex];
+        }
+    }
     
     [SyncVar] public int playerNum;
 
@@ -26,19 +37,43 @@ public abstract class BattlePlayerBase : BattleActorBase
     [SerializeField] protected Ability ability2;
     [SerializeField] protected Ability ability3;
 
-    protected List<Ability> Abilities;
+    protected List<BattleActorBase> ValidTargets
+    {
+        get
+        {
+            if (SelectedAbility == null || SelectedAbility.Targets == TargetMode.Enemy)
+            {
+                return new List<BattleActorBase>(BattleController.Instance.aliveEnemies);
+            }
+            else if (SelectedAbility.Targets == TargetMode.OverrideAuto || SelectedAbility.Targets == TargetMode.OverrideSelect)
+            {
+                return customTargets;
+            }
+            else
+            {
+                List<BattleActorBase> targets = PersistentPlayer.players.Select(x => x.battlePlayer).ToList<BattleActorBase>();
+                if (SelectedAbility.Targets == TargetMode.Ally)
+                    targets.Remove(this);
+                return targets;
+            }
+        }
+    }
+    protected List<BattleActorBase> customTargets;
+    protected int selectedAbilityIndex = -1;
 
     private int attacksRemaining;
 
-    public enum TargetMode { Auto, Friend, Foe }
+    public enum TargetMode { OverrideAuto, OverrideSelect, Ally, AllyAndSelf, Enemy }
 
     [Serializable]
     public class Ability
     {
-        public Action<BattleActorBase> ExecuteAbility { get; set; }
         public int Damage { get { return damage; } }
+        public int Duration { get { return duration; } }
+        public Sprite ButtonIcon { get { return buttonIcon; } }
+        public string Name { get { return abilityName; } }
         public TargetMode Targets { get { return targets; } }
-
+        
         public StatusEffect StatusEffect
         {
             get
@@ -51,31 +86,30 @@ public abstract class BattlePlayerBase : BattleActorBase
 
         [HideInInspector] public int RemainingCooldown;
 
-        [SerializeField] private string AbilityName;
-        [SerializeField] private TargetMode targets;
-        [SerializeField] private StatusEffectType applies;
         [Tooltip("Also used for heal amount")]
         [SerializeField] private int damage;
+        [SerializeField] private int duration;
         [SerializeField] private int cooldown;
+        [SerializeField] private TargetMode targets;
+        [SerializeField] private StatusEffectType applies;
+        [SerializeField] private string abilityName;
+        [SerializeField] private Sprite buttonIcon;
 
         private StatusEffect statusEffect;
 
         //TODO:
         [HideInInspector] public bool IsUpgraded;
-
-        [SerializeField] private Sprite ButtonIcon;
-        //END TODO
         
-        public void Bind(Action<BattleActorBase> action)
-        {
-            ExecuteAbility = action;
-        }
-
-        public void Use(BattleActorBase target)
+        public void Use()
         {
             LocalAuthority.AbilityPlayedThisTurn = true;
-            RemainingCooldown = cooldown;
-            ExecuteAbility(target);
+            RemainingCooldown = cooldown + 1;
+        }
+
+        public void DecrementCooldown()
+        {
+            if (RemainingCooldown > 0)
+                RemainingCooldown--;
         }
     }
 
@@ -94,26 +128,90 @@ public abstract class BattlePlayerBase : BattleActorBase
         persistentPlayer = PersistentPlayer.players[i];
         persistentPlayer.battlePlayer = this;
 
-        transform.position = BattleController.Instance.playerSpawnPoints[i].position;
-        
+        transform.position = BattleController.Instance.battleCam.PlayerSpawnPoints[i].position;
+
         Abilities = new List<Ability>() { ability1, ability2, ability3 };
-        ability1.Bind(Ability1);
-        ability2.Bind(Ability2);
-        ability3.Bind(Ability3);
+        BattleController.Instance.OnBattlePlayerSpawned(this);
 
         Initialize();
+    }
+
+    [Server]
+    public void OnPlayerPhaseStart()
+    {
+        RpcOnPlayerPhaseStart();
+    }
+
+    [ClientRpc]
+    private void RpcOnPlayerPhaseStart()
+    {
+        LocalAuthority.AbilityPlayedThisTurn = false;
+        UpdateAttackBlock(attacksPerTurn);
+
+        foreach (Ability a in Abilities)
+        {
+            a.DecrementCooldown();
+        }
     }
 
     #endregion
 
     #region Attack
-    
+
     private void OnMouseUpAsButton()
     {
-        if (IsAlive && LocalAuthority.IsUsingAbility && SelectedAbility.Targets == TargetMode.Friend)
+        if (IsAlive && LocalAuthority.IsValidTarget(this))
         {
-            LocalAuthority.OnAbilityTargetChosen(this);
+            if (LocalAuthority.SelectedAbility != null)
+            {
+                LocalAuthority.OnAbilityTargetChosen(this);
+            }
+            else
+            {
+                //TODO: help with fire and ice
+            }
         }
+    }
+    
+    [Command]
+    public void CmdAttack(GameObject target)
+    {
+        if (attacksRemaining > 0 && BattleController.Instance.IsPlayerPhase)
+        {
+            RpcAttack();
+            EnemyBase enemy = target.GetComponent<EnemyBase>();
+            enemy.DispatchDamage(basicDamage, true);
+        }
+    }
+
+    [ClientRpc]
+    private void RpcAttack()
+    {
+        UpdateAttackBlock(attacksRemaining - 1);
+        if (localPlayerAuthority)
+        {
+            animator.SetTrigger("Attack");
+        }
+    }
+    
+    private void UpdateAttackBlock(int newAttacksRemaining)
+    {
+        attacksRemaining = newAttacksRemaining;
+        blockAmount = (int)Mathf.Min((float)attacksRemaining / attacksPerTurn * 100f, 90);
+
+        if (this == LocalAuthority)
+        {
+            BattleController.Instance.UpdateAttackBlockUI(attacksRemaining, blockAmount);
+        }
+    }
+
+    #endregion
+
+    #region Abilities
+
+    public bool IsValidTarget(BattleActorBase target)
+    {
+        return ValidTargets.Contains(target);
     }
 
     public void AbilitySelected(int i)
@@ -137,98 +235,88 @@ public abstract class BattlePlayerBase : BattleActorBase
             Target_UseAbilityConfirm(persistentPlayer.connectionToClient, i);
         }
     }
-    
+
     [TargetRpc]
     private void Target_UseAbilityConfirm(NetworkConnection conn, int i)
     {
-        SelectedAbility = Abilities[i];
-        IsUsingAbility = true;
-
-        switch (SelectedAbility.Targets)
+        selectedAbilityIndex = i;
+        if (SelectedAbility.Targets == TargetMode.OverrideAuto)
         {
-            case TargetMode.Auto:
-                SelectedAbility.Use(null);
-                EndAbility();
-                break;
-            case TargetMode.Friend:
-                ToggleTargetFriends(true);
-                break;
-            case TargetMode.Foe:
-                ToggleTargetFoes(true);
-                break;
+            OnAbilityTargetChosen(null);
         }
-    }
-
-    private void ToggleTargetFriends(bool active)
-    {
-        foreach (PersistentPlayer p in PersistentPlayer.players)
+        else
         {
-            p.battlePlayer.tempAbilityTarget.SetActive(active);
-        }
-    }
-
-    private void ToggleTargetFoes(bool active)
-    {
-        foreach (EnemyBase e in BattleController.Instance.aliveEnemies)
-        {
-            e.tempAbilityTarget.SetActive(active);
-        }
-    }
-    
-    public void OnAbilityTargetChosen(BattleActorBase target)
-    {
-        SelectedAbility.Use(target);
-        EndAbility();
-    }
-
-    //override these implementations if the ability is a little more complex than what CmdUseAbility handles
-    public virtual void Ability1(BattleActorBase target)
-    {
-        CmdUseAbility(target?.gameObject, 0);
-    }
-
-    public virtual void Ability2(BattleActorBase target)
-    {
-        CmdUseAbility(target?.gameObject, 1);
-    }
-
-    public virtual void Ability3(BattleActorBase target)
-    {
-        CmdUseAbility(target?.gameObject, 2);
-    }
-
-    [Command] //This method is used for abilities with a simple setup (attack all/selected enemy(s)/player(s) and apply some status effect)
-    protected void CmdUseAbility(GameObject target, int i)
-    {
-        if (target == null)
-        {
-            foreach (EnemyBase e in BattleController.Instance.aliveEnemies)
+            if (SelectedAbility.Targets == TargetMode.OverrideSelect)
             {
-                UseAbility(e, Abilities[i]);
+                CustomTargeting();
+            }
+            ToggleTargetIndicators(true);
+        }
+    }
+
+    protected abstract void CustomTargeting();
+    
+    protected void ToggleTargetIndicators(bool active)
+    {
+        if (active)
+        {
+            foreach (BattleActorBase target in ValidTargets)
+            {
+                target.tempAbilityTarget.SetActive(true);
             }
         }
         else
         {
-            EnemyBase enemy = target.GetComponent<EnemyBase>();
-            if (enemy != null)
+            foreach (EnemyBase enemy in BattleController.Instance.aliveEnemies)
             {
-                UseAbility(enemy, Abilities[i]);
+                enemy.tempAbilityTarget.SetActive(false);
+            }
+
+            foreach (PersistentPlayer player in PersistentPlayer.players)
+            {
+                player.battlePlayer.tempAbilityTarget.SetActive(false);
             }
         }
     }
 
-    private void UseAbility(EnemyBase enemy, Ability ability)
+    public void OnAbilityTargetChosen(BattleActorBase target)
     {
-        enemy.DispatchDamage(ability.Damage);
-        enemy.AddStatusEffect(ability.StatusEffect);
+        CmdUseAbility(target?.gameObject, selectedAbilityIndex);
+        SelectedAbility.Use();
+        EndAbility();
+    }
+    
+    [Command]
+    protected void CmdUseAbility(GameObject target, int i)
+    {
+        selectedAbilityIndex = i;
+        if (target == null)
+        {
+            CustomTargeting();
+            foreach (BattleActorBase actor in ValidTargets)
+            {
+                UseAbility(actor, SelectedAbility);
+            }
+        }
+        else
+        {
+            BattleActorBase actor = target.GetComponent<BattleActorBase>();
+            UseAbility(actor, Abilities[i]);
+        }
+    }
+
+    [Server]
+    private void UseAbility(BattleActorBase target, Ability ability)
+    {
+        target.DispatchDamage(ability.Damage, true);
+        target.AddStatusEffect(ability.StatusEffect, this, ability.Duration);
     }
 
     public void EndAbility()
     {
-        ToggleTargetFriends(false);
-        ToggleTargetFoes(false);
-        SelectedAbility = null;
-        IsUsingAbility = false;
+        ToggleTargetIndicators(false);
+        selectedAbilityIndex = -1;
+        customTargets = null;
         CmdEndAbility();
     }
 
@@ -238,76 +326,15 @@ public abstract class BattlePlayerBase : BattleActorBase
         PlayersUsingAbility--;
     }
 
-    [Server]
-    public void OnPlayerPhaseStart()
-    {
-        RpcUpdateAttackBlock(attacksPerTurn);
-        RpcOnPlayerPhaseStart();
-    }
-
-    [ClientRpc]
-    private void RpcOnPlayerPhaseStart()
-    {
-        LocalAuthority.AbilityPlayedThisTurn = false;
-    }
-
-    [Command]
-    public void CmdAttack(GameObject target)
-    {
-        if (attacksRemaining > 0 && BattleController.Instance.IsPlayerPhase)
-        {
-            RpcAttack();
-            EnemyBase enemy = target.GetComponent<EnemyBase>();
-            enemy.DispatchDamage(basicDamage);
-        }
-    }
-
-    [ClientRpc]
-    private void RpcAttack()
-    {
-        UpdateAttackBlock(attacksRemaining - 1);
-        if (localPlayerAuthority)
-        {
-            animator.SetTrigger("Attack");
-        }
-    }
-
-    [ClientRpc]
-    private void RpcUpdateAttackBlock(int newAttacksRemaining)
-    {
-        UpdateAttackBlock(newAttacksRemaining);
-    }
-
-    private void UpdateAttackBlock(int newAttacksRemaining)
-    {
-        attacksRemaining = newAttacksRemaining;
-        blockAmount = (int)Mathf.Min((float)attacksRemaining / attacksPerTurn * 100f, 90);
-
-        if (this == LocalAuthority)
-        {
-            BattleController.Instance.UpdateAttackBlockUI(attacksRemaining, blockAmount);
-        }
-    }
-
     #endregion
 
     #region Damage
 
-    [Server]
-    public void TakeDamage(EnemyBase e)
+    public override void TakeBlockedDamage(int damage)
     {
-        int blocked = e.BasicDamage * blockAmount / 100;
-        int damageTaken = e.BasicDamage - blocked;
+        int blocked = damage * blockAmount / 100;
+        int damageTaken = damage - blocked;
         RpcTakeDamage(damageTaken, blocked);
-    }
-
-    [ClientRpc]
-    private void RpcTakeDamage(int damageTaken, int blocked)
-    {
-        damagePopup.Display(damageTaken, blocked);
-
-        Health -= damageTaken;
-        HealthBar.SetHealth(Health);
     }
 
     protected override void Die()

@@ -77,6 +77,7 @@ MonoBehaviour:
   m_SpawnPrefabs:
   - {fileID: 5389947726256375910, guid: 5edbfece0d9fa46d1a5b13ea5ee779ee, type: 3}
   - {fileID: 28, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
+  - {fileID: 1054630008981005556, guid: e0ec02e4620468d42a2b2e314bb03e1d, type: 3}
   - {fileID: 8458088793063255136, guid: d1d4135aeebf79d42a00a5bd414fbaef, type: 3}
   - {fileID: 5365767304399832582, guid: 2160ec161c577fd45bf809abbc9b19e1, type: 3}
   - {fileID: 3126196965850195258, guid: efe228486430c6e48b9bdcd8d1726a5f, type: 3}

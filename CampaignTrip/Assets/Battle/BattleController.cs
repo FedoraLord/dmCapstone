@@ -17,7 +17,7 @@ public class BattleController : NetworkBehaviour
     public bool IsEnemyPhase { get { return battlePhase == Phase.Enemy; } }
     public bool IsPlayerPhase { get { return battlePhase == Phase.Player; } }
     public bool IsWaitingPhase { get { return !IsEnemyPhase && !IsPlayerPhase; } }
-    public Camera MainCamera { get { return cam; } }
+    public Camera MainCamera { get { return battleCam.Cam; } }
     
     private bool AllPlayersReady { get { return playersReady == PersistentPlayer.players.Count; } }
     private bool AllEnemiesReady { get { return enemiesReady == waves[waveIndex].members.Count; } }
@@ -25,11 +25,13 @@ public class BattleController : NetworkBehaviour
 	private string homeSceneName; // we need this because you can only find the active scene, not the scene the object is in with Scene Manager
 
 	[Header("UI")]
+    public BattleCamera battleCam;
 	public Canvas battleCanvas;
 
-    [SerializeField] private Camera cam;
     [SerializeField] private int totalAttackTime = 5;
     [SerializeField] private RectTransform attackTimerBar;
+    [SerializeField] private Image[] abilityImages;
+    [SerializeField] private Text[] abilityTexts;
     [SerializeField] private Text attackTimerText;
     [SerializeField] private Text attacksLeftText;
     [SerializeField] private Text blockText;
@@ -43,10 +45,7 @@ public class BattleController : NetworkBehaviour
 
     [Header("Spawning")]
     [HideInInspector] public List<EnemyBase> aliveEnemies;
-
-    public List<Transform> enemySpawnPoints;
-    public List<Transform> playerSpawnPoints;
-
+    
     [Tooltip("Groups of enemies to spawn together.")]
     [SerializeField] private EnemyDataList enemyDataList;
     [SerializeField] private Wave[] waves;
@@ -99,7 +98,6 @@ public class BattleController : NetworkBehaviour
 		homeSceneName = SceneManager.GetActiveScene().name;
         NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
 
-        cam.gameObject.transform.SetParent(null);
         PersistentPlayer.localAuthority.CmdSpawnBattlePlayer();
 
         if (isServer)
@@ -108,16 +106,21 @@ public class BattleController : NetworkBehaviour
         }
     }
 
-    [Server]
-    public void OnPlayerReady()
+    public void OnBattlePlayerSpawned(BattlePlayerBase player)
     {
-        playersReady++;
-    }
+        if (player == BattlePlayerBase.LocalAuthority)
+        {
+            for (int i = 0; i < player.Abilities.Count; i++)
+            {
+                abilityImages[i].sprite = player.Abilities[i].ButtonIcon;
+                abilityTexts[i].text = player.Abilities[i].Name;
+            }
+        }
 
-    private IEnumerator DelayExecution(float time, Action callback)
-    {
-        yield return new WaitForSeconds(time);
-        callback();
+        if (isServer)
+        {
+            playersReady++;
+        }
     }
 
     #endregion
@@ -196,7 +199,7 @@ public class BattleController : NetworkBehaviour
     [ClientRpc]
     private void RpcForceCancelAbility()
     {
-        if (BattlePlayerBase.LocalAuthority.IsUsingAbility)
+        if (BattlePlayerBase.LocalAuthority.SelectedAbility != null)
         {
             BattlePlayerBase.LocalAuthority.EndAbility();
         }
@@ -209,6 +212,7 @@ public class BattleController : NetworkBehaviour
         StartCoroutine(ExecuteEnemyPhase());
 	}
 
+    [Server]
     private IEnumerator ExecuteEnemyPhase()
     {
         yield return new WaitForSeconds(0.5f);
@@ -247,7 +251,7 @@ public class BattleController : NetworkBehaviour
     [ClientRpc]
     private void RpcLoadMinigame(int minigameNumber)
     {
-		cam.enabled = false;
+		battleCam.Cam.enabled = false;
 		currentMinigame = minigameSceneNames[minigameNumber];
         SceneManager.LoadScene(currentMinigame, LoadSceneMode.Additive);
 		StartCoroutine(SetActiveSceneDelayed(currentMinigame));
@@ -267,10 +271,12 @@ public class BattleController : NetworkBehaviour
 			SceneManager.SetActiveScene(SceneManager.GetSceneByName(homeSceneName)); // can't find the scene were in, only the active scene
 			SceneManager.UnloadScene(currentMinigame);
             battleCanvas.enabled = true;
-			cam.enabled = true;
+            battleCam.Cam.enabled = true;
 		}
 		else
+        {
 			throw new Exception("There is no Minigame in scene however one it trying to be removed");
+        }
 	}
 
     #endregion
@@ -285,7 +291,7 @@ public class BattleController : NetworkBehaviour
         }
 
         int i = aliveEnemies.Count;
-        enemy.transform.position = enemySpawnPoints[i].position;
+        enemy.transform.position = battleCam.EnemySpawnPoints[i].position;
         aliveEnemies.Add(enemy);
     }
     
