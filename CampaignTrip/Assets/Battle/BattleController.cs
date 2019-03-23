@@ -158,6 +158,7 @@ public class BattleController : NetworkBehaviour
     private void StartPlayerPhase()
     {
         RpcLoadMinigame(minigameSceneNames.FindIndex(x => x.Equals("CardSequence")));
+        return;
 
         battlePhase = Phase.Player;
 
