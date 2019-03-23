@@ -5,15 +5,41 @@ using UnityEngine.Networking;
 
 public class CS_Card : NetworkBehaviour
 {
+    private Sprite sprite;
+    public Sprite Sprite
+    {
+        get { return sprite; }
+        set
+        {
+            sprite = value;
+            dataChanged = true;
+        }
+    }
+    private bool dataChanged;
+    private SpriteRenderer spriteRenderer;
+
+    public string name;
+
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        Sprite = spriteRenderer.sprite;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (dataChanged)
+        {
+            spriteRenderer.sprite = sprite;
+            dataChanged = false;
+        }
+    }
+
+    private void OnMouseDown()
+    {
+        CS_Manager.Instance.CardSelected(this);
     }
 }
