@@ -63,16 +63,34 @@ public class MinigameManager : NetworkBehaviour
 		//do something when you win, or not
 	}
 
-	[Command]
+    protected virtual void Lose()
+    {
+
+    }
+
+    [Command]
 	public void CmdWin()
 	{
 		Win();
 		RpcWin();
 	}
 
-	[ClientRpc]
+    [Command]
+    public void CmdLose()
+    {
+        Lose();
+        RpcLose();
+    }
+
+    [ClientRpc]
 	public void RpcWin()
 	{
 		Win();
 	}
+
+    [ClientRpc]
+    public void RpcLose()
+    {
+        Lose();
+    }
 }
