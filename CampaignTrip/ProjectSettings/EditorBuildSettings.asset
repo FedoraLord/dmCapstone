@@ -20,10 +20,13 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Battle.unity
     guid: de5115eb129d1404a8ad791d34989ec0
+<<<<<<< HEAD
   - enabled: 0
     path: Assets/Scenes/CardFlip.unity
     guid: 3822c416ac214634984711aa150134fe
   - enabled: 1
     path: Assets/Scenes/CardSequence.unity
     guid: 7370d2fabd6104cdf98d586d0b82192d
+=======
+>>>>>>> parent of 0764261... Merge remote-tracking branch 'origin/cardMinigame' into roman
   m_configObjects: {}
