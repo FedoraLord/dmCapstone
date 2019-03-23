@@ -49,4 +49,14 @@ public class CardFlipManager : MinigameManager
 			randomPlayers.Remove(p);
 		}
 	}
+
+    protected override void Win()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void Lose()
+    {
+        throw new System.NotImplementedException();
+    }
 }

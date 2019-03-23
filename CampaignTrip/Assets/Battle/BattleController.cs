@@ -157,6 +157,9 @@ public class BattleController : NetworkBehaviour
     [Server]
     private void StartPlayerPhase()
     {
+        //SceneManager.GetSceneByName("CardSequence").buildIndex;
+        RpcLoadMinigame(minigameSceneNames.FindIndex(x => x.Equals("CardSequence")));
+
         battlePhase = Phase.Player;
 
         foreach (PersistentPlayer p in PersistentPlayer.players)
