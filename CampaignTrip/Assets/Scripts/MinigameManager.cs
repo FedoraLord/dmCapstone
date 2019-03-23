@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class MinigameManager : NetworkBehaviour
+public abstract class MinigameManager : NetworkBehaviour
 {
     public static MinigameManager Instance;
 
@@ -57,16 +57,9 @@ public class MinigameManager : NetworkBehaviour
     {
 		yield return 0; //please override this, also we have to return something here
 	}
-
-	protected virtual void Win()
-	{
-		//do something when you win, or not
-	}
-
-    protected virtual void Lose()
-    {
-
-    }
+    
+    protected abstract void Win();
+    protected abstract void Lose();
 
     [Command]
 	public void CmdWin()
