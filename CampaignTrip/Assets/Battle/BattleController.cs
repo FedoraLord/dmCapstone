@@ -157,7 +157,7 @@ public class BattleController : NetworkBehaviour
     [Server]
     private void StartPlayerPhase()
     {
-        RpcLoadMinigame(SceneManager.GetSceneByName("CardSequence").buildIndex);
+        RpcLoadMinigame(SceneUtility.GetBuildIndexByScenePath("Assets/Scenes/CardSequence.unity"));
         return;
 
         battlePhase = Phase.Player;
@@ -255,9 +255,16 @@ public class BattleController : NetworkBehaviour
     private void RpcLoadMinigame(int minigameNumber)
     {
 		battleCam.Cam.enabled = false;
-		currentMinigame = minigameSceneNames[minigameNumber];
-        SceneManager.LoadScene(currentMinigame, LoadSceneMode.Additive);
-		StartCoroutine(SetActiveSceneDelayed(currentMinigame));
+        SceneManager.LoadScene(minigameNumber, LoadSceneMode.Additive);
+
+        string path = SceneUtility.GetScenePathByBuildIndex(minigameNumber);
+        int slash = path.LastIndexOf('/');
+        string name = path.Substring(slash + 1);
+        int dot = name.LastIndexOf('.');
+        name = name.Substring(0, dot);
+
+        StartCoroutine(SetActiveSceneDelayed(name));
+        currentMinigame = name;
 		battleCanvas.enabled = false;
     }
 
