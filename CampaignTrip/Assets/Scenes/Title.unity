@@ -481,7 +481,7 @@ PrefabInstance:
     - target: {fileID: 3162331145551321813, guid: 7fcc54fab411d4c488b2144a32ce10e0,
         type: 3}
       propertyPath: sceneAfterLobbyName
-      value: CardSequence
+      value: Battle
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7fcc54fab411d4c488b2144a32ce10e0, type: 3}
