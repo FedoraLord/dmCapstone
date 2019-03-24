@@ -65,6 +65,7 @@ public abstract class BattleActorBase : NetworkBehaviour
         Health = maxHealth;
         healthBarUI.Init(this);
         damagePopup.Init(this);
+        DontDestroyOnLoad(gameObject);
     }
 
     private void OnDestroy()
