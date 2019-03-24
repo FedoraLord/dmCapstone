@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 7419913632964830580}
   - component: {fileID: 5906613151900921178}
   - component: {fileID: 6399025334163070987}
-  - component: {fileID: 6513457194499906148}
   m_Layer: 0
   m_Name: CS_Card
   m_TagString: Untagged
@@ -106,7 +105,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.0001, y: 0.0001}
+  m_Size: {x: 2.125, y: 3.625}
   m_EdgeRadius: 0
 --- !u!114 &6399025334163070987
 MonoBehaviour:
@@ -120,36 +119,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a2c106b7782d4cd38e5dedab201ec6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6513457194499906148
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3356566715453812173}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SceneId:
-    m_Value: 0
-  m_AssetId:
-    i0: 0
-    i1: 0
-    i2: 0
-    i3: 0
-    i4: 0
-    i5: 0
-    i6: 0
-    i7: 0
-    i8: 0
-    i9: 0
-    i10: 0
-    i11: 0
-    i12: 0
-    i13: 0
-    i14: 0
-    i15: 0
-  m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0
+  name: 

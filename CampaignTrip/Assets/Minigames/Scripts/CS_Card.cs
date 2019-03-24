@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class CS_Card : NetworkBehaviour
+public class CS_Card : MonoBehaviour
 {
     private Sprite sprite;
     public Sprite Sprite
