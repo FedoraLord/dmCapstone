@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class CS_Manager : MinigameManager
@@ -10,9 +11,11 @@ public class CS_Manager : MinigameManager
     public Text timerText;
     public List<CS_Card> sequenceCards;
     public List<CS_Card> selectCards;
+    public List<Sprite> cardSprites;
+    public GameObject selectCardObject;
+    public GameObject sequenceCardObject;
 
-    private PersistentPlayer sequencePlayer;
-    private List<PersistentPlayer> viewingPlayers;
+    private List<CS_Card> unassignedCards;
 
     private int sequenceIterator;
 
@@ -20,8 +23,10 @@ public class CS_Manager : MinigameManager
     protected override void Start()
     {
         Instance = this;
+        if (NetworkWrapper.IsHost)
+            GenerateCardSequence();
+
         base.Start();
-        GenerateCardSequence();
     }
 
     // Update is called once per frame
@@ -37,6 +42,7 @@ public class CS_Manager : MinigameManager
         }
     }
 
+    [Server]
     private void GenerateCardSequence()
     {
         foreach(var sequenceCard in sequenceCards)
@@ -45,35 +51,81 @@ public class CS_Manager : MinigameManager
             CS_Card selectedCard = selectCards[index];
             sequenceCard.name = selectedCard.name;
             sequenceCard.Sprite = selectedCard.Sprite;
+            sequenceCard.index = selectedCard.index;
         }
+        unassignedCards = sequenceCards;
     }
 
     public void CardSelected(CS_Card card)
     {
-        if (card.name.Equals(sequenceCards[sequenceIterator].name))
+        if (card.index == sequenceCards[sequenceIterator].index)
         {
             sequenceIterator++;
             // TODO make visual showing success
 
-            if (sequenceIterator > 4)
+            if (sequenceIterator > sequenceCards.Count - 1)
             {
                 CmdWin();
             }
         }
         else
         {
-            sequenceIterator = 0;
+            CmdLose();
             // TODO make visual showing failed sequence
         }
     }
 
     protected override IEnumerator HandlePlayers(List<PersistentPlayer> randomPlayers)
     {
-        for (int i = 0; i < randomPlayers.Count; i++)
+        PersistentPlayer p = randomPlayers[0];
+        TargetShowSelectCards(p.connectionToClient);
+
+        for (int i = 1; i < randomPlayers.Count; i++)
         {
-            PersistentPlayer p = randomPlayers[i];
+            p = randomPlayers[i];
+            int[] cardsToShow = GetCardsToShow();
+            TargetShowSequenceCards(p.connectionToClient, cardsToShow);
             yield return new WaitUntil(() => p.connectionToClient.isReady);
         }
+    }
+
+    private int[] GetCardsToShow()
+    {
+        int[] cards = { 0, 0, 0, 0, 0 };
+        int randomCard = Random.Range(0, unassignedCards.Count);
+        cards[randomCard] = unassignedCards[randomCard].index;
+        unassignedCards.RemoveAt(randomCard);
+        if (unassignedCards.Count > 1)
+        {
+            randomCard = Random.Range(0, unassignedCards.Count);
+            cards[randomCard] = unassignedCards[randomCard].index;
+            unassignedCards.RemoveAt(randomCard);
+        }
+
+        return cards;
+    }
+
+    [TargetRpc]
+    private void TargetShowSequenceCards(NetworkConnection connection, int[] cardInfo)
+    {
+        for(int i = 0; i < sequenceCards.Count; i++)
+        {
+            if (cardInfo[i] > 0)
+            {
+                sequenceCards[i].index = cardInfo[i];
+                sequenceCards[i].Sprite = cardSprites[cardInfo[i]];
+            }
+        }
+
+        selectCardObject.SetActive(false);
+        sequenceCardObject.SetActive(true);
+    }
+
+    [TargetRpc]
+    private void TargetShowSelectCards(NetworkConnection connection)
+    {
+        selectCardObject.SetActive(true);
+        sequenceCardObject.SetActive(false);
     }
 
     protected override void Win()
