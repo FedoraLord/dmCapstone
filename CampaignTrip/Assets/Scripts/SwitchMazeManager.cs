@@ -7,6 +7,7 @@ public class SwitchMazeManager : MinigameManager
 {
 	public GameObject playerPrefab;
     public Text timerText;
+    public Camera cam;
 	
 	protected override void Win()
 	{
