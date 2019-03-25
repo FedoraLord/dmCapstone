@@ -247,7 +247,7 @@ PrefabInstance:
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
       propertyPath: TEST_GoToMinigame
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}

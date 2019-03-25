@@ -102,7 +102,11 @@ public abstract class BattleActorBase : NetworkBehaviour
     [ClientRpc]
     protected void RpcTakeDamage(int damageTaken, int blocked)
     {
-        //TODO: play damage animation
+        if (animator != null && damageTaken > 0)
+        {
+            animator.SetTrigger("Hurt");
+        }
+
         Health -= damageTaken;
         HealthBar.SetHealth(Health);
         damagePopup.Display(damageTaken, blocked);
