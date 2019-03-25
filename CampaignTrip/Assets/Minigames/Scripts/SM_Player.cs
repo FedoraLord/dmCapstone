@@ -31,8 +31,11 @@ public class SM_Player : NetworkBehaviour
         if (playernum == PersistentPlayer.localAuthority.playerNum)
         {
             localAuthority = true;
-            Camera.main.transform.parent = gameObject.transform;
-			Camera.main.transform.localPosition = new Vector3(0, 0, -10f);
+
+            Camera cam = (MinigameManager.Instance as SwitchMazeManager).cam;
+            cam.transform.parent = gameObject.transform;
+			cam.transform.localPosition = new Vector3(0, 0, -10f);
+
             DPad.Instance.Setup(this);
 
             switch(PersistentPlayer.localAuthority.character.CharacterName)

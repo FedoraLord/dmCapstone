@@ -276,22 +276,23 @@ public class BattleController : NetworkBehaviour
     [Server]
     private void LoadMinigame(string sceneName)
     {
+        RpcLoadScene(false);
         NetworkWrapper.manager.ServerChangeScene(sceneName);
-        RpcLoadScene();
     }
 
     [ClientRpc]
-    private void RpcLoadScene()
+    private void RpcLoadScene(bool isBattleScene)
     {
-        ClientScene.Ready(connectionToServer);
+        MainCamera.enabled = isBattleScene;
+        battleCanvas.enabled = isBattleScene;
     }
 
     [Server]
     public void UnloadMinigame(bool succ)
     {
         StartPlayerPhase();
+        RpcLoadScene(true);
         NetworkWrapper.manager.ServerChangeScene("Battle");
-        RpcLoadScene();
     }
 
     #endregion
