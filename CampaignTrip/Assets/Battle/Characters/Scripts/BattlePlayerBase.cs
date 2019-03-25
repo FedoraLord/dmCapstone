@@ -63,7 +63,7 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     private int attacksRemaining;
 
-    public enum TargetMode { OverrideAuto, OverrideSelect, Ally, AllyAndSelf, Enemy }
+    public enum TargetMode { OverrideAuto, OverrideSelect, Ally, AllyAndSelf, Enemy, Self }
 
     [Serializable]
     public class Ability
@@ -86,13 +86,13 @@ public abstract class BattlePlayerBase : BattleActorBase
 
         [HideInInspector] public int RemainingCooldown;
 
+        [SerializeField] private string abilityName;
         [Tooltip("Also used for heal amount")]
         [SerializeField] private int damage;
         [SerializeField] private int duration;
         [SerializeField] private int cooldown;
         [SerializeField] private TargetMode targets;
         [SerializeField] private StatusEffectType applies;
-        [SerializeField] private string abilityName;
         [SerializeField] private Sprite buttonIcon;
 
         private StatusEffect statusEffect;

@@ -24,7 +24,8 @@ public class StatusEffect : ScriptableObject
         Protected,  //An ally will take all incomming damage for this actor.
         Reflect,    //All incoming damage will be deflected back at the attacker.
         Stun,       //Cannot attack enemies or use abilities.
-        Weak        //Lowers block and attack damage.
+        Weak,        //Lowers block and attack damage.
+        Cure
     }
 }
 #pragma warning restore 0649 
