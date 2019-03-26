@@ -84,8 +84,6 @@ public abstract class BattlePlayerBase : BattleActorBase
         [SerializeField] private StatusEffect applies;
         [SerializeField] private Sprite buttonIcon;
 
-        private StatusEffect statusEffect;
-
         //TODO:
         [HideInInspector] public bool IsUpgraded;
         
@@ -237,13 +235,14 @@ public abstract class BattlePlayerBase : BattleActorBase
         {
             if (SelectedAbility.Targets == TargetMode.OverrideSelect)
             {
-                CustomTargeting();
+                OverrideTargeting();
             }
             ToggleTargetIndicators(true);
         }
     }
 
-    protected abstract void CustomTargeting();
+    protected abstract void OverrideTargeting();
+    protected abstract void OnAbilityUsed();
     
     protected void ToggleTargetIndicators(bool active)
     {
@@ -281,7 +280,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         selectedAbilityIndex = i;
         if (target == null)
         {
-            CustomTargeting();
+            OverrideTargeting();
             foreach (BattleActorBase actor in ValidTargets)
             {
                 UseAbility(actor, SelectedAbility);
@@ -292,12 +291,21 @@ public abstract class BattlePlayerBase : BattleActorBase
             BattleActorBase actor = target.GetComponent<BattleActorBase>();
             UseAbility(actor, Abilities[i]);
         }
+        OnAbilityUsed();
     }
 
     [Server]
     private void UseAbility(BattleActorBase target, Ability ability)
     {
-        target.DispatchDamage(ability.Damage, true);
+        if (ability.Applies == StatusEffect.Cure)
+        {
+            target.Heal(ability.Damage);
+        }
+        else
+        {
+            target.DispatchDamage(ability.Damage, true);
+        }
+        
         target.AddStatusEffect(ability.Applies, this, ability.Duration);
     }
 
@@ -333,4 +341,3 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     #endregion
 }
-#pragma warning restore CS0618

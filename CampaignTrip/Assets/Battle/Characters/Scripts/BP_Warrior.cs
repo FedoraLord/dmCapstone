@@ -3,13 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-#pragma warning disable CS0618, 0649
+#pragma warning disable 0618
 public class BP_Warrior : BattlePlayerBase
 {
-    protected override void CustomTargeting()
+    [Server]
+    protected override void OnAbilityUsed()
+    {
+        //throw new System.NotImplementedException();
+    }
+
+    protected override void OverrideTargeting()
     {
         if (selectedAbilityIndex == 1)
         {
+            //Cleave (all enemies)
             customTargets = new List<BattleActorBase>(BattleController.Instance.aliveEnemies);
         }
         else
@@ -18,4 +25,3 @@ public class BP_Warrior : BattlePlayerBase
         }
     }
 }
-#pragma warning restore CS0618, 0649

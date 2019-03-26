@@ -77,6 +77,8 @@ public abstract class BattleActorBase : NetworkBehaviour
         }
     }
 
+    #region Initialization
+
     public void Initialize()
     {
         Health = maxHealth;
@@ -92,6 +94,10 @@ public abstract class BattleActorBase : NetworkBehaviour
         if (damagePopup != null)
             Destroy(damagePopup.gameObject);
     }
+
+    #endregion
+
+    #region Damage
 
     [Server]
     public void DispatchDamage(int damage, bool canBlock)
@@ -131,6 +137,17 @@ public abstract class BattleActorBase : NetworkBehaviour
 
     protected abstract void Die();
 
+    public void Heal(int amount)
+    {
+        Health += amount;
+        HealthBar.SetHealth(Health);
+        //TODO: hp popup like damage popup
+    }
+
+    #endregion
+
+    #region StatusEffects
+
     public bool HasStatusEffect(StatusEffect type)
     {
         return statusEffects.ContainsKey(type);
@@ -154,9 +171,13 @@ public abstract class BattleActorBase : NetworkBehaviour
     {
         Stat s = new Stat(type, otherActor.GetComponent<BattleActorBase>(), duration);
 
-        RemoveOnAdd(s.Type);
+        RemoveOnAdd(type);
+        if (type == StatusEffect.Cure)
+        {
+            return;
+        }
         
-        if (HasStatusEffect(s.Type))
+        if (HasStatusEffect(type))
         {
             AddStack(s);
         }
@@ -243,6 +264,15 @@ public abstract class BattleActorBase : NetworkBehaviour
             case StatusEffect.Protected:
                 statusEffects.Remove(StatusEffect.Protected);
                 break;
+            case StatusEffect.Cure:
+                statusEffects.Remove(StatusEffect.Bleed);
+                statusEffects.Remove(StatusEffect.Blind);
+                statusEffects.Remove(StatusEffect.Burn);
+                statusEffects.Remove(StatusEffect.Freeze);
+                statusEffects.Remove(StatusEffect.Poison);
+                statusEffects.Remove(StatusEffect.Stun);
+                statusEffects.Remove(StatusEffect.Weak);
+                break;
             default:
                 break;
         }
@@ -304,5 +334,6 @@ public abstract class BattleActorBase : NetworkBehaviour
             yield return new WaitForSeconds(0.5f);
         }
     }
+
+#endregion
 }
-#pragma warning restore CS0618, 0649

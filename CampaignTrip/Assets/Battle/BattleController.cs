@@ -46,13 +46,12 @@ public class BattleController : NetworkBehaviour
     [Header("Spawning")]
     [HideInInspector] public List<EnemyBase> aliveEnemies;
     
-    [Tooltip("Groups of enemies to spawn together.")]
     [SerializeField] private EnemyDataList enemyDataList;
+    [Tooltip("Groups of enemies to spawn together.")]
     [SerializeField] private Wave[] waves;
 
-    [Header("Misc")]
+    //[Header("Misc")]
     private Dictionary<StatusEffect, int> dotStatusEffects = new Dictionary<StatusEffect, int>();
-    
     private int enemiesReady;
     private int playersReady;
 	private int waveIndex = -1;
