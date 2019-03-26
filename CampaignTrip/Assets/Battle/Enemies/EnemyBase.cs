@@ -125,7 +125,17 @@ public class EnemyBase : BattleActorBase
     {
         foreach (int t in targets)
         {
-            PersistentPlayer.players[t].battlePlayer.DispatchDamage(basicDamage, true);
+            PersistentPlayer.players[t].battlePlayer.DispatchDamage(this, basicDamage, true);
+        }
+    }
+
+    public void RemoveTarget(int playerNum)
+    {
+        List<int> targetsCopy = new List<int>(targets);
+        if (targetsCopy.Remove(playerNum - 1))
+        {
+            targets = targetsCopy.ToArray();
+            healthBarUI.SetTargets(targets);
         }
     }
 

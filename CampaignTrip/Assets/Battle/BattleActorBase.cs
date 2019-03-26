@@ -56,7 +56,7 @@ public abstract class BattleActorBase : NetworkBehaviour
         Protected,  //An ally will take all incomming damage for this actor.
         Reflect,    //All incoming damage will be deflected back at the attacker.
         Stun,       //Cannot attack enemies or use abilities.
-        Weak,        //Lowers block and attack damage.
+        Weak,       //Lowers block and attack damage.
         Cure
     }
     
@@ -100,11 +100,18 @@ public abstract class BattleActorBase : NetworkBehaviour
     #region Damage
 
     [Server]
-    public void DispatchDamage(int damage, bool canBlock)
+    public void DispatchDamage(BattleActorBase attacker, int damage, bool canBlock)
     {
         if (canBlock)
         {
-            if (HasStatusEffect(StatusEffect.Protected))
+            if (HasStatusEffect(StatusEffect.Reflect))
+            {
+                if (attacker != null)
+                {
+                    attacker.DispatchDamage(null, damage, false);
+                }
+            }
+            else if (HasStatusEffect(StatusEffect.Protected))
             {
                 BattleActorBase protector = GetOtherActor(StatusEffect.Protected);
                 protector.TakeBlockedDamage(damage);
@@ -155,7 +162,7 @@ public abstract class BattleActorBase : NetworkBehaviour
 
     public BattleActorBase GetOtherActor(StatusEffect type)
     {
-        if (statusEffects.ContainsKey(type))
+        if (HasStatusEffect(type))
             return statusEffects[type][0].OtherActor;
         return null;
     }
@@ -188,39 +195,39 @@ public abstract class BattleActorBase : NetworkBehaviour
 
         switch (s.Type)
         {
-            case StatusEffect.Bleed:
-                OnAddBleed();
-                break;
-            case StatusEffect.Blind:
-                OnAddBlind();
-                break;
-            case StatusEffect.Burn:
-                OnAddBurn();
-                break;
-            case StatusEffect.Focus:
-                OnAddFocus();
-                break;
-            case StatusEffect.Freeze:
-                OnAddFreeze();
-                break;
+            //case StatusEffect.Bleed:
+            //    OnAddBleed();
+            //    break;
+            //case StatusEffect.Blind:
+            //    OnAddBlind();
+            //    break;
+            //case StatusEffect.Burn:
+            //    OnAddBurn();
+            //    break;
+            //case StatusEffect.Focus:
+            //    OnAddFocus();
+            //    break;
+            //case StatusEffect.Freeze:
+            //    OnAddFreeze();
+            //    break;
             case StatusEffect.Invisible:
-                OnAddInvisible();
+                OnChangeInvisible(true);
                 break;
-            case StatusEffect.Poison:
-                OnAddPoison();
-                break;
-            case StatusEffect.Protected:
-                OnAddProtected();
-                break;
-            case StatusEffect.Reflect:
-                OnAddReflect();
-                break;
+            //case StatusEffect.Poison:
+            //    OnAddPoison();
+            //    break;
+            //case StatusEffect.Protected:
+            //    OnAddProtected();
+            //    break;
+            //case StatusEffect.Reflect:
+            //    OnAddReflect();
+            //    break;
             case StatusEffect.Stun:
                 OnAddStun();
                 break;
-            case StatusEffect.Weak:
-                OnAddWeak();
-                break;
+            //case StatusEffect.Weak:
+            //    OnAddWeak();
+            //    break;
             default:
                 break;
         }
@@ -256,39 +263,63 @@ public abstract class BattleActorBase : NetworkBehaviour
         switch (type)
         {
             case StatusEffect.Burn:
-                statusEffects.Remove(StatusEffect.Freeze);
+                RemoveStatusEffect(StatusEffect.Freeze);
                 break;
             case StatusEffect.Freeze:
-                statusEffects.Remove(StatusEffect.Burn);
+                RemoveStatusEffect(StatusEffect.Burn);
                 break;
             case StatusEffect.Protected:
-                statusEffects.Remove(StatusEffect.Protected);
+                RemoveStatusEffect(StatusEffect.Protected);
                 break;
             case StatusEffect.Cure:
-                statusEffects.Remove(StatusEffect.Bleed);
-                statusEffects.Remove(StatusEffect.Blind);
-                statusEffects.Remove(StatusEffect.Burn);
-                statusEffects.Remove(StatusEffect.Freeze);
-                statusEffects.Remove(StatusEffect.Poison);
-                statusEffects.Remove(StatusEffect.Stun);
-                statusEffects.Remove(StatusEffect.Weak);
+                RemoveStatusEffect(StatusEffect.Bleed);
+                RemoveStatusEffect(StatusEffect.Blind);
+                RemoveStatusEffect(StatusEffect.Burn);
+                RemoveStatusEffect(StatusEffect.Freeze);
+                RemoveStatusEffect(StatusEffect.Poison);
+                RemoveStatusEffect(StatusEffect.Stun);
+                RemoveStatusEffect(StatusEffect.Weak);
                 break;
             default:
                 break;
         }
     }
 
-    protected virtual void OnAddBleed() { }
-    protected virtual void OnAddBlind() { }
-    protected virtual void OnAddBurn() { }
-    protected virtual void OnAddFocus() { }
-    protected virtual void OnAddFreeze() { }
-    protected virtual void OnAddInvisible() { }
-    protected virtual void OnAddPoison() { }
-    protected virtual void OnAddProtected() { }
-    protected virtual void OnAddReflect() { }
-    protected virtual void OnAddWeak() { }
+    private void RemoveStatusEffect(StatusEffect type)
+    {
+        if (!HasStatusEffect(type))
+            return;
+
+        statusEffects.Remove(type);
+        switch (type)
+        {
+            case StatusEffect.Invisible:
+                OnChangeInvisible(false);
+                break;
+            default:
+                break;
+        }
+    }
+    
+    private void OnChangeInvisible(bool added)
+    {
+        SpriteRenderer s = GetComponent<SpriteRenderer>();
+        Color c = s.color;
+
+        if (added)
+        {
+            c.a = 0.5f;
+            OnAddInvisible();
+        }
+        else
+        {
+            c.a = 1;
+        }
+        s.color = c;
+    }
+
     protected virtual void OnAddStun() { }
+    protected virtual void OnAddInvisible() { }
     
     public IEnumerator ApplySatusEffects()
     {
@@ -316,7 +347,7 @@ public abstract class BattleActorBase : NetworkBehaviour
 
         if (s.Count == 0)
         {
-            statusEffects.Remove(type);
+            RemoveStatusEffect(type);
         }
     }
 
@@ -330,7 +361,7 @@ public abstract class BattleActorBase : NetworkBehaviour
             {
                 damage += s[i].DOT;
             }
-            DispatchDamage(damage, false);
+            DispatchDamage(null, damage, false);
             yield return new WaitForSeconds(0.5f);
         }
     }

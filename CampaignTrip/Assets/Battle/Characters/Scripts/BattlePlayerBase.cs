@@ -15,7 +15,7 @@ public abstract class BattlePlayerBase : BattleActorBase
     //public static BP_Alchemist Alchemist { get; protected set; }
     public static int PlayersUsingAbility;
 
-    public bool AbilityPlayedThisTurn { get; set; }
+    public bool CanPlayAbility { get; set; }
     public List<Ability> Abilities { get; private set; }
 
     public Ability SelectedAbility
@@ -40,20 +40,28 @@ public abstract class BattlePlayerBase : BattleActorBase
     {
         get
         {
-            if (SelectedAbility == null || SelectedAbility.Targets == TargetMode.Enemy)
+            TargetMode mode = (SelectedAbility == null) ? TargetMode.Enemy : SelectedAbility.Targets;
+
+            switch (mode)
             {
-                return new List<BattleActorBase>(BattleController.Instance.aliveEnemies);
-            }
-            else if (SelectedAbility.Targets == TargetMode.OverrideAuto || SelectedAbility.Targets == TargetMode.OverrideSelect)
-            {
-                return customTargets;
-            }
-            else
-            {
-                List<BattleActorBase> targets = PersistentPlayer.players.Select(x => x.battlePlayer).ToList<BattleActorBase>();
-                if (SelectedAbility.Targets == TargetMode.Ally)
-                    targets.Remove(this);
-                return targets;
+                case TargetMode.Self:
+                    return new List<BattleActorBase>() { this };
+                case TargetMode.Ally:
+                case TargetMode.AllyAndSelf:
+                    List<BattleActorBase> targets = PersistentPlayer.players.Select(x => x.battlePlayer).ToList<BattleActorBase>();
+                    if (SelectedAbility.Targets == TargetMode.Ally)
+                    {
+                        targets.Remove(this);
+                    }
+                    return targets;
+                case TargetMode.OverrideAuto:
+                case TargetMode.OverrideSelect:
+                    return customTargets;
+                case TargetMode.Enemy:
+                    return new List<BattleActorBase>(BattleController.Instance.aliveEnemies);
+                default:
+                    Debug.LogErrorFormat("Valid targets not implemented for {0}", SelectedAbility.Targets);
+                    return new List<BattleActorBase>();
             }
         }
     }
@@ -89,7 +97,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         
         public void Use()
         {
-            LocalAuthority.AbilityPlayedThisTurn = true;
+            LocalAuthority.CanPlayAbility = true;
             RemainingCooldown = cooldown + 1;
         }
 
@@ -132,7 +140,16 @@ public abstract class BattlePlayerBase : BattleActorBase
     [ClientRpc]
     private void RpcOnPlayerPhaseStart()
     {
-        LocalAuthority.AbilityPlayedThisTurn = false;
+        if (HasStatusEffect(StatusEffect.Stun))
+        {
+            LocalAuthority.CanPlayAbility = true;
+            UpdateAttackBlock(0);
+        }
+        else
+        {
+            LocalAuthority.CanPlayAbility = false;
+        }
+        
         UpdateAttackBlock(attacksPerTurn);
 
         foreach (Ability a in Abilities)
@@ -167,7 +184,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         {
             RpcAttack();
             EnemyBase enemy = target.GetComponent<EnemyBase>();
-            enemy.DispatchDamage(basicDamage, true);
+            enemy.DispatchDamage(this, basicDamage, true);
         }
     }
 
@@ -207,7 +224,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         {
             EndAbility();
         }
-        else if (!AbilityPlayedThisTurn && Abilities[i].RemainingCooldown <= 0)
+        else if (!CanPlayAbility && Abilities[i].RemainingCooldown <= 0)
         {
             CmdUseAbilityRequest(i);
         }
@@ -227,17 +244,24 @@ public abstract class BattlePlayerBase : BattleActorBase
     private void Target_UseAbilityConfirm(NetworkConnection conn, int i)
     {
         selectedAbilityIndex = i;
-        if (SelectedAbility.Targets == TargetMode.OverrideAuto)
+        switch (SelectedAbility.Targets)
         {
-            OnAbilityTargetChosen(null);
-        }
-        else
-        {
-            if (SelectedAbility.Targets == TargetMode.OverrideSelect)
-            {
+            case TargetMode.OverrideAuto:
+                OnAbilityTargetChosen(null);
+                break;
+            case TargetMode.Self:
+                OnAbilityTargetChosen(this);
+                break;
+            case TargetMode.OverrideSelect:
                 OverrideTargeting();
-            }
-            ToggleTargetIndicators(true);
+                ToggleTargetIndicators(true);
+                break;
+            case TargetMode.Ally:
+            case TargetMode.AllyAndSelf:
+            case TargetMode.Enemy:
+            default:
+                ToggleTargetIndicators(true);
+                break;
         }
     }
 
@@ -303,7 +327,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         }
         else
         {
-            target.DispatchDamage(ability.Damage, true);
+            target.DispatchDamage(this, ability.Damage, true);
         }
         
         target.AddStatusEffect(ability.Applies, this, ability.Duration);
@@ -337,6 +361,19 @@ public abstract class BattlePlayerBase : BattleActorBase
     protected override void Die()
     {
         
+    }
+
+    #endregion
+
+    #region StatusEffects
+
+    protected override void OnAddInvisible()
+    {
+        base.OnAddInvisible();
+        foreach (EnemyBase enemy in BattleController.Instance.aliveEnemies)
+        {
+            enemy.RemoveTarget(playerNum);
+        }
     }
 
     #endregion
