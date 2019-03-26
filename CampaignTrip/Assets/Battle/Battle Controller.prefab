@@ -893,6 +893,8 @@ MonoBehaviour:
   attacksLeftText: {fileID: 978044166622188987}
   blockText: {fileID: 978044166606812425}
   minigameSceneNames: []
+  TEST_GoToMinigame: 0
+  TEST_ForceMinigameSceneName: 
   aliveEnemies: []
   enemyDataList: {fileID: 11400000, guid: 444a86a589f7caf48beb2133db50fb0e, type: 2}
   waves:
@@ -901,8 +903,6 @@ MonoBehaviour:
   - members: 
   statusEffects:
   - {fileID: 11400000, guid: 8edb413a09d127b4593271bf0cb57354, type: 2}
-  - {fileID: 11400000, guid: d06975a41c252d849a274029200483a6, type: 2}
-  - {fileID: 11400000, guid: a5aa9d8a34732c24b8429bd35059fe0b, type: 2}
 --- !u!1 &978044166578950849
 GameObject:
   m_ObjectHideFlags: 0

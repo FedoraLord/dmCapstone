@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-using static StatusEffect;
 
 #pragma warning disable CS0618, 0649
 public class EnemyBase : BattleActorBase
@@ -81,7 +80,7 @@ public class EnemyBase : BattleActorBase
         remainingBlock = blockAmount;
         ChooseTargets();
 
-        if (HasStatusEffect(StatusEffectType.Stun))
+        if (HasStatusEffect(StatusEffect.Stun))
             RpcUpdateTargets(new int[0]);
         else
             RpcUpdateTargets(targets);

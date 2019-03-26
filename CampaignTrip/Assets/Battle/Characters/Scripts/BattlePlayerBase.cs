@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
-using static StatusEffect;
 
 #pragma warning disable CS0618, 0649
 public abstract class BattlePlayerBase : BattleActorBase
@@ -73,26 +72,16 @@ public abstract class BattlePlayerBase : BattleActorBase
         public Sprite ButtonIcon { get { return buttonIcon; } }
         public string Name { get { return abilityName; } }
         public TargetMode Targets { get { return targets; } }
-        
-        public StatusEffect StatusEffect
-        {
-            get
-            {
-                if (statusEffect == null)
-                    statusEffect = BattleController.Instance.GetStatusEffect(applies);
-                return statusEffect;
-            }
-        }
+        public StatusEffect Applies { get { return applies; } }
 
         [HideInInspector] public int RemainingCooldown;
 
         [SerializeField] private string abilityName;
-        [Tooltip("Also used for heal amount")]
         [SerializeField] private int damage;
         [SerializeField] private int duration;
         [SerializeField] private int cooldown;
         [SerializeField] private TargetMode targets;
-        [SerializeField] private StatusEffectType applies;
+        [SerializeField] private StatusEffect applies;
         [SerializeField] private Sprite buttonIcon;
 
         private StatusEffect statusEffect;
@@ -309,7 +298,7 @@ public abstract class BattlePlayerBase : BattleActorBase
     private void UseAbility(BattleActorBase target, Ability ability)
     {
         target.DispatchDamage(ability.Damage, true);
-        target.AddStatusEffect(ability.StatusEffect, this, ability.Duration);
+        target.AddStatusEffect(ability.Applies, this, ability.Duration);
     }
 
     public void EndAbility()

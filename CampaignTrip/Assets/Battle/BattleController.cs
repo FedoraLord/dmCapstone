@@ -6,8 +6,8 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using static BattleActorBase;
 using static EnemyPrefab;
-using static StatusEffect;
 
 #pragma warning disable CS0618, 0649
 public class BattleController : NetworkBehaviour
@@ -51,7 +51,7 @@ public class BattleController : NetworkBehaviour
     [SerializeField] private Wave[] waves;
 
     [Header("Misc")]
-    [SerializeField] private List<StatusEffect> statusEffects;
+    private Dictionary<StatusEffect, int> dotStatusEffects = new Dictionary<StatusEffect, int>();
     
     private int enemiesReady;
     private int playersReady;
@@ -88,7 +88,7 @@ public class BattleController : NetworkBehaviour
             }
         }
     }
-
+    
     protected void Start()
 	{
         if (Instance)
@@ -107,6 +107,10 @@ public class BattleController : NetworkBehaviour
         NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
 
         PersistentPlayer.localAuthority.CmdSpawnBattlePlayer();
+
+        dotStatusEffects.Add(StatusEffect.Bleed, 5);
+        dotStatusEffects.Add(StatusEffect.Burn, 5);
+        dotStatusEffects.Add(StatusEffect.Poison, 5);
 
         if (isServer)
         {
@@ -418,16 +422,11 @@ public class BattleController : NetworkBehaviour
 
     #endregion
 
-    public StatusEffect GetStatusEffect(StatusEffectType type)
+    public int GetDOT(StatusEffect effect)
     {
-        foreach (StatusEffect s in statusEffects)
-        {
-            if (s.Type == type)
-                return s;
-        }
-
-        Debug.LogErrorFormat("Status Effect {0} not found on BattleController", type);
-        return null;
+        if (dotStatusEffects.ContainsKey(effect))
+            return dotStatusEffects[effect];
+        return 0;
     }
 
     protected void Win()
