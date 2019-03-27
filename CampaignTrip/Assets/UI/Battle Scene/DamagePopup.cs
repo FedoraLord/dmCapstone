@@ -8,18 +8,19 @@ public class DamagePopup : BattleActorUI
 {
     public Text damageText;
     public Text blockText;
-    public Text missText;
+    public Text messageText;
     
     private Camera mainCamera;
     private Coroutine damageAnimation;
     private Coroutine blockAnimation;
-    private Coroutine missAnimation;
+    private Coroutine messageAnimation;
+    private int animationsPlaying;
 
     private void Start()
     {
         damageText.gameObject.SetActive(false);
         blockText.gameObject.SetActive(false);
-        missText.gameObject.SetActive(false);
+        messageText.gameObject.SetActive(false);
         mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
     }
 
@@ -38,14 +39,25 @@ public class DamagePopup : BattleActorUI
         damageText.enabled = (damage > 0);
         damageText.text = string.Format("-{0}", damage);
 
-        damageAnimation = StartCoroutine(Animate(damageText, () => damageAnimation = null));
-        blockAnimation = StartCoroutine(Animate(blockText, () => blockAnimation = null));
+        damageAnimation = StartCoroutine(Animate(damageText, true, () => damageAnimation = null));
+        blockAnimation = StartCoroutine(Animate(blockText, true, () => blockAnimation = null));
     }
 
     public void DisplayMiss()
     {
-        StopAnimation(missAnimation);
-        missAnimation = StartCoroutine(Animate(missText, () => missAnimation = null));
+        DisplayMessage("Miss");
+    }
+
+    public void DisplayInterrupt()
+    {
+        DisplayMessage("Interrupt");
+    }
+
+    private void DisplayMessage(string msg)
+    {
+        messageText.text = msg;
+        StopAnimation(messageAnimation);
+        messageAnimation = StartCoroutine(Animate(messageText, false, () => messageAnimation = null));
     }
 
     private void StopAnimation(Coroutine animation)
@@ -54,8 +66,14 @@ public class DamagePopup : BattleActorUI
             StopCoroutine(animation);
     }
 
-    private IEnumerator Animate(Text text, Action callback = null)
+    private IEnumerator Animate(Text text, bool allowMultiple, Action callback = null)
     {
+        if (!allowMultiple)
+        {
+            yield return new WaitUntil(() => animationsPlaying == 0);
+        }
+
+        animationsPlaying++;
         text.gameObject.SetActive(true);
 
         float animTime = 0;
@@ -78,6 +96,7 @@ public class DamagePopup : BattleActorUI
 
         float fadeOutTime = 1f;
         text.CrossFadeAlpha(0, fadeOutTime, false);
+        animationsPlaying--;
 
         yield return new WaitForSeconds(fadeOutTime);
 

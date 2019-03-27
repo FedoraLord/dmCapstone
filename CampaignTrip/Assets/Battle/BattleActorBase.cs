@@ -65,13 +65,15 @@ public abstract class BattleActorBase : NetworkBehaviour
         //can be the person you are healing or the person protecting you
         public BattleActorBase OtherActor;
         public StatusEffect Type;
+        public int HealthOnRemove;
         public int RemainingDuration;
         public int DOT;
 
-        public Stat(StatusEffect effect, BattleActorBase otherActor, int duration)
+        public Stat(StatusEffect effect, BattleActorBase otherActor, int duration, int healthGain = 0)
         {
             Type = effect;
             OtherActor = otherActor;
+            HealthOnRemove = healthGain;
             RemainingDuration = duration;
             DOT = BattleController.Instance.GetDOT(effect);
         }
@@ -93,6 +95,18 @@ public abstract class BattleActorBase : NetworkBehaviour
             Destroy(healthBarUI.gameObject);
         if (damagePopup != null)
             Destroy(damagePopup.gameObject);
+    }
+
+    public virtual void OnPlayerPhaseStart()
+    {
+        if (HasStatusEffect(StatusEffect.Focus))
+        {
+            Stat s = statusEffects[StatusEffect.Focus][0];
+            if (s.RemainingDuration <= 0)
+            {
+                RemoveStatusEffect(StatusEffect.Focus);
+            }
+        }
     }
 
     #endregion
@@ -185,15 +199,15 @@ public abstract class BattleActorBase : NetworkBehaviour
     }
 
     [Server] //stacks the duration if it is already in the list
-    public void AddStatusEffect(StatusEffect effect, BattleActorBase otherActor, int duration)
+    public void AddStatusEffect(StatusEffect effect, BattleActorBase otherActor, int duration, int healthOnRemove = 0)
     {
-        RpcAddStatusEffect(effect, otherActor.gameObject, duration);
+        RpcAddStatusEffect(effect, otherActor.gameObject, duration, healthOnRemove);
     }
 
     [ClientRpc]
-    private void RpcAddStatusEffect(StatusEffect type, GameObject otherActor, int duration)
+    private void RpcAddStatusEffect(StatusEffect type, GameObject otherActor, int duration, int healthOnRemove)
     {
-        Stat s = new Stat(type, otherActor.GetComponent<BattleActorBase>(), duration);
+        Stat s = new Stat(type, otherActor.GetComponent<BattleActorBase>(), duration, healthOnRemove);
 
         RemoveOnAdd(type);
         if (type == StatusEffect.Cure)
@@ -212,39 +226,12 @@ public abstract class BattleActorBase : NetworkBehaviour
 
         switch (s.Type)
         {
-            //case StatusEffect.Bleed:
-            //    OnAddBleed();
-            //    break;
-            //case StatusEffect.Blind:
-            //    OnAddBlind();
-            //    break;
-            //case StatusEffect.Burn:
-            //    OnAddBurn();
-            //    break;
-            //case StatusEffect.Focus:
-            //    OnAddFocus();
-            //    break;
-            //case StatusEffect.Freeze:
-            //    OnAddFreeze();
-            //    break;
             case StatusEffect.Invisible:
                 OnChangeInvisible(true);
                 break;
-            //case StatusEffect.Poison:
-            //    OnAddPoison();
-            //    break;
-            //case StatusEffect.Protected:
-            //    OnAddProtected();
-            //    break;
-            //case StatusEffect.Reflect:
-            //    OnAddReflect();
-            //    break;
             case StatusEffect.Stun:
                 OnAddStun();
                 break;
-            //case StatusEffect.Weak:
-            //    OnAddWeak();
-            //    break;
             default:
                 break;
         }
@@ -282,8 +269,15 @@ public abstract class BattleActorBase : NetworkBehaviour
             case StatusEffect.Burn:
                 RemoveStatusEffect(StatusEffect.Freeze);
                 break;
+            case StatusEffect.Blind:
+                RemoveStatusEffect(StatusEffect.Focus);
+                break;
             case StatusEffect.Freeze:
                 RemoveStatusEffect(StatusEffect.Burn);
+                RemoveStatusEffect(StatusEffect.Focus);
+                break;
+            case StatusEffect.Stun:
+                RemoveStatusEffect(StatusEffect.Focus);
                 break;
             case StatusEffect.Protected:
                 RemoveStatusEffect(StatusEffect.Protected);
@@ -306,16 +300,19 @@ public abstract class BattleActorBase : NetworkBehaviour
     {
         if (!HasStatusEffect(type))
             return;
-
-        statusEffects.Remove(type);
+        
         switch (type)
         {
             case StatusEffect.Invisible:
                 OnChangeInvisible(false);
                 break;
+            case StatusEffect.Focus:
+                OnRemoveFocus();
+                break;
             default:
                 break;
         }
+        statusEffects.Remove(type);
     }
     
     private void OnChangeInvisible(bool added)
@@ -333,6 +330,19 @@ public abstract class BattleActorBase : NetworkBehaviour
             c.a = 1;
         }
         s.color = c;
+    }
+
+    private void OnRemoveFocus()
+    {
+        Stat s = statusEffects[StatusEffect.Focus][0];
+        if (s.RemainingDuration > 0)
+        {
+            damagePopup.DisplayInterrupt();
+        }
+        else
+        {
+            s.OtherActor.Heal(s.HealthOnRemove);
+        }
     }
 
     protected virtual void OnAddStun() { }
@@ -357,6 +367,9 @@ public abstract class BattleActorBase : NetworkBehaviour
             s[i].RemainingDuration--;
             if (s[i].RemainingDuration <= 0)
             {
+                if (type == StatusEffect.Focus)
+                    return;
+
                 s.RemoveAt(i);
                 i--;
             }

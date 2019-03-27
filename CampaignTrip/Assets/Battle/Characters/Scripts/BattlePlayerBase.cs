@@ -131,8 +131,9 @@ public abstract class BattlePlayerBase : BattleActorBase
     }
 
     [Server]
-    public void OnPlayerPhaseStart()
+    public override void OnPlayerPhaseStart()
     {
+        base.OnPlayerPhaseStart();
         RpcOnPlayerPhaseStart();
     }
 
@@ -333,12 +334,13 @@ public abstract class BattlePlayerBase : BattleActorBase
         {
             target.Heal(ability.Damage);
         }
-        else
+        else if (target is EnemyBase)
         {
             target.DispatchDamage(this, ability.Damage, true);
         }
-        
-        target.AddStatusEffect(ability.Applies, this, ability.Duration);
+
+        int healthOnRemove = (ability.Applies == StatusEffect.Focus) ? ability.Damage : 0;
+        target.AddStatusEffect(ability.Applies, this, ability.Duration, healthOnRemove);
     }
 
     public void EndAbility()

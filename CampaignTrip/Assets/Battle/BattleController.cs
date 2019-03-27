@@ -28,7 +28,7 @@ public class BattleController : NetworkBehaviour
     public BattleCamera battleCam;
 	public Canvas battleCanvas;
 
-    [SerializeField] private int totalAttackTime = 5;
+    [SerializeField] private float totalAttackTime = 5;
     [SerializeField] private RectTransform attackTimerBar;
     [SerializeField] private Image[] abilityImages;
     [SerializeField] private Text[] abilityTexts;

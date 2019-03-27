@@ -76,8 +76,9 @@ public class EnemyBase : BattleActorBase
 
     #region Attack
 
-    public void OnPlayerPhaseStart()
+    public override void OnPlayerPhaseStart()
     {
+        base.OnPlayerPhaseStart();
         remainingBlock = blockAmount;
         
         if (HasStatusEffect(StatusEffect.Stun))
