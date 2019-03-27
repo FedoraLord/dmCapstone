@@ -98,20 +98,20 @@ public abstract class BattleActorBase : NetworkBehaviour
     #endregion
 
     [Server]
-    protected bool TryAttack()
+    protected bool TryAttack(BattleActorBase target)
     {
         if (HasStatusEffect(StatusEffect.Blind) && UnityEngine.Random.Range(0, 100) < 80)
         {
-            RpcMiss();
+            target.RpcMiss();
             return false;
         }
         return true;
     }
 
     [ClientRpc]
-    private void RpcMiss()
+    public void RpcMiss()
     {
-        Debug.LogFormat("Actor {0} missed", this);
+        damagePopup.DisplayMiss();
     }
 
     #region Damage
@@ -156,7 +156,7 @@ public abstract class BattleActorBase : NetworkBehaviour
 
         Health -= damageTaken;
         HealthBar.SetHealth(Health);
-        damagePopup.Display(damageTaken, blocked);
+        damagePopup.DisplayDamage(damageTaken, blocked);
     }
 
     protected abstract void Die();

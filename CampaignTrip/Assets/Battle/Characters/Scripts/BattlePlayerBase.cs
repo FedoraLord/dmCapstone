@@ -188,7 +188,7 @@ public abstract class BattlePlayerBase : BattleActorBase
             RpcAttack();
             EnemyBase enemy = target.GetComponent<EnemyBase>();
 
-            if (TryAttack())
+            if (TryAttack(enemy))
             {
                 enemy.DispatchDamage(this, basicDamage, true);
             }

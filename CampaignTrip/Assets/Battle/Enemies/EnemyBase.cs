@@ -127,7 +127,7 @@ public class EnemyBase : BattleActorBase
     {
         foreach (int t in targets)
         {
-            if (TryAttack())
+            if (TryAttack(PersistentPlayer.players[t].battlePlayer))
             {
                 PersistentPlayer.players[t].battlePlayer.DispatchDamage(this, basicDamage, true);
             }
