@@ -9,7 +9,7 @@ public class BP_Rogue : BattlePlayerBase
     [Server]
     protected override void OnAbilityUsed()
     {
-        //throw new System.NotImplementedException();
+        
     }
 
     protected override void OverrideTargeting()

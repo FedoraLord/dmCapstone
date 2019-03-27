@@ -97,6 +97,23 @@ public abstract class BattleActorBase : NetworkBehaviour
 
     #endregion
 
+    [Server]
+    protected bool TryAttack()
+    {
+        if (HasStatusEffect(StatusEffect.Blind) && UnityEngine.Random.Range(0, 100) < 80)
+        {
+            RpcMiss();
+            return false;
+        }
+        return true;
+    }
+
+    [ClientRpc]
+    private void RpcMiss()
+    {
+        Debug.LogFormat("Actor {0} missed", this);
+    }
+
     #region Damage
 
     [Server]

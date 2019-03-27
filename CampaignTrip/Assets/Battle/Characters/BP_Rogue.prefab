@@ -28,7 +28,8 @@ MonoBehaviour:
     damage: 0
     duration: 3
     cooldown: 7
-    targets: 5
+    targetAll: 0
+    targetGroup: 2
     applies: 5
     buttonIcon: {fileID: 21300000, guid: cc6d4064464af4da294c404785f26c93, type: 3}
     IsUpgraded: 0
@@ -38,7 +39,8 @@ MonoBehaviour:
     damage: 100
     duration: 5
     cooldown: 10
-    targets: 4
+    targetAll: 0
+    targetGroup: 4
     applies: 0
     buttonIcon: {fileID: 21300000, guid: 1a88cca4066794396a8a9ead1f7e2f78, type: 3}
     IsUpgraded: 0
@@ -48,7 +50,8 @@ MonoBehaviour:
     damage: 10
     duration: 4
     cooldown: 15
-    targets: 0
+    targetAll: 1
+    targetGroup: 4
     applies: 1
     buttonIcon: {fileID: 21300000, guid: 1e0a366f4e16c4dc1ab2e431fc7e78cf, type: 3}
     IsUpgraded: 0
@@ -63,17 +66,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: BP_Rogue
       objectReference: {fileID: 0}
-    - target: {fileID: 854968600512077322, guid: 54e2aa1d050673e459432da61c3d9441,
-        type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 22100000, guid: a06caca707f857f438786217e4201e91,
-        type: 2}
-    - target: {fileID: 424259247384908331, guid: 54e2aa1d050673e459432da61c3d9441,
-        type: 3}
-      propertyPath: m_Animator
-      value: 
-      objectReference: {fileID: 4731732375695448080}
     - target: {fileID: 34, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -118,11 +110,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 39, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 7a806a1e1418ba74a8720c9da1ab258c,
-        type: 3}
     - target: {fileID: 63, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
       propertyPath: m_AssetId.i0
       value: 0
@@ -187,6 +174,22 @@ PrefabInstance:
       propertyPath: m_AssetId.i15
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 424259247384908331, guid: 54e2aa1d050673e459432da61c3d9441,
+        type: 3}
+      propertyPath: m_Animator
+      value: 
+      objectReference: {fileID: 4731732375695448080}
+    - target: {fileID: 39, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 7a806a1e1418ba74a8720c9da1ab258c,
+        type: 3}
+    - target: {fileID: 854968600512077322, guid: 54e2aa1d050673e459432da61c3d9441,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 22100000, guid: a06caca707f857f438786217e4201e91,
+        type: 2}
     - target: {fileID: 1541344304113446009, guid: 54e2aa1d050673e459432da61c3d9441,
         type: 3}
       propertyPath: healthBar

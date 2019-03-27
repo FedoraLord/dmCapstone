@@ -17,10 +17,6 @@ public class BP_Alchemist : BattlePlayerBase
                 enemy.AddStatusEffect(StatusEffect.Burn, this, SelectedAbility.Duration);
             }
         }
-        else
-        {
-            throw new System.NotImplementedException();
-        }
     }
 
     protected override void OverrideTargeting()

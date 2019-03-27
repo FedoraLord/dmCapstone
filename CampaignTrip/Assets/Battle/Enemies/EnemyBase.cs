@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -78,32 +79,26 @@ public class EnemyBase : BattleActorBase
     public void OnPlayerPhaseStart()
     {
         remainingBlock = blockAmount;
-        ChooseTargets();
-
+        
         if (HasStatusEffect(StatusEffect.Stun))
+        {
             RpcUpdateTargets(new int[0]);
+        }
         else
+        {
+            List<PersistentPlayer> visiblePlayers = PersistentPlayer.players.Where(x => !x.battlePlayer.HasStatusEffect(StatusEffect.Invisible)).ToList();
+            targets = ChooseTargets(visiblePlayers);
             RpcUpdateTargets(targets);
+        }
     }
 
-    protected virtual void ChooseTargets()
+    //picks targets randomly unless overridden
+    protected virtual int[] ChooseTargets(List<PersistentPlayer> validTargets)
     {
-        //picks targets randomly unless overridden
-        targets = GetRandomNPlayers(attacksPerTurn);
-    }
-
-    [ClientRpc]
-    private void RpcUpdateTargets(int[] newTargets)
-    {
-        targets = newTargets;
-        HealthBar.SetTargets(targets);
-    }
-
-    protected int[] GetRandomNPlayers(int n)
-    {
-        Mathf.Clamp(n, 0, PersistentPlayer.players.Count);
+        int n = Mathf.Clamp(attacksPerTurn, 0, validTargets.Count);
         List<int> choices = new List<int>();
-        for (int i = 0; i < PersistentPlayer.players.Count; i++)
+
+        for (int i = 0; i < n; i++)
         {
             choices.Add(i);
         }
@@ -119,13 +114,23 @@ public class EnemyBase : BattleActorBase
 
         return result.ToArray();
     }
+
+    [ClientRpc]
+    private void RpcUpdateTargets(int[] newTargets)
+    {
+        targets = newTargets;
+        HealthBar.SetTargets(targets);
+    }
     
     [Server]
     public void Attack()
     {
         foreach (int t in targets)
         {
-            PersistentPlayer.players[t].battlePlayer.DispatchDamage(this, basicDamage, true);
+            if (TryAttack())
+            {
+                PersistentPlayer.players[t].battlePlayer.DispatchDamage(this, basicDamage, true);
+            }
         }
     }
 

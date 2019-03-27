@@ -40,24 +40,21 @@ public abstract class BattlePlayerBase : BattleActorBase
     {
         get
         {
-            TargetMode mode = (SelectedAbility == null) ? TargetMode.Enemy : SelectedAbility.Targets;
-
-            switch (mode)
+            TargetGroup group = (SelectedAbility == null) ? TargetGroup.Enemy : SelectedAbility.Targets;
+            
+            switch (group)
             {
-                case TargetMode.Self:
-                    return new List<BattleActorBase>() { this };
-                case TargetMode.Ally:
-                case TargetMode.AllyAndSelf:
-                    List<BattleActorBase> targets = PersistentPlayer.players.Select(x => x.battlePlayer).ToList<BattleActorBase>();
-                    if (SelectedAbility.Targets == TargetMode.Ally)
-                    {
-                        targets.Remove(this);
-                    }
-                    return targets;
-                case TargetMode.OverrideAuto:
-                case TargetMode.OverrideSelect:
+                case TargetGroup.Override:
                     return customTargets;
-                case TargetMode.Enemy:
+                case TargetGroup.Self:
+                    return new List<BattleActorBase>() { this };
+                case TargetGroup.Ally:
+                    List<BattleActorBase> targets =  PersistentPlayer.players.Select(x => x.battlePlayer).ToList<BattleActorBase>();
+                    targets.Remove(this);
+                    return targets;
+                case TargetGroup.AllyAndSelf:
+                    return PersistentPlayer.players.Select(x => x.battlePlayer).ToList<BattleActorBase>();
+                case TargetGroup.Enemy:
                     return new List<BattleActorBase>(BattleController.Instance.aliveEnemies);
                 default:
                     Debug.LogErrorFormat("Valid targets not implemented for {0}", SelectedAbility.Targets);
@@ -70,16 +67,17 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     private int attacksRemaining;
 
-    public enum TargetMode { OverrideAuto, OverrideSelect, Ally, AllyAndSelf, Enemy, Self }
+    public enum TargetGroup { Override, Ally, Self, AllyAndSelf, Enemy }
 
     [Serializable]
     public class Ability
     {
+        public bool TargetAll { get { return targetAll; } }
         public int Damage { get { return damage; } }
         public int Duration { get { return duration; } }
         public Sprite ButtonIcon { get { return buttonIcon; } }
         public string Name { get { return abilityName; } }
-        public TargetMode Targets { get { return targets; } }
+        public TargetGroup Targets { get { return targetGroup; } }
         public StatusEffect Applies { get { return applies; } }
 
         [HideInInspector] public int RemainingCooldown;
@@ -88,7 +86,8 @@ public abstract class BattlePlayerBase : BattleActorBase
         [SerializeField] private int damage;
         [SerializeField] private int duration;
         [SerializeField] private int cooldown;
-        [SerializeField] private TargetMode targets;
+        [SerializeField] private bool targetAll;
+        [SerializeField] private TargetGroup targetGroup;
         [SerializeField] private StatusEffect applies;
         [SerializeField] private Sprite buttonIcon;
 
@@ -164,13 +163,17 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     private void OnMouseUpAsButton()
     {
-        if (IsAlive && LocalAuthority.IsValidTarget(this))
+        if (IsAlive)
         {
-            if (LocalAuthority.SelectedAbility != null)
+            if (LocalAuthority.SelectedAbility != null && LocalAuthority.IsValidTarget(this))
             {
                 LocalAuthority.OnAbilityTargetChosen(this);
             }
-            else
+            else if (HasStatusEffect(StatusEffect.Burn))
+            {
+
+            }
+            else if (HasStatusEffect(StatusEffect.Freeze))
             {
                 //TODO: help with fire and ice
             }
@@ -184,7 +187,11 @@ public abstract class BattlePlayerBase : BattleActorBase
         {
             RpcAttack();
             EnemyBase enemy = target.GetComponent<EnemyBase>();
-            enemy.DispatchDamage(this, basicDamage, true);
+
+            if (TryAttack())
+            {
+                enemy.DispatchDamage(this, basicDamage, true);
+            }
         }
     }
 
@@ -244,24 +251,21 @@ public abstract class BattlePlayerBase : BattleActorBase
     private void Target_UseAbilityConfirm(NetworkConnection conn, int i)
     {
         selectedAbilityIndex = i;
-        switch (SelectedAbility.Targets)
+        if (SelectedAbility.Targets == TargetGroup.Self)
         {
-            case TargetMode.OverrideAuto:
-                OnAbilityTargetChosen(null);
-                break;
-            case TargetMode.Self:
-                OnAbilityTargetChosen(this);
-                break;
-            case TargetMode.OverrideSelect:
+            OnAbilityTargetChosen(this);
+        }
+        else if (SelectedAbility.TargetAll)
+        {
+            OnAbilityTargetChosen(null);
+        }
+        else
+        {
+            if (SelectedAbility.Targets == TargetGroup.Override)
+            {
                 OverrideTargeting();
-                ToggleTargetIndicators(true);
-                break;
-            case TargetMode.Ally:
-            case TargetMode.AllyAndSelf:
-            case TargetMode.Enemy:
-            default:
-                ToggleTargetIndicators(true);
-                break;
+            }
+            ToggleTargetIndicators(true);
         }
     }
 
@@ -304,7 +308,11 @@ public abstract class BattlePlayerBase : BattleActorBase
         selectedAbilityIndex = i;
         if (target == null)
         {
-            OverrideTargeting();
+            if (!SelectedAbility.TargetAll)
+            {
+                OverrideTargeting();
+            }
+
             foreach (BattleActorBase actor in ValidTargets)
             {
                 UseAbility(actor, SelectedAbility);
