@@ -108,12 +108,23 @@ public abstract class BattlePlayerBase : BattleActorBase
         {
             LocalAuthority.CanPlayAbility = true;
             RemainingCooldown = cooldown + 1;
+            aButton.button.interactable = false;
         }
 
         public void DecrementCooldown()
         {
             if (RemainingCooldown > 0)
+            {
                 RemainingCooldown--;
+                if (RemainingCooldown > 0)
+                {
+
+                }
+                else
+                {
+                    aButton.button.interactable = true;
+                }
+            }
         }
     }
 
