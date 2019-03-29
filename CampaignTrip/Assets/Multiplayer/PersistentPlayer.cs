@@ -15,6 +15,7 @@ public class PersistentPlayer : NetworkBehaviour
     public int playerNum;
 
 	public bool isReady;
+    public int minigameReady;
 
     [HideInInspector] public BattlePlayerBase battlePlayer;
     [HideInInspector] public PlayerPanel lobbyPanel;
@@ -142,5 +143,13 @@ public class PersistentPlayer : NetworkBehaviour
     }
 
     #endregion
+
+
+
+    [Command]
+    public void CmdReadyForMinigame()
+    {
+        localAuthority.minigameReady++;
+    }
 }
 #pragma warning restore CS0618, 0649

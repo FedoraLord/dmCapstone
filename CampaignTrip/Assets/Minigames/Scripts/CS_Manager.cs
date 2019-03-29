@@ -45,11 +45,10 @@ public class CS_Manager : MinigameManager
     [Server]
     private void GenerateCardSequence()
     {
-        foreach(var sequenceCard in sequenceCards)
+        foreach (var sequenceCard in sequenceCards)
         {
             int index = Random.Range(0, sequenceCards.Count);
             CS_Card selectedCard = selectCards[index];
-            sequenceCard.name = selectedCard.name;
             sequenceCard.Sprite = selectedCard.Sprite;
             sequenceCard.index = selectedCard.index;
         }
@@ -77,6 +76,9 @@ public class CS_Manager : MinigameManager
 
     protected override IEnumerator HandlePlayers(List<PersistentPlayer> randomPlayers)
     {
+        yield return base.HandlePlayers(randomPlayers);
+        randomPlayers = PersistentPlayer.players;
+
         PersistentPlayer p = randomPlayers[0];
         TargetShowSelectCards(p.connectionToClient);
 
@@ -84,8 +86,14 @@ public class CS_Manager : MinigameManager
         {
             p = randomPlayers[i];
             int[] cardsToShow = GetCardsToShow();
-            TargetShowSequenceCards(p.connectionToClient, cardsToShow);
-            yield return new WaitUntil(() => p.connectionToClient.isReady);
+            if (p.isServer)
+            {
+                TargetShowSequenceCards(p.connectionToClient, cardsToShow);
+            }
+            else
+            {
+                TargetShowSequenceCards(p.connectionToClient, cardsToShow);
+            }
         }
     }
 
@@ -105,16 +113,22 @@ public class CS_Manager : MinigameManager
         return cards;
     }
 
+    private void ServerShowSequenceCards(int[] cardsToShow) 
+    {
+        for (int i = 0; i < cardsToShow.Length; i++)
+        {
+            sequenceCards[i].Sprite = cardSprites[cardsToShow[i]];
+        }
+    }
+
     [TargetRpc]
     private void TargetShowSequenceCards(NetworkConnection connection, int[] cardInfo)
     {
         for(int i = 0; i < sequenceCards.Count; i++)
         {
-            if (cardInfo[i] > 0)
-            {
-                sequenceCards[i].index = cardInfo[i];
-                sequenceCards[i].Sprite = cardSprites[cardInfo[i]];
-            }
+
+            sequenceCards[i].index = cardInfo[i];
+            sequenceCards[i].Sprite = cardSprites[cardInfo[i]];
         }
 
         selectCardObject.SetActive(false);

@@ -277,6 +277,7 @@ public class BattleController : NetworkBehaviour
     private void LoadMinigame(string sceneName)
     {
         RpcLoadScene(false);
+        PersistentPlayer.localAuthority.minigameReady = 0;
         NetworkWrapper.manager.ServerChangeScene(sceneName);
     }
 

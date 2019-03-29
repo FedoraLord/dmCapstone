@@ -19,6 +19,7 @@ public abstract class MinigameManager : NetworkBehaviour
         Instance = this;
 
 		numPlayersWon = 0;
+        PersistentPlayer.localAuthority.CmdReadyForMinigame();
 
         if (NetworkWrapper.IsHost)
 		{
@@ -55,8 +56,10 @@ public abstract class MinigameManager : NetworkBehaviour
 
     protected virtual IEnumerator HandlePlayers(List<PersistentPlayer> randomPlayers)
     {
-		yield return 0; //please override this, also we have to return something here
-	}
+        yield return new WaitUntil(() => {
+            return PersistentPlayer.localAuthority.minigameReady == randomPlayers.Count;
+        });
+    }
     
     protected abstract void Win();
     protected abstract void Lose();

@@ -200,6 +200,11 @@ PrefabInstance:
       propertyPath: name
       value: Lovers
       objectReference: {fileID: 0}
+    - target: {fileID: 6399025334163070987, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f,
+        type: 3}
+      propertyPath: index
+      value: 7
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f, type: 3}
 --- !u!1001 &81440530
@@ -289,6 +294,11 @@ PrefabInstance:
         type: 3}
       propertyPath: name
       value: Fool
+      objectReference: {fileID: 0}
+    - target: {fileID: 6399025334163070987, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f,
+        type: 3}
+      propertyPath: index
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6513457194499906148, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f,
         type: 3}
@@ -566,6 +576,11 @@ PrefabInstance:
         type: 3}
       propertyPath: name
       value: Magician
+      objectReference: {fileID: 0}
+    - target: {fileID: 6399025334163070987, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f,
+        type: 3}
+      propertyPath: index
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f, type: 3}
@@ -974,7 +989,7 @@ MonoBehaviour:
   m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: 8c059df46b23a3c4281784c946de9642, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
@@ -1241,6 +1256,11 @@ PrefabInstance:
       propertyPath: name
       value: Strength
       objectReference: {fileID: 0}
+    - target: {fileID: 6399025334163070987, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f,
+        type: 3}
+      propertyPath: index
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f, type: 3}
 --- !u!114 &922547553 stripped
@@ -1348,6 +1368,11 @@ PrefabInstance:
         type: 3}
       propertyPath: name
       value: Chariot
+      objectReference: {fileID: 0}
+    - target: {fileID: 6399025334163070987, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f,
+        type: 3}
+      propertyPath: index
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f, type: 3}
@@ -1597,6 +1622,11 @@ PrefabInstance:
         type: 3}
       propertyPath: name
       value: Herophant
+      objectReference: {fileID: 0}
+    - target: {fileID: 6399025334163070987, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f,
+        type: 3}
+      propertyPath: index
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f, type: 3}
@@ -1933,6 +1963,11 @@ PrefabInstance:
       propertyPath: name
       value: Hermit
       objectReference: {fileID: 0}
+    - target: {fileID: 6399025334163070987, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f,
+        type: 3}
+      propertyPath: index
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f, type: 3}
 --- !u!4 &1509762092 stripped
@@ -2028,6 +2063,11 @@ PrefabInstance:
         type: 3}
       propertyPath: name
       value: Empress
+      objectReference: {fileID: 0}
+    - target: {fileID: 6399025334163070987, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f,
+        type: 3}
+      propertyPath: index
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f, type: 3}
@@ -2149,6 +2189,11 @@ PrefabInstance:
       propertyPath: name
       value: Emperor
       objectReference: {fileID: 0}
+    - target: {fileID: 6399025334163070987, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f,
+        type: 3}
+      propertyPath: index
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f, type: 3}
 --- !u!1001 &1827076758
@@ -2238,6 +2283,11 @@ PrefabInstance:
         type: 3}
       propertyPath: name
       value: Priestess
+      objectReference: {fileID: 0}
+    - target: {fileID: 6399025334163070987, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f,
+        type: 3}
+      propertyPath: index
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53ca18e8c3eaa4089bcf1bbf0fc98d8f, type: 3}
@@ -2370,6 +2420,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7376606175904609357, guid: d844fa92e60b3a944824cf14dff89b0c,
         type: 3}
+      propertyPath: cardSprites.Array.size
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 7376606175904609357, guid: d844fa92e60b3a944824cf14dff89b0c,
+        type: 3}
       propertyPath: winText
       value: 
       objectReference: {fileID: 759178010}
@@ -2468,5 +2523,71 @@ PrefabInstance:
       propertyPath: sequenceCardObject
       value: 
       objectReference: {fileID: 1155149612}
+    - target: {fileID: 7376606175904609357, guid: d844fa92e60b3a944824cf14dff89b0c,
+        type: 3}
+      propertyPath: cardSprites.Array.data[0]
+      value: 
+      objectReference: {fileID: 21300000, guid: a1f11c9c36ebb410e860a1e24bd7a256,
+        type: 3}
+    - target: {fileID: 7376606175904609357, guid: d844fa92e60b3a944824cf14dff89b0c,
+        type: 3}
+      propertyPath: cardSprites.Array.data[1]
+      value: 
+      objectReference: {fileID: 21300000, guid: cc6d4064464af4da294c404785f26c93,
+        type: 3}
+    - target: {fileID: 7376606175904609357, guid: d844fa92e60b3a944824cf14dff89b0c,
+        type: 3}
+      propertyPath: cardSprites.Array.data[2]
+      value: 
+      objectReference: {fileID: 21300000, guid: 1a88cca4066794396a8a9ead1f7e2f78,
+        type: 3}
+    - target: {fileID: 7376606175904609357, guid: d844fa92e60b3a944824cf14dff89b0c,
+        type: 3}
+      propertyPath: cardSprites.Array.data[3]
+      value: 
+      objectReference: {fileID: 21300000, guid: 1e0a366f4e16c4dc1ab2e431fc7e78cf,
+        type: 3}
+    - target: {fileID: 7376606175904609357, guid: d844fa92e60b3a944824cf14dff89b0c,
+        type: 3}
+      propertyPath: cardSprites.Array.data[4]
+      value: 
+      objectReference: {fileID: 21300000, guid: e58e790925fcf4d55ab430928e0b0411,
+        type: 3}
+    - target: {fileID: 7376606175904609357, guid: d844fa92e60b3a944824cf14dff89b0c,
+        type: 3}
+      propertyPath: cardSprites.Array.data[5]
+      value: 
+      objectReference: {fileID: 21300000, guid: 773ac18ab3a994e3cb52b52ccce52f42,
+        type: 3}
+    - target: {fileID: 7376606175904609357, guid: d844fa92e60b3a944824cf14dff89b0c,
+        type: 3}
+      propertyPath: cardSprites.Array.data[6]
+      value: 
+      objectReference: {fileID: 21300000, guid: 6c808cfd7d0234baf9922ac8be1c2c3e,
+        type: 3}
+    - target: {fileID: 7376606175904609357, guid: d844fa92e60b3a944824cf14dff89b0c,
+        type: 3}
+      propertyPath: cardSprites.Array.data[7]
+      value: 
+      objectReference: {fileID: 21300000, guid: 2e2b1cafdb92b48fdb36babef6f48401,
+        type: 3}
+    - target: {fileID: 7376606175904609357, guid: d844fa92e60b3a944824cf14dff89b0c,
+        type: 3}
+      propertyPath: cardSprites.Array.data[8]
+      value: 
+      objectReference: {fileID: 21300000, guid: fdc8d3d157dfc4544b30ac58d4c3ef22,
+        type: 3}
+    - target: {fileID: 7376606175904609357, guid: d844fa92e60b3a944824cf14dff89b0c,
+        type: 3}
+      propertyPath: cardSprites.Array.data[9]
+      value: 
+      objectReference: {fileID: 21300000, guid: 050c5272a669347af87c3e8f45a8937a,
+        type: 3}
+    - target: {fileID: 7376606175904609357, guid: d844fa92e60b3a944824cf14dff89b0c,
+        type: 3}
+      propertyPath: cardSprites.Array.data[10]
+      value: 
+      objectReference: {fileID: 21300000, guid: 84f2cf709ddef4a129ecee728658552f,
+        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d844fa92e60b3a944824cf14dff89b0c, type: 3}
