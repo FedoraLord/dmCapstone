@@ -30,8 +30,7 @@ public class BattleController : NetworkBehaviour
 
     [SerializeField] private float totalAttackTime = 5;
     [SerializeField] private RectTransform attackTimerBar;
-    [SerializeField] private Image[] abilityImages;
-    [SerializeField] private Text[] abilityTexts;
+    [SerializeField] private AbilityButton[] abilityButtons;
     [SerializeField] private Text attackTimerText;
     [SerializeField] private Text attacksLeftText;
     [SerializeField] private Text blockText;
@@ -123,8 +122,7 @@ public class BattleController : NetworkBehaviour
         {
             for (int i = 0; i < player.Abilities.Count; i++)
             {
-                abilityImages[i].sprite = player.Abilities[i].ButtonIcon;
-                abilityTexts[i].text = player.Abilities[i].Name;
+                player.Abilities[i].SetButton(abilityButtons[i]);
             }
         }
 

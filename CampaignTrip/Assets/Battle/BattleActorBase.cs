@@ -10,7 +10,7 @@ public abstract class BattleActorBase : NetworkBehaviour
     public bool IsAlive { get { return Health > 0; } }
     public int BasicDamage { get { return basicDamage; } }
     public int BlockAmount { get { return blockAmount; } }
-    public int MaxHealth { get { return maxHealth; } }
+    public int MaxHealth { get; private set; }
     public Transform UITransform { get { return uiTransform; } }
 
     public int Health
@@ -18,12 +18,13 @@ public abstract class BattleActorBase : NetworkBehaviour
         get { return health; }
         protected set
         {
-            int hp = Mathf.Clamp(value, 0, maxHealth);
+            int hp = Mathf.Clamp(value, 0, MaxHealth);
             if (IsAlive && hp == 0)
             {
                 Die();
             }
             health = hp;
+            HealthBar.UpdateHealth();
         }
     }
     
@@ -35,10 +36,9 @@ public abstract class BattleActorBase : NetworkBehaviour
     [SerializeField] protected Transform uiTransform;
     [SerializeField] protected int attacksPerTurn;
     [SerializeField] protected int basicDamage;
-    [SerializeField] protected int maxHealth;
     [SerializeField] protected int blockAmount;
-
-    private int health;
+    [SerializeField] protected int health;
+    
     private Dictionary<StatusEffect, List<Stat>> statusEffects = new Dictionary<StatusEffect, List<Stat>>();
 
     //TODO: REMOVE AND REPLACE
@@ -83,7 +83,7 @@ public abstract class BattleActorBase : NetworkBehaviour
 
     public void Initialize()
     {
-        Health = maxHealth;
+        MaxHealth = health;
         healthBarUI.Init(this);
         damagePopup.Init(this);
         DontDestroyOnLoad(gameObject);
@@ -169,7 +169,6 @@ public abstract class BattleActorBase : NetworkBehaviour
         }
 
         Health -= damageTaken;
-        HealthBar.UpdateValue();
         damagePopup.DisplayDamage(damageTaken, blocked);
     }
 
@@ -178,7 +177,6 @@ public abstract class BattleActorBase : NetworkBehaviour
     public void Heal(int amount)
     {
         Health += amount;
-        HealthBar.UpdateValue();
         //TODO: hp popup like damage popup
     }
 

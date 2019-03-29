@@ -15,14 +15,6 @@ public class HealthBarUI : BattleActorUI
 
     private bool IsDead { get { return healthData.CurrentValue == 0; } }
 
-    //private Action healthBarCallback;
-    //private Coroutine animateHealthBar;
-    //private int block;
-    //private int health;
-    //private int maxBlock;
-    //private int maxHealth;
-    //private float currentDisplayedHP;
-
     private BarData healthData;
     private BarData blockData;
 
@@ -37,13 +29,14 @@ public class HealthBarUI : BattleActorUI
         private int MaxValue;
         private float DisplayedValue;
 
-        public BarData(HealthBarUI proxy, RectTransform bar, Text text, int maxValue)
+        public BarData(HealthBarUI proxy, RectTransform bar, Text text, int maxValue, int startingValue)
         {
             Proxy = proxy;
             Bar = bar;
             Text = text;
-            DisplayedValue = MaxValue = CurrentValue = maxValue;
-            UpdateValue(maxValue);
+            MaxValue = maxValue;
+            DisplayedValue = CurrentValue = startingValue;
+            UpdateValue(startingValue);
         }
 
         public void Animate(int targetValue)
@@ -62,7 +55,10 @@ public class HealthBarUI : BattleActorUI
 
         private void UpdateValue(float value)
         {
-            Text.text = value.ToString("0");
+            if (Text != null)
+            {
+                Text.text = value.ToString("0");
+            }
 
             if (MaxValue == 0)
             {
@@ -102,16 +98,30 @@ public class HealthBarUI : BattleActorUI
         SetTargets();
 
         int block = (actor is EnemyBase) ? actor.BlockAmount : 0;
-        blockData = new BarData(this, blockBar, healthText, actor.BlockAmount);
-        healthData = new BarData(this, healthBar, healthText, actor.MaxHealth);
+        if (actor is EnemyBase)
+        {
+            int max = Mathf.Max(actor.BlockAmount, actor.MaxHealth);
+            blockData = new BarData(this, blockBar, null, max, actor.BlockAmount);
+            healthData = new BarData(this, healthBar, healthText, max, actor.MaxHealth);
+        }
+        else
+        {
+            blockData = new BarData(this, blockBar, null, 0, actor.BlockAmount);
+            healthData = new BarData(this, healthBar, healthText, actor.MaxHealth, actor.MaxHealth);
+        }
     }
 
-    public void UpdateValue()
+    public void UpdateBlock()
     {
-        if (owner is EnemyBase)
+        EnemyBase enemy = owner as EnemyBase;
+        if (enemy != null)
         {
-            blockData.Animate(owner.BlockAmount);
+            blockData.Animate(enemy.RemainingBlock);
         }
+    }
+
+    public void UpdateHealth()
+    {
         healthData.Animate(owner.Health);
     }
 

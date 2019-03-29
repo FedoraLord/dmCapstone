@@ -72,16 +72,16 @@ public abstract class BattlePlayerBase : BattleActorBase
     [Serializable]
     public class Ability
     {
+        public AbilityButton AButton { get { return aButton; } }
         public bool TargetAll { get { return targetAll; } }
         public int Damage { get { return damage; } }
         public int Duration { get { return duration; } }
-        public Sprite ButtonIcon { get { return buttonIcon; } }
-        public string Name { get { return abilityName; } }
         public TargetGroup Targets { get { return targetGroup; } }
         public StatusEffect Applies { get { return applies; } }
 
         [HideInInspector] public int RemainingCooldown;
 
+        [SerializeField] private AbilityButton aButton;
         [SerializeField] private string abilityName;
         [SerializeField] private int damage;
         [SerializeField] private int duration;
@@ -94,6 +94,16 @@ public abstract class BattlePlayerBase : BattleActorBase
         //TODO:
         [HideInInspector] public bool IsUpgraded;
         
+        public void SetButton(AbilityButton button)
+        {
+            aButton = button;
+            aButton.nameText.text = abilityName;
+            if (buttonIcon != null)
+            {
+                aButton.iconImage.sprite = buttonIcon;
+            }
+        }
+
         public void Use()
         {
             LocalAuthority.CanPlayAbility = true;

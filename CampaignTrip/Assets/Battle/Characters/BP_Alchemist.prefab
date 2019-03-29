@@ -18,12 +18,14 @@ MonoBehaviour:
   uiTransform: {fileID: 2966475051797436724}
   attacksPerTurn: 3
   basicDamage: 15
-  maxHealth: 150
+  blockAmount: 0
+  health: 100
   tempAbilityTarget: {fileID: 2731567121900576358}
   playerNum: 0
   persistentPlayer: {fileID: 0}
   ability1:
     RemainingCooldown: 0
+    aButton: {fileID: 0}
     abilityName: Cure
     damage: 30
     duration: 0
@@ -35,6 +37,7 @@ MonoBehaviour:
     IsUpgraded: 0
   ability2:
     RemainingCooldown: 0
+    aButton: {fileID: 0}
     abilityName: Weaken
     damage: 20
     duration: 5
@@ -46,6 +49,7 @@ MonoBehaviour:
     IsUpgraded: 0
   ability3:
     RemainingCooldown: 0
+    aButton: {fileID: 0}
     abilityName: Molotov Flask
     damage: 80
     duration: 5

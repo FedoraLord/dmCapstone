@@ -8,6 +8,15 @@ using UnityEngine.Networking;
 public class EnemyBase : BattleActorBase
 {
     public bool HasTargets { get { return targets != null && targets.Length > 0; } }
+    public int RemainingBlock
+    {
+        get { return remainingBlock; }
+        private set
+        {
+            remainingBlock = value;
+            HealthBar.UpdateBlock();
+        }
+    }
 
     private int[] targets;
     private int remainingBlock;
@@ -45,15 +54,15 @@ public class EnemyBase : BattleActorBase
     
     public override void TakeBlockedDamage(int damage)
     {
-        int initialBlock = remainingBlock;
+        int initialBlock = RemainingBlock;
 
-        if (remainingBlock > 0)
+        if (RemainingBlock > 0)
         {
-            remainingBlock = Mathf.Max(remainingBlock - damage, 0);
-            damage -= remainingBlock;
+            RemainingBlock = Mathf.Max(RemainingBlock - damage, 0);
+            damage -= initialBlock - RemainingBlock;
         }
 
-        RpcTakeDamage(damage, initialBlock - remainingBlock);
+        RpcTakeDamage(damage, initialBlock - RemainingBlock);
     }
 
     protected override void Die()
@@ -79,7 +88,7 @@ public class EnemyBase : BattleActorBase
     public override void OnPlayerPhaseStart()
     {
         base.OnPlayerPhaseStart();
-        remainingBlock = blockAmount;
+        RemainingBlock = blockAmount;
         
         if (HasStatusEffect(StatusEffect.Stun) || HasStatusEffect(StatusEffect.Freeze))
         {
