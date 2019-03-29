@@ -9,6 +9,7 @@ public abstract class BattleActorBase : NetworkBehaviour
 {
     public bool IsAlive { get { return Health > 0; } }
     public int BasicDamage { get { return basicDamage; } }
+    public int BlockAmount { get { return blockAmount; } }
     public int MaxHealth { get { return maxHealth; } }
     public Transform UITransform { get { return uiTransform; } }
 
@@ -35,8 +36,7 @@ public abstract class BattleActorBase : NetworkBehaviour
     [SerializeField] protected int attacksPerTurn;
     [SerializeField] protected int basicDamage;
     [SerializeField] protected int maxHealth;
-    
-    protected int blockAmount;
+    [SerializeField] protected int blockAmount;
 
     private int health;
     private Dictionary<StatusEffect, List<Stat>> statusEffects = new Dictionary<StatusEffect, List<Stat>>();
@@ -169,7 +169,7 @@ public abstract class BattleActorBase : NetworkBehaviour
         }
 
         Health -= damageTaken;
-        HealthBar.SetHealth(Health);
+        HealthBar.UpdateValue();
         damagePopup.DisplayDamage(damageTaken, blocked);
     }
 
@@ -178,7 +178,7 @@ public abstract class BattleActorBase : NetworkBehaviour
     public void Heal(int amount)
     {
         Health += amount;
-        HealthBar.SetHealth(Health);
+        HealthBar.UpdateValue();
         //TODO: hp popup like damage popup
     }
 
@@ -231,6 +231,9 @@ public abstract class BattleActorBase : NetworkBehaviour
                 break;
             case StatusEffect.Stun:
                 OnAddStun();
+                break;
+            case StatusEffect.Freeze:
+                OnAddFreeze();
                 break;
             default:
                 break;
@@ -347,7 +350,9 @@ public abstract class BattleActorBase : NetworkBehaviour
 
     protected virtual void OnAddStun() { }
     protected virtual void OnAddInvisible() { }
-    
+    protected virtual void OnAddFreeze() { }
+
+
     public IEnumerator ApplySatusEffects()
     {
         List<StatusEffect> types = new List<StatusEffect>(statusEffects.Keys);

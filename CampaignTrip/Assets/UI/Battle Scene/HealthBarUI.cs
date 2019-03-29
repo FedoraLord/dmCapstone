@@ -10,75 +10,109 @@ public class HealthBarUI : BattleActorUI
     [HideInInspector] public bool isClaimed;
 
     [SerializeField] private RectTransform healthBar;
+    [SerializeField] private RectTransform blockBar;
     [SerializeField] private Text healthText;
 
-    private bool IsDead { get { return health == 0; } }
+    private bool IsDead { get { return healthData.CurrentValue == 0; } }
 
-    private Action healthBarCallback;
-    private Coroutine animateHealthBar;
-    private int health;
-    private int maxHealth;
-    private float currentDisplayedHP;
+    //private Action healthBarCallback;
+    //private Coroutine animateHealthBar;
+    //private int block;
+    //private int health;
+    //private int maxBlock;
+    //private int maxHealth;
+    //private float currentDisplayedHP;
+
+    private BarData healthData;
+    private BarData blockData;
+
+    private class BarData
+    {
+        public int CurrentValue;
+
+        private Coroutine Animation;
+        private HealthBarUI Proxy;
+        private RectTransform Bar;
+        private Text Text;
+        private int MaxValue;
+        private float DisplayedValue;
+
+        public BarData(HealthBarUI proxy, RectTransform bar, Text text, int maxValue)
+        {
+            Proxy = proxy;
+            Bar = bar;
+            Text = text;
+            DisplayedValue = MaxValue = CurrentValue = maxValue;
+            UpdateValue(maxValue);
+        }
+
+        public void Animate(int targetValue)
+        {
+            if (targetValue != CurrentValue)
+            {
+                if (Animation != null)
+                {
+                    Proxy.StopCoroutine(Animation);
+                }
+                CurrentValue = targetValue;
+                Animation = Proxy.StartCoroutine(AnimationRoutine(targetValue));
+            }
+            
+        }
+
+        private void UpdateValue(float value)
+        {
+            Text.text = value.ToString("0");
+
+            if (MaxValue == 0)
+            {
+                Bar.localScale = new Vector3(0, 1, 1);
+            }
+            else
+            {
+                float percentage = value / MaxValue;
+                Vector3 scale = new Vector3(percentage, 1, 1);
+                Bar.localScale = scale;
+            }
+        }
+
+        private IEnumerator AnimationRoutine(int targetValue)
+        {
+            float animTime = 0;
+            float totalAnimTime = 0.25f;
+            float startValue = DisplayedValue;
+
+            while (animTime < 1)
+            {
+                animTime += Time.deltaTime / totalAnimTime;
+                DisplayedValue = Mathf.Lerp(startValue, targetValue, animTime);
+                UpdateValue(DisplayedValue);
+
+                yield return new WaitForEndOfFrame();
+            }
+
+            Animation = null;
+        }
+    }
 
     public override void Init(BattleActorBase actor)
     {
         base.Init(actor);
 
         SetTargets();
-        currentDisplayedHP = health = maxHealth = actor.MaxHealth;
-        UpdateHealthUI(health);
+
+        int block = (actor is EnemyBase) ? actor.BlockAmount : 0;
+        blockData = new BarData(this, blockBar, healthText, actor.BlockAmount);
+        healthData = new BarData(this, healthBar, healthText, actor.MaxHealth);
     }
 
-    public void SetHealth(int newHeath, Action animCallback = null, bool animate = true)
+    public void UpdateValue()
     {
-        if (animateHealthBar != null)
+        if (owner is EnemyBase)
         {
-            healthBarCallback?.Invoke();
-            StopCoroutine(animateHealthBar);
-            animateHealthBar = null;
+            blockData.Animate(owner.BlockAmount);
         }
-
-        healthBarCallback = animCallback;
-        int prevHealth = health;
-        health = Mathf.Clamp(newHeath, 0, maxHealth);
-
-        if (animate)
-        {
-            animateHealthBar = StartCoroutine(AnimateHealthBar(prevHealth, health));
-        }
-        else
-        {
-            UpdateHealthUI(health);
-            healthBarCallback?.Invoke();
-        }
-    }
-
-    private IEnumerator AnimateHealthBar(int startHealth, int endHealth)
-    {
-        float animTime = 0;
-        float totalAnimTime = 0.5f;
-
-        while (animTime < 1)
-        {
-            animTime += Time.deltaTime / totalAnimTime;
-            currentDisplayedHP = Mathf.Lerp(currentDisplayedHP, endHealth, animTime);
-            UpdateHealthUI(currentDisplayedHP);
-
-            yield return new WaitForEndOfFrame();
-        }
-
-        animateHealthBar = null;
-        healthBarCallback?.Invoke();
-        healthBarCallback = null;
-    }
-
-    private void UpdateHealthUI(float currentHealth)
-    {
-        healthText.text = currentHealth.ToString("0");
-
-        float percentageHealth = currentHealth / maxHealth;
-        Vector3 scale = new Vector3(percentageHealth, 1, 1);
-        healthBar.localScale = scale;
+        healthData.Animate(owner.Health);
     }
 
     [SerializeField] private Image target1;

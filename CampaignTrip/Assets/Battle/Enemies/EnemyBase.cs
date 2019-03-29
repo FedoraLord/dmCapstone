@@ -81,7 +81,7 @@ public class EnemyBase : BattleActorBase
         base.OnPlayerPhaseStart();
         remainingBlock = blockAmount;
         
-        if (HasStatusEffect(StatusEffect.Stun))
+        if (HasStatusEffect(StatusEffect.Stun) || HasStatusEffect(StatusEffect.Freeze))
         {
             RpcUpdateTargets(new int[0]);
         }
@@ -152,6 +152,17 @@ public class EnemyBase : BattleActorBase
     protected override void OnAddStun()
     {
         base.OnAddStun();
+        LoseTargets();
+    }
+
+    protected override void OnAddFreeze()
+    {
+        base.OnAddFreeze();
+        LoseTargets();
+    }
+
+    private void LoseTargets()
+    {
         HealthBar.SetTargets();
 
         if (isServer)
