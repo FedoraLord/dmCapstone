@@ -34,7 +34,6 @@ public class CS_Manager : MinigameManager
         yield return base.HandlePlayers(randomPlayers);
         
         StartCoroutine(Timer());
-        randomPlayers = PersistentPlayer.players;
 
         TargetShowSelectCards(randomPlayers[0].connectionToClient);
 
@@ -85,11 +84,15 @@ public class CS_Manager : MinigameManager
     [Server]
     private void GenerateCardSequence()
     {
+        List<CS_Card> tempPool = new List<CS_Card>(selectableCards);
         randomSequence = new List<CS_Card>();
         unassignedCards = new List<CS_Card>();
         for (int i = 0; i < sequenceCards.Count; i++)
         {
-            CS_Card randomCard = selectableCards[Random.Range(0, selectableCards.Count)];
+            int tempPoolIndex = Random.Range(0, tempPool.Count);
+            CS_Card randomCard = tempPool[tempPoolIndex];
+            tempPool.RemoveAt(tempPoolIndex);
+
             randomSequence.Add(randomCard);
             unassignedCards.Add(randomCard);
         }
