@@ -25,7 +25,6 @@ MonoBehaviour:
   persistentPlayer: {fileID: 0}
   ability1:
     RemainingCooldown: 0
-    aButton: {fileID: 0}
     abilityName: Cure
     damage: 30
     duration: 0
@@ -33,11 +32,10 @@ MonoBehaviour:
     targetAll: 0
     targetGroup: 3
     applies: 11
-    buttonIcon: {fileID: 21300000, guid: cc6d4064464af4da294c404785f26c93, type: 3}
+    buttonIcon: {fileID: 0}
     IsUpgraded: 0
   ability2:
     RemainingCooldown: 0
-    aButton: {fileID: 0}
     abilityName: Weaken
     damage: 20
     duration: 5
@@ -45,11 +43,10 @@ MonoBehaviour:
     targetAll: 0
     targetGroup: 4
     applies: 10
-    buttonIcon: {fileID: 21300000, guid: 1a88cca4066794396a8a9ead1f7e2f78, type: 3}
+    buttonIcon: {fileID: 0}
     IsUpgraded: 0
   ability3:
     RemainingCooldown: 0
-    aButton: {fileID: 0}
     abilityName: Molotov Flask
     damage: 80
     duration: 5
@@ -57,7 +54,7 @@ MonoBehaviour:
     targetAll: 0
     targetGroup: 0
     applies: 2
-    buttonIcon: {fileID: 21300000, guid: 1e0a366f4e16c4dc1ab2e431fc7e78cf, type: 3}
+    buttonIcon: {fileID: 0}
     IsUpgraded: 0
 --- !u!1001 &1054630008981005544
 PrefabInstance:
@@ -183,6 +180,26 @@ PrefabInstance:
       propertyPath: m_Animator
       value: 
       objectReference: {fileID: 396238763109726946}
+    - target: {fileID: 3718406984874502740, guid: 54e2aa1d050673e459432da61c3d9441,
+        type: 3}
+      propertyPath: uiTransform
+      value: 
+      objectReference: {fileID: 2966475051797436724}
+    - target: {fileID: 3718406984874502740, guid: 54e2aa1d050673e459432da61c3d9441,
+        type: 3}
+      propertyPath: animator
+      value: 
+      objectReference: {fileID: 396238763109726946}
+    - target: {fileID: 3783056568265927373, guid: 54e2aa1d050673e459432da61c3d9441,
+        type: 3}
+      propertyPath: damageText
+      value: 
+      objectReference: {fileID: 2212108401868189951}
+    - target: {fileID: 3783056568265927373, guid: 54e2aa1d050673e459432da61c3d9441,
+        type: 3}
+      propertyPath: blockText
+      value: 
+      objectReference: {fileID: 6229088752002357348}
     - target: {fileID: 1541344304113446009, guid: 54e2aa1d050673e459432da61c3d9441,
         type: 3}
       propertyPath: healthBar
@@ -213,26 +230,6 @@ PrefabInstance:
       propertyPath: target4
       value: 
       objectReference: {fileID: 4539126250164134468}
-    - target: {fileID: 3783056568265927373, guid: 54e2aa1d050673e459432da61c3d9441,
-        type: 3}
-      propertyPath: damageText
-      value: 
-      objectReference: {fileID: 2212108401868189951}
-    - target: {fileID: 3783056568265927373, guid: 54e2aa1d050673e459432da61c3d9441,
-        type: 3}
-      propertyPath: blockText
-      value: 
-      objectReference: {fileID: 6229088752002357348}
-    - target: {fileID: 3718406984874502740, guid: 54e2aa1d050673e459432da61c3d9441,
-        type: 3}
-      propertyPath: uiTransform
-      value: 
-      objectReference: {fileID: 2966475051797436724}
-    - target: {fileID: 3718406984874502740, guid: 54e2aa1d050673e459432da61c3d9441,
-        type: 3}
-      propertyPath: animator
-      value: 
-      objectReference: {fileID: 396238763109726946}
     m_RemovedComponents:
     - {fileID: 3718406984874502740, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}

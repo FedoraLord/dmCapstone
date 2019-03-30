@@ -72,7 +72,7 @@ public abstract class BattlePlayerBase : BattleActorBase
     [Serializable]
     public class Ability
     {
-        public AbilityButton AButton { get { return aButton; } }
+        public AbilityButton AButton { get; set; }
         public bool TargetAll { get { return targetAll; } }
         public int Damage { get { return damage; } }
         public int Duration { get { return duration; } }
@@ -80,8 +80,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         public StatusEffect Applies { get { return applies; } }
 
         [HideInInspector] public int RemainingCooldown;
-
-        [SerializeField] private AbilityButton aButton;
+        
         [SerializeField] private string abilityName;
         [SerializeField] private int damage;
         [SerializeField] private int duration;
@@ -90,17 +89,17 @@ public abstract class BattlePlayerBase : BattleActorBase
         [SerializeField] private TargetGroup targetGroup;
         [SerializeField] private StatusEffect applies;
         [SerializeField] private Sprite buttonIcon;
-
+        
         //TODO:
         [HideInInspector] public bool IsUpgraded;
         
         public void SetButton(AbilityButton button)
         {
-            aButton = button;
-            aButton.nameText.text = abilityName;
+            AButton = button;
+            AButton.nameText.text = abilityName;
             if (buttonIcon != null)
             {
-                aButton.iconImage.sprite = buttonIcon;
+                AButton.iconImage.sprite = buttonIcon;
             }
         }
 
@@ -108,23 +107,21 @@ public abstract class BattlePlayerBase : BattleActorBase
         {
             LocalAuthority.CanPlayAbility = true;
             RemainingCooldown = cooldown + 1;
-            aButton.button.interactable = false;
+            UpdateButtonUI();
         }
 
         public void DecrementCooldown()
         {
             if (RemainingCooldown > 0)
-            {
                 RemainingCooldown--;
-                if (RemainingCooldown > 0)
-                {
 
-                }
-                else
-                {
-                    aButton.button.interactable = true;
-                }
-            }
+            UpdateButtonUI();
+        }
+
+        private void UpdateButtonUI()
+        {
+            AButton.button.interactable = (RemainingCooldown <= 0);
+            AButton.UpdateCooldown(RemainingCooldown, cooldown + 1);
         }
     }
 
@@ -321,7 +318,16 @@ public abstract class BattlePlayerBase : BattleActorBase
     {
         CmdUseAbility(target?.gameObject, selectedAbilityIndex);
         SelectedAbility.Use();
+        DisableAbilityButtons();
         EndAbility();
+    }
+
+    public void DisableAbilityButtons()
+    {
+        foreach (Ability a in Abilities)
+        {
+            a.AButton.button.interactable = false;
+        }
     }
     
     [Command]
