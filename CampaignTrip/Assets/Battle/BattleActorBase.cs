@@ -63,16 +63,16 @@ public abstract class BattleActorBase : NetworkBehaviour
     private class Stat
     {
         //can be the person you are healing or the person protecting you
-        public BattleActorBase OtherActor;
+        public BattleActorBase LinkedActor;
         public StatusEffect Type;
         public int HealthOnRemove;
         public int RemainingDuration;
         public int DOT;
 
-        public Stat(StatusEffect effect, BattleActorBase otherActor, int duration, int healthGain = 0)
+        public Stat(StatusEffect effect, BattleActorBase linkedActor, int duration, int healthGain = 0)
         {
             Type = effect;
-            OtherActor = otherActor;
+            LinkedActor = linkedActor;
             HealthOnRemove = healthGain;
             RemainingDuration = duration;
             DOT = BattleController.Instance.GetDOT(effect);
@@ -122,44 +122,51 @@ public abstract class BattleActorBase : NetworkBehaviour
         return true;
     }
 
-    [ClientRpc]
-    public void RpcMiss()
-    {
-        damagePopup.DisplayMiss();
-    }
-
     #region Damage
 
+    public abstract void TakeBlockedDamage(int damage);
+
+    protected abstract void Die();
+
     [Server]
-    public void DispatchDamage(BattleActorBase attacker, int damage, bool canBlock)
+    public void DispatchBlockableDamage(BattleActorBase attacker)
     {
-        if (canBlock)
+        DispatchBlockableDamage(new List<BattleActorBase>() { attacker });
+    }
+
+    [Server]
+    public void DispatchBlockableDamage(List<BattleActorBase> attackers)
+    {
+        DecrementDuration(StatusEffect.Freeze, attackers.Count);
+        DecrementDuration(StatusEffect.Burn, attackers.Count);
+
+        if (HasStatusEffect(StatusEffect.Reflect))
         {
-            if (HasStatusEffect(StatusEffect.Reflect))
+            foreach (BattleActorBase attacker in attackers)
             {
-                if (attacker != null)
-                {
-                    attacker.DispatchDamage(null, damage, false);
-                }
-            }
-            else if (HasStatusEffect(StatusEffect.Protected))
-            {
-                BattleActorBase protector = GetOtherActor(StatusEffect.Protected);
-                protector.TakeBlockedDamage(damage);
-            }
-            else
-            {
-                TakeBlockedDamage(damage);
+                attacker.TakeBlockedDamage(attacker.basicDamage);
             }
         }
         else
         {
-            RpcTakeDamage(damage, 0);
+            int sumDamage = 0;
+            foreach (BattleActorBase attacker in attackers)
+            {
+                sumDamage += attacker.basicDamage;
+            }
+
+            if (HasStatusEffect(StatusEffect.Protected))
+            {
+                BattleActorBase protector = GetOtherActor(StatusEffect.Protected);
+                protector.TakeBlockedDamage(sumDamage);
+            }
+            else
+            {
+                TakeBlockedDamage(sumDamage);
+            }
         }
     }
-
-    public abstract void TakeBlockedDamage(int damage);
-
+    
     [ClientRpc]
     protected void RpcTakeDamage(int damageTaken, int blocked)
     {
@@ -167,13 +174,17 @@ public abstract class BattleActorBase : NetworkBehaviour
         {
             animator.SetTrigger("Hurt");
         }
-
+        
         Health -= damageTaken;
         damagePopup.DisplayDamage(damageTaken, blocked);
     }
 
-    protected abstract void Die();
-
+    [ClientRpc]
+    public void RpcMiss()
+    {
+        damagePopup.DisplayMiss();
+    }
+    
     public void Heal(int amount)
     {
         Health += amount;
@@ -192,7 +203,7 @@ public abstract class BattleActorBase : NetworkBehaviour
     public BattleActorBase GetOtherActor(StatusEffect type)
     {
         if (HasStatusEffect(type))
-            return statusEffects[type][0].OtherActor;
+            return statusEffects[type][0].LinkedActor;
         return null;
     }
 
@@ -342,32 +353,43 @@ public abstract class BattleActorBase : NetworkBehaviour
         }
         else
         {
-            s.OtherActor.Heal(s.HealthOnRemove);
+            s.LinkedActor.Heal(s.HealthOnRemove);
         }
     }
 
     protected virtual void OnAddStun() { }
     protected virtual void OnAddInvisible() { }
     protected virtual void OnAddFreeze() { }
-
-
-    public IEnumerator ApplySatusEffects()
+    
+    public bool ApplySatusEffects()
     {
+        int sumDOT = 0;
         List<StatusEffect> types = new List<StatusEffect>(statusEffects.Keys);
+
         for (int i = 0; i < types.Count; i++)
         {
             List<Stat> s = statusEffects[types[i]];
-            yield return DamageOverTime(s);
+            sumDOT += s[0].DOT;
             DecrementDuration(types[i]);
         }
+
+        if (sumDOT > 0)
+        {
+            RpcTakeDamage(sumDOT, 0);
+            return true;
+        }
+        return false;
     }
     
-    private void DecrementDuration(StatusEffect type)
+    private void DecrementDuration(StatusEffect type, int decBy = 1)
     {
+        if (!HasStatusEffect(type))
+            return;
+
         List<Stat> s = statusEffects[type];
         for (int i = 0; i < s.Count; i++)
         {
-            s[i].RemainingDuration--;
+            s[i].RemainingDuration -= decBy;
             if (s[i].RemainingDuration <= 0)
             {
                 if (type == StatusEffect.Focus)
@@ -381,21 +403,6 @@ public abstract class BattleActorBase : NetworkBehaviour
         if (s.Count == 0)
         {
             RemoveStatusEffect(type);
-        }
-    }
-
-    [Server]
-    private IEnumerator DamageOverTime(List<Stat> s)
-    {
-        if (s[0].DOT > 0)
-        {
-            int damage = 0;
-            for (int i = 0; i < s.Count; i++)
-            {
-                damage += s[i].DOT;
-            }
-            DispatchDamage(null, damage, false);
-            yield return new WaitForSeconds(0.5f);
         }
     }
 

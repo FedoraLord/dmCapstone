@@ -187,6 +187,7 @@ public class BattleController : NetworkBehaviour
         StartCoroutine(TransitionPhase());
     }
 
+    [Server]
     private IEnumerator TransitionPhase()
     {
         float timeout = Time.time + 3;
@@ -197,11 +198,16 @@ public class BattleController : NetworkBehaviour
             RpcForceCancelAbility();
         }
 
+        bool tookStatDamage = false;
         foreach (PersistentPlayer p in PersistentPlayer.players)
         {
-            yield return p.battlePlayer.ApplySatusEffects();
+            if (p.battlePlayer.ApplySatusEffects())
+                tookStatDamage = true;
         }
-        
+
+        if (tookStatDamage)
+            yield return new WaitForSeconds(0.5f);
+
         StartEnemyPhase();
     }
 
@@ -242,20 +248,38 @@ public class BattleController : NetworkBehaviour
     private IEnumerator ExecuteEnemyPhase()
     {
         yield return new WaitForSeconds(0.5f);
+        
+        //attackInfo[i] == a list of enemies attacking PersistentPlayer.players[i]
+        List<BattleActorBase>[] attackInfo = new List<BattleActorBase>[PersistentPlayer.players.Count];
+        for (int i = 0; i < attackInfo.Length; i++)
+        {
+            attackInfo[i] = new List<BattleActorBase>();
+        }
 
         foreach (EnemyBase e in aliveEnemies)
         {
             if (e.IsAlive && e.HasTargets)
             {
-                e.Attack();
+                e.AttackPlayers(attackInfo);
+            }
+        }
+
+        for (int i = 0; i < PersistentPlayer.players.Count; i++)
+        {
+            if (attackInfo[i].Count > 0)
+            {
+                PersistentPlayer.players[i].battlePlayer.DispatchBlockableDamage(attackInfo[i]);
                 yield return new WaitForSeconds(0.5f);
             }
         }
 
+        bool tookStatDamage = false;
         for (int i = 0; i < aliveEnemies.Count; i++)
         {
             EnemyBase e = aliveEnemies[i];
-            yield return e.ApplySatusEffects();
+
+            if (e.ApplySatusEffects())
+                tookStatDamage = true;
 
             if (i >= aliveEnemies.Count || e != aliveEnemies[i])
             {
@@ -263,6 +287,9 @@ public class BattleController : NetworkBehaviour
                 i--;
             }
         }
+
+        if (tookStatDamage)
+            yield return new WaitForSeconds(0.5f);
 
         if (aliveEnemies.Count > 0 && IsEnemyPhase)
         {

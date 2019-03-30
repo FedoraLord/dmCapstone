@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 
+#pragma warning disable 0618
 public class FlippableCard : NetworkBehaviour
 {
 	public bool isWinner;

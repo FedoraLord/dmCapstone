@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+#pragma warning disable 0618
 public abstract class MinigameManager : NetworkBehaviour
 {
     public static MinigameManager Instance;

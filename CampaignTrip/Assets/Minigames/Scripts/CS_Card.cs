@@ -18,7 +18,7 @@ public class CS_Card : MonoBehaviour
     private bool dataChanged;
     private SpriteRenderer spriteRenderer;
 
-    public string name;
+    public new string name;
 
 
     // Start is called before the first frame update

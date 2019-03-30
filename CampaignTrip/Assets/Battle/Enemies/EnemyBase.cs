@@ -13,8 +13,14 @@ public class EnemyBase : BattleActorBase
         get { return remainingBlock; }
         private set
         {
-            remainingBlock = value;
-            HealthBar.UpdateBlock();
+            if (remainingBlock != value)
+            {
+                remainingBlock = value;
+                HealthBar.UpdateBlock();
+
+                if (isServer)
+                    RpcUpdateBlock(value);
+            }
         }
     }
 
@@ -65,6 +71,12 @@ public class EnemyBase : BattleActorBase
         RpcTakeDamage(damage, initialBlock - RemainingBlock);
     }
 
+    [ClientRpc]
+    private void RpcUpdateBlock(int value)
+    {
+        RemainingBlock = value;
+    }
+
     protected override void Die()
     {
         BattleController.Instance.OnEnemyDeath(this);
@@ -96,8 +108,18 @@ public class EnemyBase : BattleActorBase
         }
         else
         {
-            List<PersistentPlayer> visiblePlayers = PersistentPlayer.players.Where(x => !x.battlePlayer.HasStatusEffect(StatusEffect.Invisible)).ToList();
-            targets = ChooseTargets(visiblePlayers);
+            List<PersistentPlayer> validTargets = new List<PersistentPlayer>();
+            foreach (PersistentPlayer player in PersistentPlayer.players)
+            {
+                BattlePlayerBase p = player.battlePlayer;
+                if (!p.IsAlive)
+                    continue;
+                if (p.HasStatusEffect(StatusEffect.Invisible))
+                    continue;
+                validTargets.Add(player);
+            }
+
+            targets = ChooseTargets(validTargets);
             RpcUpdateTargets(targets);
         }
     }
@@ -108,7 +130,7 @@ public class EnemyBase : BattleActorBase
         int n = Mathf.Clamp(attacksPerTurn, 0, validTargets.Count);
         List<int> choices = new List<int>();
 
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < validTargets.Count; i++)
         {
             choices.Add(i);
         }
@@ -133,13 +155,13 @@ public class EnemyBase : BattleActorBase
     }
     
     [Server]
-    public void Attack()
+    public void AttackPlayers(List<BattleActorBase>[] attackInfo)
     {
         foreach (int t in targets)
         {
             if (TryAttack(PersistentPlayer.players[t].battlePlayer))
             {
-                PersistentPlayer.players[t].battlePlayer.DispatchDamage(this, basicDamage, true);
+                attackInfo[t].Add(this);
             }
         }
     }

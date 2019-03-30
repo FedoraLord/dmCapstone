@@ -115,7 +115,8 @@ public abstract class BattlePlayerBase : BattleActorBase
             if (RemainingCooldown > 0)
                 RemainingCooldown--;
 
-            UpdateButtonUI();
+            if (AButton != null)
+                UpdateButtonUI();
         }
 
         private void UpdateButtonUI()
@@ -209,7 +210,7 @@ public abstract class BattlePlayerBase : BattleActorBase
 
             if (TryAttack(enemy))
             {
-                enemy.DispatchDamage(this, basicDamage, true);
+                enemy.DispatchBlockableDamage(this);
             }
         }
     }
@@ -322,7 +323,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         EndAbility();
     }
 
-    public void DisableAbilityButtons()
+    private void DisableAbilityButtons()
     {
         foreach (Ability a in Abilities)
         {
@@ -363,7 +364,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         }
         else if (target is EnemyBase)
         {
-            target.DispatchDamage(this, ability.Damage, true);
+            target.DispatchBlockableDamage(this);
         }
 
         int healthOnRemove = (ability.Applies == StatusEffect.Focus) ? ability.Damage : 0;
