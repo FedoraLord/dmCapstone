@@ -4,135 +4,75 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+#pragma warning disable 0618
 public class CS_Manager : MinigameManager
 {
     public static new CS_Manager Instance;
 
     public Text timerText;
+    public List<CS_Card> selectableCards;
     public List<CS_Card> sequenceCards;
-    public List<CS_Card> selectCards;
-    public List<Sprite> cardSprites;
     public GameObject selectCardObject;
     public GameObject sequenceCardObject;
 
+    //contains the indecies in selectCards
+    private List<CS_Card> randomSequence;
     private List<CS_Card> unassignedCards;
+    private List<int> userSequence = new List<int>();
 
-    private int sequenceIterator;
-
-    // Start is called before the first frame update
     protected override void Start()
     {
-        Instance = this;
-        if (NetworkWrapper.IsHost)
-            GenerateCardSequence();
-
         base.Start();
-    }
-
-    // Update is called once per frame
-    private void Update()
-    {
-        timer -= Time.deltaTime;
-        timerText.text = string.Format("Time Remaining: {0}", (int)timer);
-
-        if (timer <= 0.0f)
+        for (int i = 0; i < selectableCards.Count; i++)
         {
-            Lose();
-            BattleController.Instance.UnloadMinigame(false);
-        }
-    }
-
-    [Server]
-    private void GenerateCardSequence()
-    {
-        foreach (var sequenceCard in sequenceCards)
-        {
-            int index = Random.Range(0, sequenceCards.Count);
-            CS_Card selectedCard = selectCards[index];
-            sequenceCard.Sprite = selectedCard.Sprite;
-            sequenceCard.index = selectedCard.index;
-        }
-        unassignedCards = sequenceCards;
-    }
-
-    public void CardSelected(CS_Card card)
-    {
-        if (card.index == sequenceCards[sequenceIterator].index)
-        {
-            sequenceIterator++;
-            // TODO make visual showing success
-
-            if (sequenceIterator > sequenceCards.Count - 1)
-            {
-                CmdWin();
-            }
-        }
-        else
-        {
-            CmdLose();
-            // TODO make visual showing failed sequence
+            selectableCards[i].InitializeSelectable(i);
         }
     }
 
     protected override IEnumerator HandlePlayers(List<PersistentPlayer> randomPlayers)
     {
         yield return base.HandlePlayers(randomPlayers);
+        
+        StartCoroutine(Timer());
         randomPlayers = PersistentPlayer.players;
 
-        PersistentPlayer p = randomPlayers[0];
-        TargetShowSelectCards(p.connectionToClient);
+        TargetShowSelectCards(randomPlayers[0].connectionToClient);
 
+        GenerateCardSequence();
         for (int i = 1; i < randomPlayers.Count; i++)
         {
-            p = randomPlayers[i];
-            int[] cardsToShow = GetCardsToShow();
-            if (p.isServer)
+            //will look something like this { -1, 3, -1, -1, 8, -1 } where non-negatives are their shown cards
+            int[] indecies = new int[randomSequence.Count];
+            for (int j = 0; j < indecies.Length; j++)
             {
-                TargetShowSequenceCards(p.connectionToClient, cardsToShow);
+                indecies[j] = -1;
             }
-            else
+            
+            //chooses 6 / 3 = 2 cards per player, did it this way so you dont have to use 4 players to test the minigame
+            for (int j = 0; j < indecies.Length / (randomPlayers.Count - 1); j++)
             {
-                TargetShowSequenceCards(p.connectionToClient, cardsToShow);
+                int k = Random.Range(0, unassignedCards.Count);
+                CS_Card assignment = unassignedCards[k];
+                int sequenceIndex = randomSequence.IndexOf(assignment);
+                indecies[sequenceIndex] = assignment.index;
+                unassignedCards.RemoveAt(k);
             }
+            
+            TargetShowSequenceCards(randomPlayers[i].connectionToClient, indecies);
         }
     }
 
-    private int[] GetCardsToShow()
+    private IEnumerator Timer()
     {
-        int[] cards = { 0, 0, 0, 0, 0 };
-        int randomCard = Random.Range(0, unassignedCards.Count);
-        cards[randomCard] = unassignedCards[randomCard].index;
-        unassignedCards.RemoveAt(randomCard);
-        if (unassignedCards.Count > 1)
+        while (timer > 0)
         {
-            randomCard = Random.Range(0, unassignedCards.Count);
-            cards[randomCard] = unassignedCards[randomCard].index;
-            unassignedCards.RemoveAt(randomCard);
+            timer -= Time.deltaTime;
+            timerText.text = string.Format("Time Remaining: {0}", (int)timer);
+            yield return new WaitForEndOfFrame();
         }
 
-        return cards;
-    }
-
-    private void ServerShowSequenceCards(int[] cardsToShow) 
-    {
-        for (int i = 0; i < cardsToShow.Length; i++)
-        {
-            sequenceCards[i].Sprite = cardSprites[cardsToShow[i]];
-        }
-    }
-
-    [TargetRpc]
-    private void TargetShowSequenceCards(NetworkConnection connection, int[] cardInfo)
-    {
-        for(int i = 0; i < sequenceCards.Count; i++)
-        {
-
-            sequenceCards[i].index = cardInfo[i];
-            sequenceCards[i].Sprite = cardSprites[cardInfo[i]];
-        }
-
-        selectCardObject.SetActive(false);
-        sequenceCardObject.SetActive(true);
+        Lose();
+        BattleController.Instance.UnloadMinigame(false);
     }
 
     [TargetRpc]
@@ -141,7 +81,46 @@ public class CS_Manager : MinigameManager
         selectCardObject.SetActive(true);
         sequenceCardObject.SetActive(false);
     }
+    
+    [Server]
+    private void GenerateCardSequence()
+    {
+        randomSequence = new List<CS_Card>();
+        unassignedCards = new List<CS_Card>();
+        for (int i = 0; i < sequenceCards.Count; i++)
+        {
+            CS_Card randomCard = selectableCards[Random.Range(0, selectableCards.Count)];
+            randomSequence.Add(randomCard);
+            unassignedCards.Add(randomCard);
+        }
+    }
 
+    public void CardSelected(CS_Card card)
+    {
+        userSequence.Add(card.index);
+        if (userSequence.Count == randomSequence.Count)
+        {
+            //compare
+            //CmdWin();
+            //CmdLose();
+        }
+    }
+
+    [TargetRpc]
+    private void TargetShowSequenceCards(NetworkConnection connection, int[] cardIndecies)
+    {
+        for(int i = 0; i < cardIndecies.Length; i++)
+        {
+            if (cardIndecies[i] >= 0)
+            {
+                sequenceCards[i].spriteRenderer.sprite = selectableCards[cardIndecies[i]].spriteRenderer.sprite;
+            }
+        }
+
+        selectCardObject.SetActive(false);
+        sequenceCardObject.SetActive(true);
+    }
+    
     protected override void Win()
     {
         winText.text = "Success!";
