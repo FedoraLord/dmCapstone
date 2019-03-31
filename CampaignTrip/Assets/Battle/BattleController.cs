@@ -107,7 +107,7 @@ public class BattleController : NetworkBehaviour
         PersistentPlayer.localAuthority.CmdSpawnBattlePlayer();
 
         dotStatusEffects.Add(StatusEffect.Bleed, 5);
-        dotStatusEffects.Add(StatusEffect.Burn, 5);
+        dotStatusEffects.Add(StatusEffect.Burn, 0); //damage = duration
         dotStatusEffects.Add(StatusEffect.Poison, 5);
 
         if (isServer)

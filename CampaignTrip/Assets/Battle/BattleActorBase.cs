@@ -33,6 +33,7 @@ public abstract class BattleActorBase : NetworkBehaviour
     [SerializeField] protected Animator animator;
     [SerializeField] protected DamagePopup damagePopup;
     [SerializeField] protected HealthBarUI healthBarUI;
+    [SerializeField] protected StatusEffectOverlays overlays;
     [SerializeField] protected Transform uiTransform;
     [SerializeField] protected int attacksPerTurn;
     [SerializeField] protected int basicDamage;
@@ -233,7 +234,8 @@ public abstract class BattleActorBase : NetworkBehaviour
             return;
         }
 
-        damagePopup.DisplayDOT(GetDOTColor(type), duration);
+        damagePopup.DisplayStat(GetStatColor(type), duration);
+        overlays.ToggleOverlay(type, true);
 
         if (HasStatusEffect(type))
         {
@@ -247,7 +249,7 @@ public abstract class BattleActorBase : NetworkBehaviour
         switch (s.Type)
         {
             case StatusEffect.Invisible:
-                OnChangeInvisible(true);
+                OnAddInvisible();
                 break;
             case StatusEffect.Stun:
                 OnAddStun();
@@ -277,7 +279,7 @@ public abstract class BattleActorBase : NetworkBehaviour
             case StatusEffect.Weak:
                 //stack duration
                 int duration = statusEffects[s.Type][0].RemainingDuration + s.RemainingDuration;
-                statusEffects[s.Type][0].RemainingDuration += Mathf.Min(duration, maxDuration);
+                statusEffects[s.Type][0].RemainingDuration = Mathf.Min(duration, maxDuration);
                 break;
             default:
                 //dont stack
@@ -332,9 +334,6 @@ public abstract class BattleActorBase : NetworkBehaviour
     {
         switch (type)
         {
-            case StatusEffect.Invisible:
-                OnChangeInvisible(false);
-                break;
             case StatusEffect.Focus:
                 OnRemoveFocus();
                 break;
@@ -342,23 +341,7 @@ public abstract class BattleActorBase : NetworkBehaviour
                 break;
         }
         statusEffects.Remove(type);
-    }
-
-    private void OnChangeInvisible(bool added)
-    {
-        SpriteRenderer s = GetComponent<SpriteRenderer>();
-        Color c = s.color;
-
-        if (added)
-        {
-            c.a = 0.5f;
-            OnAddInvisible();
-        }
-        else
-        {
-            c.a = 1;
-        }
-        s.color = c;
+        overlays.ToggleOverlay(type, false);
     }
 
     private void OnRemoveFocus()
@@ -377,21 +360,29 @@ public abstract class BattleActorBase : NetworkBehaviour
     protected virtual void OnAddStun() { }
     protected virtual void OnAddInvisible() { }
     protected virtual void OnAddFreeze() { }
-    
+
     [Server]
     public bool ApplyDOT(StatusEffect type)
     {
         if (!HasStatusEffect(type))
             return false;
 
-        int sumDOT = 0;
-        for (int i = 0; i < statusEffects[type].Count; i++)
+        int dot;
+        if (type == StatusEffect.Burn)
         {
-            sumDOT += statusEffects[type][i].DOT;
+            dot = statusEffects[type][0].RemainingDuration;
+        }
+        else
+        {
+            dot = 0;
+            for (int i = 0; i < statusEffects[type].Count; i++)
+            {
+                dot += statusEffects[type][i].DOT;
+            }
         }
 
         RpcDisplayDOT(type);
-        RpcTakeDamage(sumDOT, 0);
+        RpcTakeDamage(dot, 0);
         return true;
     }
 
@@ -399,10 +390,10 @@ public abstract class BattleActorBase : NetworkBehaviour
     private void RpcDisplayDOT(StatusEffect type)
     {
         List<Stat> stats = statusEffects[type];
-        damagePopup.DisplayDOT(GetDOTColor(type), stats[stats.Count - 1].RemainingDuration - 1);
+        damagePopup.DisplayStat(GetStatColor(type), stats[stats.Count - 1].RemainingDuration - 1);
     }
 
-    private Color GetDOTColor(StatusEffect type)
+    private Color GetStatColor(StatusEffect type)
     {
         switch (type)
         {

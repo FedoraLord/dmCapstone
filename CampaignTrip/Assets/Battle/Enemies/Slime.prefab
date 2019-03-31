@@ -15,6 +15,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   damagePopup: {fileID: 3245608765852765489}
   healthBarUI: {fileID: 963320182993334783}
+  overlays: {fileID: 692020140722269344}
   uiTransform: {fileID: 3989840763669419232}
   attacksPerTurn: 1
   basicDamage: 5
@@ -28,46 +29,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 5133637243884992181, guid: 4ab14dd3fb4643b49889b005e10b15ee,
-        type: 3}
-      propertyPath: healthBar
-      value: 
-      objectReference: {fileID: 7047864874152282588}
-    - target: {fileID: 5133637243884992181, guid: 4ab14dd3fb4643b49889b005e10b15ee,
-        type: 3}
-      propertyPath: healthText
-      value: 
-      objectReference: {fileID: 3209731358305701881}
-    - target: {fileID: 5133637243884992181, guid: 4ab14dd3fb4643b49889b005e10b15ee,
-        type: 3}
-      propertyPath: target1
-      value: 
-      objectReference: {fileID: 2324668492724632106}
-    - target: {fileID: 5133637243884992181, guid: 4ab14dd3fb4643b49889b005e10b15ee,
-        type: 3}
-      propertyPath: target2
-      value: 
-      objectReference: {fileID: 6043528535938340949}
-    - target: {fileID: 5133637243884992181, guid: 4ab14dd3fb4643b49889b005e10b15ee,
-        type: 3}
-      propertyPath: target3
-      value: 
-      objectReference: {fileID: 4814211120931761951}
-    - target: {fileID: 5133637243884992181, guid: 4ab14dd3fb4643b49889b005e10b15ee,
-        type: 3}
-      propertyPath: target4
-      value: 
-      objectReference: {fileID: 2909723114430552874}
-    - target: {fileID: 7451916690612193915, guid: 4ab14dd3fb4643b49889b005e10b15ee,
-        type: 3}
-      propertyPath: damageText
-      value: 
-      objectReference: {fileID: 692035526231569387}
-    - target: {fileID: 7451916690612193915, guid: 4ab14dd3fb4643b49889b005e10b15ee,
-        type: 3}
-      propertyPath: blockText
-      value: 
-      objectReference: {fileID: 4709161355817671536}
     - target: {fileID: 3291355430086226004, guid: 4ab14dd3fb4643b49889b005e10b15ee,
         type: 3}
       propertyPath: m_Name
@@ -208,6 +169,46 @@ PrefabInstance:
       propertyPath: m_AssetId.i15
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5133637243884992181, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: healthBar
+      value: 
+      objectReference: {fileID: 7047864874152282588}
+    - target: {fileID: 5133637243884992181, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: healthText
+      value: 
+      objectReference: {fileID: 3209731358305701881}
+    - target: {fileID: 5133637243884992181, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: target1
+      value: 
+      objectReference: {fileID: 2324668492724632106}
+    - target: {fileID: 5133637243884992181, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: target2
+      value: 
+      objectReference: {fileID: 6043528535938340949}
+    - target: {fileID: 5133637243884992181, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: target3
+      value: 
+      objectReference: {fileID: 4814211120931761951}
+    - target: {fileID: 5133637243884992181, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: target4
+      value: 
+      objectReference: {fileID: 2909723114430552874}
+    - target: {fileID: 7451916690612193915, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: damageText
+      value: 
+      objectReference: {fileID: 692035526231569387}
+    - target: {fileID: 7451916690612193915, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: blockText
+      value: 
+      objectReference: {fileID: 4709161355817671536}
     - target: {fileID: 6357449637621016870, guid: 4ab14dd3fb4643b49889b005e10b15ee,
         type: 3}
       propertyPath: m_Animator
@@ -345,5 +346,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &692020140722269344 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4898436328684284906, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+    type: 3}
+  m_PrefabInstance: {fileID: 5359337731261646666}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03e910c20cfa8b64aa70bdff54be471b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
