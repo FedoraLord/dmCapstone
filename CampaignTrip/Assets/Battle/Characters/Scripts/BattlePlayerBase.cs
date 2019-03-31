@@ -15,6 +15,8 @@ public abstract class BattlePlayerBase : BattleActorBase
     //public static BP_Alchemist Alchemist { get; protected set; }
     public static int PlayersUsingAbility;
 
+    public static List<BattlePlayerBase> players { get { return PersistentPlayer.players.Select(x => x.battlePlayer).ToList(); } }
+
     public bool CanPlayAbility { get; set; }
     public List<Ability> Abilities { get; private set; }
 
@@ -49,11 +51,11 @@ public abstract class BattlePlayerBase : BattleActorBase
                 case TargetGroup.Self:
                     return new List<BattleActorBase>() { this };
                 case TargetGroup.Ally:
-                    List<BattleActorBase> targets =  PersistentPlayer.players.Select(x => x.battlePlayer).ToList<BattleActorBase>();
+                    List<BattleActorBase> targets = new List<BattleActorBase>(players);
                     targets.Remove(this);
                     return targets;
                 case TargetGroup.AllyAndSelf:
-                    return PersistentPlayer.players.Select(x => x.battlePlayer).ToList<BattleActorBase>();
+                    return new List<BattleActorBase>(players);
                 case TargetGroup.Enemy:
                     return new List<BattleActorBase>(BattleController.Instance.aliveEnemies);
                 default:
@@ -105,7 +107,7 @@ public abstract class BattlePlayerBase : BattleActorBase
 
         public void Use()
         {
-            LocalAuthority.CanPlayAbility = true;
+            LocalAuthority.CanPlayAbility = false;
             RemainingCooldown = cooldown + 1;
             UpdateButtonUI();
         }
@@ -161,12 +163,12 @@ public abstract class BattlePlayerBase : BattleActorBase
     {
         if (HasStatusEffect(StatusEffect.Stun))
         {
-            LocalAuthority.CanPlayAbility = true;
+            LocalAuthority.CanPlayAbility = false;
             UpdateAttackBlock(0);
         }
         else
         {
-            LocalAuthority.CanPlayAbility = false;
+            LocalAuthority.CanPlayAbility = true;
         }
         
         UpdateAttackBlock(attacksPerTurn);
@@ -208,9 +210,13 @@ public abstract class BattlePlayerBase : BattleActorBase
             RpcAttack();
             EnemyBase enemy = target.GetComponent<EnemyBase>();
 
-            if (TryAttack(enemy))
+            if (TryAttack())
             {
                 enemy.DispatchBlockableDamage(this);
+            }
+            else
+            {
+                enemy.RpcMiss();
             }
         }
     }
@@ -251,7 +257,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         {
             EndAbility();
         }
-        else if (!CanPlayAbility && Abilities[i].RemainingCooldown <= 0)
+        else if (CanPlayAbility && Abilities[i].RemainingCooldown <= 0)
         {
             CmdUseAbilityRequest(i);
         }
@@ -308,9 +314,9 @@ public abstract class BattlePlayerBase : BattleActorBase
                 enemy.tempAbilityTarget.SetActive(false);
             }
 
-            foreach (PersistentPlayer player in PersistentPlayer.players)
+            foreach (BattlePlayerBase p in players)
             {
-                player.battlePlayer.tempAbilityTarget.SetActive(false);
+                p.tempAbilityTarget.SetActive(false);
             }
         }
     }
@@ -344,31 +350,35 @@ public abstract class BattlePlayerBase : BattleActorBase
 
             foreach (BattleActorBase actor in ValidTargets)
             {
-                UseAbility(actor, SelectedAbility);
+                UseAbility(actor);
             }
         }
         else
         {
             BattleActorBase actor = target.GetComponent<BattleActorBase>();
-            UseAbility(actor, Abilities[i]);
+            UseAbility(actor);
         }
         OnAbilityUsed();
     }
 
     [Server]
-    private void UseAbility(BattleActorBase target, Ability ability)
+    private void UseAbility(BattleActorBase target)
     {
-        if (ability.Applies == StatusEffect.Cure)
+        if (target is EnemyBase)
         {
-            target.Heal(ability.Damage);
-        }
-        else if (target is EnemyBase)
-        {
-            target.DispatchBlockableDamage(this);
+            target.DispatchBlockableDamage(this, SelectedAbility.Damage);
         }
 
-        int healthOnRemove = (ability.Applies == StatusEffect.Focus) ? ability.Damage : 0;
-        target.AddStatusEffect(ability.Applies, this, ability.Duration, healthOnRemove);
+        Ability a = SelectedAbility;
+        if (a.Applies == StatusEffect.Cure || a.Applies == StatusEffect.Focus)
+        {
+            target.AddStatusEffect(a.Applies, this, a.Duration, a.Damage);
+        }
+        else
+        {
+            target.AddStatusEffect(a.Applies, this, a.Duration, 0);
+        }
+
     }
 
     public void EndAbility()

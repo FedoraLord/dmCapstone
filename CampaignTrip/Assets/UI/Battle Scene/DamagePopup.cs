@@ -9,6 +9,7 @@ public class DamagePopup : BattleActorUI
     public Text damageText;
     public Text blockText;
     public Text messageText;
+    public Text dotText;
     
     private Camera mainCamera;
     private Coroutine damageAnimation;
@@ -21,12 +22,14 @@ public class DamagePopup : BattleActorUI
         damageText.gameObject.SetActive(false);
         blockText.gameObject.SetActive(false);
         messageText.gameObject.SetActive(false);
-        mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        dotText.gameObject.SetActive(false);
     }
 
     public override void Init(BattleActorBase actor)
     {
         base.Init(actor);
+        mainCamera = Camera.main;
+        dotText.transform.position = mainCamera.WorldToScreenPoint(actor.transform.position);
     }
 
     public void DisplayDamage(int damage, int blocked)
@@ -39,8 +42,8 @@ public class DamagePopup : BattleActorUI
         damageText.enabled = (damage > 0);
         damageText.text = string.Format("-{0}", damage);
 
-        damageAnimation = StartCoroutine(Animate(damageText, true, () => damageAnimation = null));
-        blockAnimation = StartCoroutine(Animate(blockText, true, () => blockAnimation = null));
+        damageAnimation = StartCoroutine(AnimatePopup(damageText, true, () => damageAnimation = null));
+        blockAnimation = StartCoroutine(AnimatePopup(blockText, true, () => blockAnimation = null));
     }
 
     public void DisplayMiss()
@@ -57,7 +60,26 @@ public class DamagePopup : BattleActorUI
     {
         messageText.text = msg;
         StopAnimation(messageAnimation);
-        messageAnimation = StartCoroutine(Animate(messageText, false, () => messageAnimation = null));
+        messageAnimation = StartCoroutine(AnimatePopup(messageText, false, () => messageAnimation = null));
+    }
+
+    public void DisplayDOT(Color color, int remainingDuration)
+    {
+        dotText.color = color;
+        dotText.text = remainingDuration.ToString();
+        dotText.gameObject.SetActive(true);
+        StartCoroutine(AnimateDOT());
+    }
+
+    private IEnumerator AnimateDOT()
+    {
+        dotText.CrossFadeAlpha(1, 0, false);
+        yield return new WaitForSeconds(0.5f);
+
+        dotText.CrossFadeAlpha(0, 0.2f, false);
+        yield return new WaitForSeconds(0.2f);
+
+        dotText.gameObject.SetActive(false);
     }
 
     private void StopAnimation(Coroutine animation)
@@ -66,7 +88,7 @@ public class DamagePopup : BattleActorUI
             StopCoroutine(animation);
     }
 
-    private IEnumerator Animate(Text text, bool allowMultiple, Action callback = null)
+    private IEnumerator AnimatePopup(Text text, bool allowMultiple, Action callback = null)
     {
         if (!allowMultiple)
         {

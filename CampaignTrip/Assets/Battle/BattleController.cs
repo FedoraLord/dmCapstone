@@ -168,9 +168,9 @@ public class BattleController : NetworkBehaviour
     {
         battlePhase = Phase.Player;
 
-        foreach (PersistentPlayer p in PersistentPlayer.players)
+        foreach (BattlePlayerBase p in BattlePlayerBase.players)
         {
-            p.battlePlayer.OnPlayerPhaseStart();
+            p.OnPlayerPhaseStart();
         }
 
         foreach (EnemyBase e in aliveEnemies)
@@ -198,15 +198,7 @@ public class BattleController : NetworkBehaviour
             RpcForceCancelAbility();
         }
 
-        bool tookStatDamage = false;
-        foreach (PersistentPlayer p in PersistentPlayer.players)
-        {
-            if (p.battlePlayer.ApplySatusEffects())
-                tookStatDamage = true;
-        }
-
-        if (tookStatDamage)
-            yield return new WaitForSeconds(0.5f);
+        yield return ApplyDOTs(BattlePlayerBase.players);
 
         StartEnemyPhase();
     }
@@ -244,56 +236,73 @@ public class BattleController : NetworkBehaviour
         StartCoroutine(ExecuteEnemyPhase());
 	}
 
+    public class AttackInfo
+    {
+        public bool containsMiss;
+        public List<BattleActorBase> attackers = new List<BattleActorBase>();
+    }
+
     [Server]
     private IEnumerator ExecuteEnemyPhase()
     {
         yield return new WaitForSeconds(0.5f);
         
-        //attackInfo[i] == a list of enemies attacking PersistentPlayer.players[i]
-        List<BattleActorBase>[] attackInfo = new List<BattleActorBase>[PersistentPlayer.players.Count];
-        for (int i = 0; i < attackInfo.Length; i++)
-        {
-            attackInfo[i] = new List<BattleActorBase>();
-        }
+        //get attack damage directed at each player
+        AttackInfo[] attacks = new AttackInfo[BattlePlayerBase.players.Count];
+        attacks.Initialize(() => new AttackInfo());
 
         foreach (EnemyBase e in aliveEnemies)
         {
             if (e.IsAlive && e.HasTargets)
-            {
-                e.AttackPlayers(attackInfo);
-            }
+                e.AttackPlayers(attacks);
         }
 
-        for (int i = 0; i < PersistentPlayer.players.Count; i++)
+        //apply attack damage on the players
+        for (int i = 0; i < BattlePlayerBase.players.Count; i++)
         {
-            if (attackInfo[i].Count > 0)
+            BattlePlayerBase bp = BattlePlayerBase.players[i];
+            if (attacks[i].containsMiss)
             {
-                PersistentPlayer.players[i].battlePlayer.DispatchBlockableDamage(attackInfo[i]);
+                bp.RpcMiss();
+                yield return new WaitForSeconds(0.5f);
+            }
+
+            if (attacks[i].attackers.Count > 0)
+            {
+                bp.DispatchBlockableDamage(attacks[i].attackers);
                 yield return new WaitForSeconds(0.5f);
             }
         }
 
-        bool tookStatDamage = false;
-        for (int i = 0; i < aliveEnemies.Count; i++)
-        {
-            EnemyBase e = aliveEnemies[i];
-
-            if (e.ApplySatusEffects())
-                tookStatDamage = true;
-
-            if (i >= aliveEnemies.Count || e != aliveEnemies[i])
-            {
-                //enemy died and was removed from aliveEnemies
-                i--;
-            }
-        }
-
-        if (tookStatDamage)
-            yield return new WaitForSeconds(0.5f);
-
+        //apply damage over time status effects on enemies
+        yield return ApplyDOTs(aliveEnemies);
+        
         if (aliveEnemies.Count > 0 && IsEnemyPhase)
         {
             StartPlayerPhase();
+        }
+    }
+
+    [Server]
+    private IEnumerator ApplyDOTs<T>(List<T> actors) where T : BattleActorBase
+    {
+        List<StatusEffect> dots = new List<StatusEffect>(dotStatusEffects.Keys);
+        for (int i = 0; i < dots.Count; i++)
+        {
+            bool tookStatDamage = false;
+            foreach (BattleActorBase actor in actors)
+            {
+                if (actor.ApplyDOT(dots[i]))
+                    tookStatDamage = true;
+            }
+
+            if (tookStatDamage)
+                yield return new WaitForSeconds(0.5f);
+        }
+
+        foreach (BattleActorBase actor in actors)
+        {
+            actor.RpcDecrementDurations();
         }
     }
 

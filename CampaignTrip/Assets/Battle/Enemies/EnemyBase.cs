@@ -97,6 +97,7 @@ public class EnemyBase : BattleActorBase
 
     #region Attack
 
+    [Server]
     public override void OnPlayerPhaseStart()
     {
         base.OnPlayerPhaseStart();
@@ -108,15 +109,14 @@ public class EnemyBase : BattleActorBase
         }
         else
         {
-            List<PersistentPlayer> validTargets = new List<PersistentPlayer>();
-            foreach (PersistentPlayer player in PersistentPlayer.players)
+            List<BattlePlayerBase> validTargets = new List<BattlePlayerBase>();
+            foreach (BattlePlayerBase p in BattlePlayerBase.players)
             {
-                BattlePlayerBase p = player.battlePlayer;
                 if (!p.IsAlive)
                     continue;
                 if (p.HasStatusEffect(StatusEffect.Invisible))
                     continue;
-                validTargets.Add(player);
+                validTargets.Add(p);
             }
 
             targets = ChooseTargets(validTargets);
@@ -125,7 +125,7 @@ public class EnemyBase : BattleActorBase
     }
 
     //picks targets randomly unless overridden
-    protected virtual int[] ChooseTargets(List<PersistentPlayer> validTargets)
+    protected virtual int[] ChooseTargets(List<BattlePlayerBase> validTargets)
     {
         int n = Mathf.Clamp(attacksPerTurn, 0, validTargets.Count);
         List<int> choices = new List<int>();
@@ -155,14 +155,14 @@ public class EnemyBase : BattleActorBase
     }
     
     [Server]
-    public void AttackPlayers(List<BattleActorBase>[] attackInfo)
+    public void AttackPlayers(BattleController.AttackInfo[] attacks)
     {
         foreach (int t in targets)
         {
-            if (TryAttack(PersistentPlayer.players[t].battlePlayer))
-            {
-                attackInfo[t].Add(this);
-            }
+            if (TryAttack())
+                attacks[t].attackers.Add(this);
+            else
+                attacks[t].containsMiss = true;
         }
     }
 

@@ -97,6 +97,7 @@ public abstract class BattleActorBase : NetworkBehaviour
             Destroy(damagePopup.gameObject);
     }
 
+    [Server]
     public virtual void OnPlayerPhaseStart()
     {
         if (HasStatusEffect(StatusEffect.Focus))
@@ -112,12 +113,11 @@ public abstract class BattleActorBase : NetworkBehaviour
     #endregion
 
     [Server]
-    protected bool TryAttack(BattleActorBase target)
+    protected bool TryAttack()
     {
-        if (HasStatusEffect(StatusEffect.Blind) && UnityEngine.Random.Range(0, 100) < 80)
+        if (HasStatusEffect(StatusEffect.Blind))
         {
-            target.RpcMiss();
-            return false;
+            return UnityEngine.Random.Range(0, 100) > 80;
         }
         return true;
     }
@@ -129,30 +129,38 @@ public abstract class BattleActorBase : NetworkBehaviour
     protected abstract void Die();
 
     [Server]
-    public void DispatchBlockableDamage(BattleActorBase attacker)
+    public void DispatchBlockableDamage(BattleActorBase attacker, int damage = 0)
     {
-        DispatchBlockableDamage(new List<BattleActorBase>() { attacker });
+        DispatchBlockableDamage(new List<BattleActorBase>() { attacker }, damage);
     }
 
     [Server]
-    public void DispatchBlockableDamage(List<BattleActorBase> attackers)
+    public void DispatchBlockableDamage(List<BattleActorBase> attackers, int damage = 0)
     {
-        DecrementDuration(StatusEffect.Freeze, attackers.Count);
-        DecrementDuration(StatusEffect.Burn, attackers.Count);
+        if (HasStatusEffect(StatusEffect.Freeze))
+            RpcDecrementDuration(StatusEffect.Freeze, attackers.Count);
 
         if (HasStatusEffect(StatusEffect.Reflect))
         {
             foreach (BattleActorBase attacker in attackers)
             {
-                attacker.TakeBlockedDamage(attacker.basicDamage);
+                int damageDealt = (damage > 0) ? damage : attacker.basicDamage;
+                attacker.TakeBlockedDamage(damageDealt);
             }
         }
         else
         {
             int sumDamage = 0;
-            foreach (BattleActorBase attacker in attackers)
+            if (damage > 0)
             {
-                sumDamage += attacker.basicDamage;
+                sumDamage = damage * attackers.Count;
+            }
+            else
+            {
+                foreach (BattleActorBase attacker in attackers)
+                {
+                    sumDamage += attacker.basicDamage;
+                }
             }
 
             if (HasStatusEffect(StatusEffect.Protected))
@@ -221,9 +229,12 @@ public abstract class BattleActorBase : NetworkBehaviour
         RemoveOnAdd(type);
         if (type == StatusEffect.Cure)
         {
+            Heal(healthOnRemove);
             return;
         }
-        
+
+        damagePopup.DisplayDOT(GetDOTColor(type), duration);
+
         if (HasStatusEffect(type))
         {
             AddStack(s);
@@ -308,11 +319,17 @@ public abstract class BattleActorBase : NetworkBehaviour
         }
     }
 
+    [Server]
     private void RemoveStatusEffect(StatusEffect type)
     {
         if (!HasStatusEffect(type))
             return;
-        
+        RpcRemoveStatusEffect(type);
+    }
+
+    [ClientRpc]
+    private void RpcRemoveStatusEffect(StatusEffect type)
+    {
         switch (type)
         {
             case StatusEffect.Invisible:
@@ -326,7 +343,7 @@ public abstract class BattleActorBase : NetworkBehaviour
         }
         statusEffects.Remove(type);
     }
-    
+
     private void OnChangeInvisible(bool added)
     {
         SpriteRenderer s = GetComponent<SpriteRenderer>();
@@ -361,31 +378,66 @@ public abstract class BattleActorBase : NetworkBehaviour
     protected virtual void OnAddInvisible() { }
     protected virtual void OnAddFreeze() { }
     
-    public bool ApplySatusEffects()
+    [Server]
+    public bool ApplyDOT(StatusEffect type)
     {
-        int sumDOT = 0;
-        List<StatusEffect> types = new List<StatusEffect>(statusEffects.Keys);
+        if (!HasStatusEffect(type))
+            return false;
 
+        int sumDOT = 0;
+        for (int i = 0; i < statusEffects[type].Count; i++)
+        {
+            sumDOT += statusEffects[type][i].DOT;
+        }
+
+        RpcDisplayDOT(type);
+        RpcTakeDamage(sumDOT, 0);
+        return true;
+    }
+
+    [ClientRpc]
+    private void RpcDisplayDOT(StatusEffect type)
+    {
+        List<Stat> stats = statusEffects[type];
+        damagePopup.DisplayDOT(GetDOTColor(type), stats[stats.Count - 1].RemainingDuration - 1);
+    }
+
+    private Color GetDOTColor(StatusEffect type)
+    {
+        switch (type)
+        {
+            case StatusEffect.Bleed:
+                return Color.red;
+            case StatusEffect.Burn:
+                return new Color(1, 0.5f, 0);
+            case StatusEffect.Poison:
+                return Color.green;
+            default:
+                return Color.black;
+        }
+    }
+
+    [ClientRpc]
+    public void RpcDecrementDurations()
+    {
+        List<StatusEffect> types = new List<StatusEffect>(statusEffects.Keys);
         for (int i = 0; i < types.Count; i++)
         {
-            List<Stat> s = statusEffects[types[i]];
-            sumDOT += s[0].DOT;
-            DecrementDuration(types[i]);
+            DecrementDuration(types[i], 1);
         }
-
-        if (sumDOT > 0)
-        {
-            RpcTakeDamage(sumDOT, 0);
-            return true;
-        }
-        return false;
     }
-    
-    private void DecrementDuration(StatusEffect type, int decBy = 1)
+
+    [ClientRpc]
+    private void RpcDecrementDuration(StatusEffect type, int decBy)
     {
         if (!HasStatusEffect(type))
             return;
 
+        DecrementDuration(type, decBy);
+    }
+
+    private void DecrementDuration(StatusEffect type, int decBy)
+    {
         List<Stat> s = statusEffects[type];
         for (int i = 0; i < s.Count; i++)
         {
