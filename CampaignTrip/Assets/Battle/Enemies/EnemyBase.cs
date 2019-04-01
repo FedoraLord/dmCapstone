@@ -154,7 +154,16 @@ public class EnemyBase : BattleActorBase
     {
         targets = newTargets;
         HealthBar.SetTargets(targets);
-    }
+		bool doWeDisplayAggro = false;
+		foreach (int i in newTargets)
+			if (i == PersistentPlayer.localAuthority.playerNum - 1)
+			{
+				doWeDisplayAggro = true;
+				break;
+			}
+		overlays.ToggleAggro(doWeDisplayAggro);
+
+	}
     
     [Server]
     public void AttackPlayers(BattleController.AttackInfo[] attacks)
