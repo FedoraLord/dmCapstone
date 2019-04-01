@@ -18,9 +18,9 @@ EditorBuildSettings:
     path: Assets/Scenes/SwitchMaze.unity
     guid: 30641b38b4a9f4633aa1285d8e9ca752
   - enabled: 1
-    path: Assets/Scenes/Battle.unity
-    guid: de5115eb129d1404a8ad791d34989ec0
-  - enabled: 1
     path: Assets/Scenes/CardFlip.unity
     guid: 3822c416ac214634984711aa150134fe
+  - enabled: 1
+    path: Assets/Scenes/CardSequence.unity
+    guid: 7370d2fabd6104cdf98d586d0b82192d
   m_configObjects: {}

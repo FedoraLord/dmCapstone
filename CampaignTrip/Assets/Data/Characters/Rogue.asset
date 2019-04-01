@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b29e01d01f27884fa8baaf04b7886ad, type: 3}
   m_Name: Rogue
   m_EditorClassIdentifier: 
+  characterName: 1
   flavorText: Quick and sneaky character who likes backstabbing enemies
   sprite: {fileID: 21300000, guid: 7a806a1e1418ba74a8720c9da1ab258c, type: 3}
   icon: {fileID: 21300000, guid: 34084a16897fe954c83be8fad93ab1de, type: 3}

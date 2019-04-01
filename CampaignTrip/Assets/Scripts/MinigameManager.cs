@@ -4,13 +4,15 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class MinigameManager : NetworkBehaviour
+#pragma warning disable 0618
+public abstract class MinigameManager : NetworkBehaviour
 {
     public static MinigameManager Instance;
 
     public List<Transform> spawnPoints;
 
 	public int numPlayersWon = 0;
+    public float timer = 30;
 	public Text winText;
 
     protected virtual void Start()
@@ -39,11 +41,12 @@ public class MinigameManager : NetworkBehaviour
 
     private void LateUpdate()
     {
-		if (numPlayersWon == PersistentPlayer.players.Count)
+		if (numPlayersWon != 0 && numPlayersWon == PersistentPlayer.players.Count)
 		{
-			Win();
-			BattleController.Instance.UnloadMinigame();
+            Win();
+            BattleController.Instance.UnloadMinigame(true);
 		}
+        // TODO Add timer for failure
     }
 
     private void OnDestroy()
@@ -55,22 +58,33 @@ public class MinigameManager : NetworkBehaviour
     {
 		yield return 0; //please override this, also we have to return something here
 	}
+    
+    protected abstract void Win();
+    protected abstract void Lose();
 
-	protected virtual void Win()
-	{
-		//do something when you win, or not
-	}
-
-	[Command]
+    [Command]
 	public void CmdWin()
 	{
 		Win();
 		RpcWin();
 	}
 
-	[ClientRpc]
+    [Command]
+    public void CmdLose()
+    {
+        Lose();
+        RpcLose();
+    }
+
+    [ClientRpc]
 	public void RpcWin()
 	{
 		Win();
 	}
+
+    [ClientRpc]
+    public void RpcLose()
+    {
+        Lose();
+    }
 }

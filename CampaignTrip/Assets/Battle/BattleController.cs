@@ -6,6 +6,8 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using static BattleActorBase;
+using static EnemyPrefab;
 
 #pragma warning disable CS0618, 0649
 public class BattleController : NetworkBehaviour
@@ -15,105 +17,119 @@ public class BattleController : NetworkBehaviour
     public bool IsEnemyPhase { get { return battlePhase == Phase.Enemy; } }
     public bool IsPlayerPhase { get { return battlePhase == Phase.Player; } }
     public bool IsWaitingPhase { get { return !IsEnemyPhase && !IsPlayerPhase; } }
-
+    public Camera MainCamera { get { return battleCam.Cam; } }
+    
     private bool AllPlayersReady { get { return playersReady == PersistentPlayer.players.Count; } }
-    private bool AllEnemiesReady { get { return enemiesReady == waves[0].Members.Length; } }
+    private bool AllEnemiesReady { get { return enemiesReady == waves[waveIndex].members.Count; } }
 
 	private string homeSceneName; // we need this because you can only find the active scene, not the scene the object is in with Scene Manager
 
 	[Header("UI")]
-	public GameObject battleCanvas;
-    public List<EnemyUI> enemyUI;
-    public List<HealthBarUI> playerHealthBars;
+    public BattleCamera battleCam;
+	public Canvas battleCanvas;
 
-    [SerializeField] private int totalAttackTime = 5;
+    [SerializeField] private float totalAttackTime = 5;
     [SerializeField] private RectTransform attackTimerBar;
+    [SerializeField] private AbilityButton[] abilityButtons;
     [SerializeField] private Text attackTimerText;
+    [SerializeField] private Text attacksLeftText;
+    [SerializeField] private Text blockText;
 
     private Coroutine attackTimerCountdown;
 
-	[Header("Minigames")]
-	public List<string> minigameSceneNames;
-
-	private string currentMinigame;
+    [Header("Minigames")]
+    public List<string> minigameSceneNames;
+    public bool TEST_GoToMinigame;
+    public string TEST_ForceMinigameSceneName;
 
     [Header("Spawning")]
+    [HideInInspector] public List<EnemyBase> aliveEnemies;
+    
+    [SerializeField] private EnemyDataList enemyDataList;
     [Tooltip("Groups of enemies to spawn together.")]
-	public Wave[] waves;
-    public Camera cam;
+    [SerializeField] private Wave[] waves;
 
-    [HideInInspector] public List<Enemy> aliveEnemies;
-    [HideInInspector] public List<Vector3> playerSpawnPoints;
-    [HideInInspector] public List<Vector3> enemySpawnPoints;
-
-    [SerializeField] private RectTransform playerSpawnArea;
-    [SerializeField] private RectTransform enemySpawnArea;
-
+    //[Header("Misc")]
+    private Dictionary<StatusEffect, int> dotStatusEffects = new Dictionary<StatusEffect, int>();
     private int enemiesReady;
     private int playersReady;
-	private int waveIndex;
+	private int waveIndex = -1;
     private Phase battlePhase;
 
     [Serializable]
 	public class Wave
 	{
-		public GameObject[] Members { get { return new GameObject[] { enemy1, enemy2, enemy4, enemy4 }; } }
-               
-        public GameObject enemy1;
-        public GameObject enemy2;
-        public GameObject enemy3;
-        public GameObject enemy4;
+        public List<EnemyType> members;
+
+        public List<GameObject> GetEnemyPrefabs(EnemyDataList data)
+        {
+            List<GameObject> prefabs = new List<GameObject>();
+            foreach (EnemyType type in members)
+            {
+                prefabs.Add(data.GetPrefab(type));
+            }
+            return prefabs;
+        }
     }
 
-    private enum Phase { StartingBattle, Player, Enemy }
+    private enum Phase { StartingBattle, Player, Transition, Enemy }
 
     #region Initialization
 
+    private void OnValidate()
+    {
+        foreach (Wave w in waves)
+        {
+            if (w.members.Count > 6)
+            {
+                w.members.RemoveRange(6, w.members.Count - 6);
+            }
+        }
+    }
+    
     protected void Start()
 	{
         if (Instance)
-			throw new Exception("There can only be one BattleController.");
+        {
+            //coming back after a minigame:
+            Destroy(gameObject);
+            Destroy(battleCam.gameObject);
+            return;
+        }
+
 		Instance = this;
+        DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(battleCam.gameObject);
 
 		homeSceneName = SceneManager.GetActiveScene().name;
-
         NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
 
-        StartBattle();
-        CalculateSpawnPoints();
         PersistentPlayer.localAuthority.CmdSpawnBattlePlayer();
+
+        dotStatusEffects.Add(StatusEffect.Bleed, 5);
+        dotStatusEffects.Add(StatusEffect.Burn, 0); //damage = duration
+        dotStatusEffects.Add(StatusEffect.Poison, 5);
+
+        if (isServer)
+        {
+            StartBattle();
+        }
     }
 
-    public HealthBarUI ClaimPlayerUI(BattlePlayer player)
+    public void OnBattlePlayerSpawned(BattlePlayerBase player)
     {
-        foreach (HealthBarUI ui in playerHealthBars)
+        if (player == BattlePlayerBase.LocalAuthority)
         {
-            if (!ui.isClaimed)
+            for (int i = 0; i < player.Abilities.Count; i++)
             {
-                ui.Claim(player.uiTransform.position, player.maxHealth, cam);
-                return ui;
+                player.Abilities[i].SetButton(abilityButtons[i]);
             }
         }
-        Debug.LogError("Could not claim HealthBarUI because all HealthBarUI are already claimed.");
-        return null;
-    }
 
-    [Server]
-    public void OnPlayerReady()
-    {
-        playersReady++;
-    }
-
-    [Server]
-    public void OnEnemyReady()
-    {
-        enemiesReady++;
-    }
-
-    private IEnumerator DelayExecution(float time, Action callback)
-    {
-        yield return new WaitForSeconds(time);
-        callback();
+        if (isServer)
+        {
+            playersReady++;
+        }
     }
 
     #endregion
@@ -136,141 +152,228 @@ public class BattleController : NetworkBehaviour
         //simulate a pause where something will happen
         yield return new WaitForSeconds(1);
 
-        SpawnWave();
-        yield return new WaitUntil(() => AllEnemiesReady);
-
-        //simulate a pause where something will happen
-        yield return new WaitForSeconds(1);
-
-        StartPlayerPhase();
-    }
-
-    [Server]
-    public void StartPlayerPhase()
-    {
-        battlePhase = Phase.Player;
-
-        foreach (PersistentPlayer p in PersistentPlayer.players)
+        if (SpawnWave())
         {
-            p.battlePlayer.OnPlayerPhaseStart();
-        }
+            yield return new WaitUntil(() => AllEnemiesReady);
 
-        foreach (Enemy e in aliveEnemies)
-        {
-            e.OnAttackTimerBegin();
+            //simulate a pause where something will happen
+            yield return new WaitForSeconds(1);
+
+            StartPlayerPhase();
         }
-        RpcStartAttackTimer(totalAttackTime);
     }
     
     [Server]
-    public void StartEnemyPhase()
+    private void StartPlayerPhase()
     {
-        battlePhase = Phase.Enemy;
-        //StartCoroutine(ExecuteEnemyPhase());
-		RpcLoadMinigame(UnityEngine.Random.Range(0, minigameSceneNames.Count));
-	}
+        battlePhase = Phase.Player;
 
-	[ClientRpc]
-    private void RpcLoadMinigame(int minigameNumber)
-    {
-		cam.enabled = false;
-		currentMinigame = minigameSceneNames[minigameNumber];
-        SceneManager.LoadScene(currentMinigame, LoadSceneMode.Additive);
-		StartCoroutine(SetActiveSceneDelayed(currentMinigame));
-		battleCanvas.SetActive(false);
+        foreach (BattlePlayerBase p in BattlePlayerBase.players)
+        {
+            p.OnPlayerPhaseStart();
+        }
+
+        foreach (EnemyBase e in aliveEnemies)
+        {
+            e.OnPlayerPhaseStart();
+        }
+        RpcStartAttackTimer(totalAttackTime);
     }
 
-	private IEnumerator SetActiveSceneDelayed(string sceneName)
-	{
-		yield return 0; //makes it wait a single frame since scenes loaded additivly always load on the next frame
-		SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName)); // https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.SetActiveScene.html
-	}
-
-	public void UnloadMinigame()
+    [Server]
+    private void StartTransitionPhase()
     {
-		if (!(currentMinigame == ""))
-		{
-			SceneManager.SetActiveScene(SceneManager.GetSceneByName(homeSceneName)); // can't find the scene were in, only the active scene
-			SceneManager.UnloadScene(currentMinigame);
-			battleCanvas.SetActive(true);
-			cam.enabled = true;
-		}
-		else
-			throw new Exception("There is no Minigame in scene however one it trying to be removed");
+        battlePhase = Phase.Transition;
+        StartCoroutine(TransitionPhase());
+    }
+
+    [Server]
+    private IEnumerator TransitionPhase()
+    {
+        float timeout = Time.time + 3;
+        yield return new WaitWhile(() => BattlePlayerBase.PlayersUsingAbility > 0 && timeout > Time.time);
+
+        if (Time.time > timeout)
+        {
+            RpcForceCancelAbility();
+        }
+
+        yield return ApplyDOTs(BattlePlayerBase.players);
+
+        StartEnemyPhase();
+    }
+
+    [ClientRpc]
+    private void RpcForceCancelAbility()
+    {
+        if (BattlePlayerBase.LocalAuthority.SelectedAbility != null)
+        {
+            BattlePlayerBase.LocalAuthority.EndAbility();
+        }
+    }
+
+    [Server]
+    private void StartEnemyPhase()
+    {
+        if (TEST_GoToMinigame)
+        {
+            TEST_GoToMinigame = false;
+
+            if (string.IsNullOrEmpty(TEST_ForceMinigameSceneName))
+            {
+                int randomIndex = UnityEngine.Random.Range(0, minigameSceneNames.Count);
+                LoadMinigame(minigameSceneNames[randomIndex]);
+            }
+            else
+            {
+                LoadMinigame(TEST_ForceMinigameSceneName);
+            }
+
+            return;
+        }
+
+        battlePhase = Phase.Enemy;
+        StartCoroutine(ExecuteEnemyPhase());
 	}
 
+    public class AttackInfo
+    {
+        public bool containsMiss;
+        public List<BattleActorBase> attackers = new List<BattleActorBase>();
+    }
+
+    [Server]
     private IEnumerator ExecuteEnemyPhase()
     {
-        foreach (Enemy e in aliveEnemies)
+        yield return new WaitForSeconds(0.5f);
+        
+        //get attack damage directed at each player
+        AttackInfo[] attacks = new AttackInfo[BattlePlayerBase.players.Count];
+        attacks.Initialize(() => new AttackInfo());
+
+        foreach (EnemyBase e in aliveEnemies)
         {
-            e.Attack();
+            if (e.IsAlive && e.HasTargets)
+                e.AttackPlayers(attacks);
         }
 
-        foreach (PersistentPlayer p in PersistentPlayer.players)
+        //apply attack damage on the players
+        for (int i = 0; i < BattlePlayerBase.players.Count; i++)
         {
-            p.battlePlayer.TakeAccumulatedDamage();
+            BattlePlayerBase bp = BattlePlayerBase.players[i];
+            if (attacks[i].containsMiss)
+            {
+                bp.RpcMiss();
+                yield return new WaitForSeconds(0.5f);
+            }
+
+            if (attacks[i].attackers.Count > 0)
+            {
+                bp.DispatchBlockableDamage(attacks[i].attackers);
+                yield return new WaitForSeconds(0.5f);
+            }
         }
 
-        //simulate a pause where something will happen
-        yield return new WaitForSeconds(1);
+        //apply damage over time status effects on enemies
+        yield return ApplyDOTs(aliveEnemies);
+        
+        if (aliveEnemies.Count > 0 && IsEnemyPhase)
+        {
+            StartPlayerPhase();
+        }
+    }
 
+    [Server]
+    private IEnumerator ApplyDOTs<T>(List<T> actors) where T : BattleActorBase
+    {
+        List<StatusEffect> dots = new List<StatusEffect>(dotStatusEffects.Keys);
+        for (int i = 0; i < dots.Count; i++)
+        {
+            bool tookStatDamage = false;
+            foreach (BattleActorBase actor in actors)
+            {
+                if (actor.ApplyDOT(dots[i]))
+                    tookStatDamage = true;
+            }
+
+            if (tookStatDamage)
+                yield return new WaitForSeconds(0.5f);
+        }
+
+        foreach (BattleActorBase actor in actors)
+        {
+            actor.RpcDecrementDurations();
+        }
+    }
+
+    #endregion
+
+    #region Minigames
+
+    [Server]
+    private void LoadMinigame(string sceneName)
+    {
+        RpcLoadScene(false);
+        NetworkWrapper.manager.ServerChangeScene(sceneName);
+    }
+
+    [ClientRpc]
+    private void RpcLoadScene(bool isBattleScene)
+    {
+        MainCamera.enabled = isBattleScene;
+        battleCanvas.enabled = isBattleScene;
+    }
+
+    [Server]
+    public void UnloadMinigame(bool succ)
+    {
         StartPlayerPhase();
+        RpcLoadScene(true);
+        NetworkWrapper.manager.ServerChangeScene("Battle");
     }
 
     #endregion
 
     #region Spawning
 
-    private void CalculateSpawnPoints()
+    public void OnEnemySpawned(EnemyBase enemy)
     {
-        //I got tired of dealing with canvas positioning so now it just gets the 
-        //center of an area and calculates world coordinate offsets for each player/enemy
-
-        Vector3 center = cam.ScreenToWorldPoint(playerSpawnArea.position);
-        center.z = 0;
-
-        playerSpawnPoints = new List<Vector3>()
+        if (isServer)
         {
-            center + 0.6f * Vector3.up,     //Player 1's spawn point
-            center + 0.6f * Vector3.down,   //Player 2's ... etc
-            center + 1.0f * Vector3.right,
-            center + 1.0f * Vector3.left
-        };
+            enemiesReady++;
+        }
 
-        center = cam.ScreenToWorldPoint(enemySpawnArea.position);
-        center.z = 0;
-        
-        enemySpawnPoints  = new List<Vector3>()
-        {
-            center + 1.5f * Vector3.left,
-            center + 0.5f * Vector3.left + 0.7f * Vector3.up,
-            center + 0.5f * Vector3.left + 0.7f * Vector3.down,
-            center + 0.5f * Vector3.right,
-            center + 1.5f * Vector3.right + 0.7f * Vector3.up,
-            center + 1.5f * Vector3.right + 0.7f * Vector3.down
-        };
+        int i = aliveEnemies.Count;
+        enemy.transform.position = battleCam.EnemySpawnPoints[i].position;
+        aliveEnemies.Add(enemy);
     }
     
 	[Server]
-	public void SpawnWave()
+	public bool SpawnWave()
 	{
-		//Are all the waves done with?
-		if (waveIndex == waves.Length)
+        waveIndex++;
+
+        //Are all the waves done with?
+        if (waveIndex == waves.Length)
 		{
 			Win();
-			return;
+			return false;
 		}
 
         //Spawn the next wave then
-        for (int i = 0; i < waves[waveIndex].Members.Length; i++)
+        List<GameObject> enemyPrefabs = waves[waveIndex].GetEnemyPrefabs(enemyDataList);
+
+        for (int i = 0; i < enemyPrefabs.Count; i++)
         {
-            GameObject newEnemy = Instantiate(waves[waveIndex].Members[i], enemySpawnPoints[i], Quaternion.identity);
-            aliveEnemies.Add(newEnemy.GetComponent<Enemy>());
+            if (enemyPrefabs[i] == null)
+                continue;
+
+            GameObject newEnemy = Instantiate(enemyPrefabs[i]);
             NetworkServer.Spawn(newEnemy);
         }
 
-        waveIndex++;
-	}
+        return true;
+    }
 
     [Server]
     public void EndWave()
@@ -282,27 +385,16 @@ public class BattleController : NetworkBehaviour
     [ClientRpc]
     private void RpcStopAttackTimer()
     {
-        StopCoroutine(attackTimerCountdown);
+        if (attackTimerCountdown != null)
+        {
+            StopCoroutine(attackTimerCountdown);
+        }
     }
 
     #endregion
 
     #region Enemy
-
-    public EnemyUI ClaimEnemyUI(Enemy enemy)
-    {
-        foreach (EnemyUI ui in enemyUI)
-        {
-            if (!ui.isClaimed)
-            {
-                ui.Claim(enemy.uiTransform.position, enemy.maxHealth, cam);
-                return ui;
-            }
-        }
-        Debug.LogError("Could not claim EnemyUI because all EnemyUI are already claimed.");
-        return null;
-    }
-
+    
     [ClientRpc]
     public void RpcStartAttackTimer(float time)
     {
@@ -333,20 +425,42 @@ public class BattleController : NetworkBehaviour
 
         if (isServer)
         {
-            StartEnemyPhase();
+            StartTransitionPhase();
         }
     }
 
-    public void OnEnemyDeath(Enemy dead)
+    public void OnEnemyDeath(EnemyBase dead)
     {
         aliveEnemies.Remove(dead);
-        if (aliveEnemies.Count == 0)
+        if (isServer && aliveEnemies.Count == 0)
         {
             EndWave();
         }
     }
 
     #endregion
+
+    #region UI
+    
+    public void UpdateAttackBlockUI(int attacks, int block)
+    {
+        attacksLeftText.text = attacks.ToString();
+        blockText.text = string.Format("{0}%", block);
+    }
+
+    public void OnAbilityButtonClicked(int i)
+    {
+        BattlePlayerBase.LocalAuthority.AbilitySelected(i);
+    }
+
+    #endregion
+
+    public int GetDOT(StatusEffect effect)
+    {
+        if (dotStatusEffects.ContainsKey(effect))
+            return dotStatusEffects[effect];
+        return 0;
+    }
 
     protected void Win()
     {

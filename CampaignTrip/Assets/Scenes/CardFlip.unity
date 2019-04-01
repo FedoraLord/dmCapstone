@@ -248,12 +248,12 @@ PrefabInstance:
     - target: {fileID: 1987850239147682968, guid: 0d9e2d8d8aab2a8409a781c2db96d731,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -2.3
+      value: -4.08
       objectReference: {fileID: 0}
     - target: {fileID: 1987850239147682968, guid: 0d9e2d8d8aab2a8409a781c2db96d731,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.91
+      value: -1.8
       objectReference: {fileID: 0}
     - target: {fileID: 1987850239147682968, guid: 0d9e2d8d8aab2a8409a781c2db96d731,
         type: 3}
@@ -528,12 +528,12 @@ PrefabInstance:
     - target: {fileID: 1987850239147682968, guid: 0d9e2d8d8aab2a8409a781c2db96d731,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 2.56
+      value: 4.07
       objectReference: {fileID: 0}
     - target: {fileID: 1987850239147682968, guid: 0d9e2d8d8aab2a8409a781c2db96d731,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -1.26
+      value: -1.79
       objectReference: {fileID: 0}
     - target: {fileID: 1987850239147682968, guid: 0d9e2d8d8aab2a8409a781c2db96d731,
         type: 3}
@@ -821,12 +821,12 @@ PrefabInstance:
     - target: {fileID: 1987850239147682968, guid: 0d9e2d8d8aab2a8409a781c2db96d731,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -1.79
+      value: -3.09
       objectReference: {fileID: 0}
     - target: {fileID: 1987850239147682968, guid: 0d9e2d8d8aab2a8409a781c2db96d731,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 1.21
+      value: 2.8
       objectReference: {fileID: 0}
     - target: {fileID: 1987850239147682968, guid: 0d9e2d8d8aab2a8409a781c2db96d731,
         type: 3}
@@ -1092,9 +1092,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnPoints: []
   numPlayersWon: 0
+  timer: 30
   winText: {fileID: 0}
-  winningSprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-  failSprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  winningSprite: {fileID: 21300000, guid: 88a8f46d1e6e14454b8b274c19326d1c, type: 3}
+  failSprite: {fileID: 21300000, guid: 202937d0cf5884bbb9b1c2877e6c7bda, type: 3}
   cards:
   - {fileID: 7627156022484079753}
   - {fileID: 2083078326}
@@ -1429,12 +1430,12 @@ PrefabInstance:
     - target: {fileID: 1987850239147682968, guid: 0d9e2d8d8aab2a8409a781c2db96d731,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 2.3
+      value: 3.1
       objectReference: {fileID: 0}
     - target: {fileID: 1987850239147682968, guid: 0d9e2d8d8aab2a8409a781c2db96d731,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 1.5
+      value: 2.83
       objectReference: {fileID: 0}
     - target: {fileID: 1987850239147682968, guid: 0d9e2d8d8aab2a8409a781c2db96d731,
         type: 3}
