@@ -63,10 +63,11 @@ public class DamagePopup : BattleActorUI
         messageAnimation = StartCoroutine(AnimatePopup(messageText, false, () => messageAnimation = null));
     }
 
-    public void DisplayStat(Color color, int remainingDuration)
+    public void DisplayStat(Color color, int remainingDuration, bool added = false)
     {
         dotText.color = color;
-        dotText.text = remainingDuration.ToString();
+        string text = (added ? "+" : string.Empty);
+        dotText.text = text + remainingDuration.ToString();
         dotText.gameObject.SetActive(true);
         StartCoroutine(AnimateDOT());
     }

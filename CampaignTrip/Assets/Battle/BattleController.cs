@@ -459,7 +459,7 @@ public class BattleController : NetworkBehaviour
     {
         if (dotStatusEffects.ContainsKey(effect))
             return dotStatusEffects[effect];
-        return 0;
+        return -1;
     }
 
     protected void Win()

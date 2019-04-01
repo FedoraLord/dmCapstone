@@ -69,6 +69,7 @@ public abstract class BattleActorBase : NetworkBehaviour
         public int HealthOnRemove;
         public int RemainingDuration;
         public int DOT;
+        public bool HasDOT;
 
         public Stat(StatusEffect effect, BattleActorBase linkedActor, int duration, int healthGain = 0)
         {
@@ -76,7 +77,13 @@ public abstract class BattleActorBase : NetworkBehaviour
             LinkedActor = linkedActor;
             HealthOnRemove = healthGain;
             RemainingDuration = duration;
-            DOT = BattleController.Instance.GetDOT(effect);
+
+            int dot = BattleController.Instance.GetDOT(effect);
+            if (dot > -1)
+            {
+                DOT = dot;
+                HasDOT = true;
+            }
         }
     }
 
@@ -234,17 +241,13 @@ public abstract class BattleActorBase : NetworkBehaviour
             return;
         }
 
-        damagePopup.DisplayStat(GetStatColor(type), duration);
+        damagePopup.DisplayStat(GetStatColor(type), duration, true);
         overlays.ToggleOverlay(type, true);
 
         if (HasStatusEffect(type))
-        {
             AddStack(s);
-        }
         else
-        {
             statusEffects.Add(type, new List<Stat>() { s });
-        }
 
         switch (s.Type)
         {
