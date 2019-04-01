@@ -1,16 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class CardFlipManager : MinigameManager
 {
-	public bool CanFlip { get { return PersistentPlayer.localAuthority == playerWhoPicksTheCard; } }
-
 	public Sprite winningSprite;
 	public Sprite failSprite;
 	public List<FlippableCard> cards;
-
-	private PersistentPlayer playerWhoPicksTheCard;
 
 	protected override IEnumerator HandlePlayers(List<PersistentPlayer> randomPlayers)
 	{
@@ -26,10 +23,15 @@ public class CardFlipManager : MinigameManager
 		}
 
 		List<PersistentPlayer> randomPlayersCopy = new List<PersistentPlayer>(randomPlayers);
-		playerWhoPicksTheCard = randomPlayersCopy[0];
-		randomPlayersCopy.Remove(playerWhoPicksTheCard);
+		var playerWhoPicksTheCard = randomPlayersCopy[0].connectionToClient;
+		randomPlayersCopy.RemoveAt(0);
+		yield return new WaitUntil(() => playerWhoPicksTheCard.isReady);
+		//give playerWhoPicksTheCard authority to flip the cards
+		foreach (FlippableCard card in cards)
+			card.GetComponent<NetworkIdentity>().AssignClientAuthority(playerWhoPicksTheCard);
 		FlippableCard winningCard = randomCards[0];
 		randomCards.Remove(winningCard);
+		winningCard.isWinner = true;
 
 		for (int playerNum = 0; playerNum < randomPlayersCopy.Count; playerNum++)
 		{
@@ -39,9 +41,6 @@ public class CardFlipManager : MinigameManager
 			//select a number of cards based on how many players have yet to get their cards
 			for(int cardsToReveal = randomCards.Count / randomPlayersCopy.Count; cardsToReveal > 0; cardsToReveal--)
 			{
-				Debug.Log(p);
-				Debug.Log(randomCards[0]);
-				Debug.Log(p.connectionToClient);
 				randomCards[0].TargetFlip(p.connectionToClient);
 				randomCards.RemoveAt(0);
 			}
