@@ -16,5 +16,5 @@ MonoBehaviour:
   flavorText: Attacks with his crow and poison potions
   sprite: {fileID: 21300000, guid: 4399e4570058f4740be457f196627e2c, type: 3}
   icon: {fileID: 21300000, guid: 1451059b290bf9446b6301d3ab92b7e6, type: 3}
-  characterPrefab: {fileID: 1054630008981005556, guid: e0ec02e4620468d42a2b2e314bb03e1d,
+  characterPrefab: {fileID: 1054630008981005312, guid: e0ec02e4620468d42a2b2e314bb03e1d,
     type: 3}
