@@ -1,13 +1,28 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
-using static StatusEffect;
 
 #pragma warning disable CS0618, 0649
 public class EnemyBase : BattleActorBase
 {
     public bool HasTargets { get { return targets != null && targets.Length > 0; } }
+    public int RemainingBlock
+    {
+        get { return remainingBlock; }
+        private set
+        {
+            if (remainingBlock != value)
+            {
+                remainingBlock = value;
+                HealthBar.UpdateBlock();
+
+                if (isServer)
+                    RpcUpdateBlock(value);
+            }
+        }
+    }
 
     private int[] targets;
     private int remainingBlock;
@@ -45,15 +60,21 @@ public class EnemyBase : BattleActorBase
     
     public override void TakeBlockedDamage(int damage)
     {
-        int initialBlock = remainingBlock;
+        int initialBlock = RemainingBlock;
 
-        if (remainingBlock > 0)
+        if (RemainingBlock > 0)
         {
-            remainingBlock = Mathf.Max(remainingBlock - damage, 0);
-            damage -= remainingBlock;
+            RemainingBlock = Mathf.Max(RemainingBlock - damage, 0);
+            damage -= initialBlock - RemainingBlock;
         }
 
-        RpcTakeDamage(damage, initialBlock - remainingBlock);
+        RpcTakeDamage(damage, initialBlock - RemainingBlock);
+    }
+
+    [ClientRpc]
+    private void RpcUpdateBlock(int value)
+    {
+        RemainingBlock = value;
     }
 
     protected override void Die()
@@ -76,35 +97,40 @@ public class EnemyBase : BattleActorBase
 
     #region Attack
 
-    public void OnPlayerPhaseStart()
+    [Server]
+    public override void OnPlayerPhaseStart()
     {
-        remainingBlock = blockAmount;
-        ChooseTargets();
-
-        if (HasStatusEffect(StatusEffectType.Stun))
+        base.OnPlayerPhaseStart();
+        RemainingBlock = blockAmount;
+        
+        if (HasStatusEffect(StatusEffect.Stun) || HasStatusEffect(StatusEffect.Freeze))
+        {
             RpcUpdateTargets(new int[0]);
+        }
         else
+        {
+            List<BattlePlayerBase> validTargets = new List<BattlePlayerBase>();
+            foreach (BattlePlayerBase p in BattlePlayerBase.players)
+            {
+                if (!p.IsAlive)
+                    continue;
+                if (p.HasStatusEffect(StatusEffect.Invisible))
+                    continue;
+                validTargets.Add(p);
+            }
+
+            targets = ChooseTargets(validTargets);
             RpcUpdateTargets(targets);
+        }
     }
 
-    protected virtual void ChooseTargets()
+    //picks targets randomly unless overridden
+    protected virtual int[] ChooseTargets(List<BattlePlayerBase> validTargets)
     {
-        //picks targets randomly unless overridden
-        targets = GetRandomNPlayers(attacksPerTurn);
-    }
-
-    [ClientRpc]
-    private void RpcUpdateTargets(int[] newTargets)
-    {
-        targets = newTargets;
-        HealthBar.SetTargets(targets);
-    }
-
-    protected int[] GetRandomNPlayers(int n)
-    {
-        Mathf.Clamp(n, 0, PersistentPlayer.players.Count);
+        int n = Mathf.Clamp(attacksPerTurn, 0, validTargets.Count);
         List<int> choices = new List<int>();
-        for (int i = 0; i < PersistentPlayer.players.Count; i++)
+
+        for (int i = 0; i < validTargets.Count; i++)
         {
             choices.Add(i);
         }
@@ -120,13 +146,33 @@ public class EnemyBase : BattleActorBase
 
         return result.ToArray();
     }
+
+    [ClientRpc]
+    private void RpcUpdateTargets(int[] newTargets)
+    {
+        targets = newTargets;
+        HealthBar.SetTargets(targets);
+    }
     
     [Server]
-    public void Attack()
+    public void AttackPlayers(BattleController.AttackInfo[] attacks)
     {
         foreach (int t in targets)
         {
-            PersistentPlayer.players[t].battlePlayer.DispatchDamage(basicDamage, true);
+            if (TryAttack())
+                attacks[t].attackers.Add(this);
+            else
+                attacks[t].containsMiss = true;
+        }
+    }
+
+    public void RemoveTarget(int playerNum)
+    {
+        List<int> targetsCopy = new List<int>(targets);
+        if (targetsCopy.Remove(playerNum - 1))
+        {
+            targets = targetsCopy.ToArray();
+            healthBarUI.SetTargets(targets);
         }
     }
 
@@ -137,6 +183,17 @@ public class EnemyBase : BattleActorBase
     protected override void OnAddStun()
     {
         base.OnAddStun();
+        LoseTargets();
+    }
+
+    protected override void OnAddFreeze()
+    {
+        base.OnAddFreeze();
+        LoseTargets();
+    }
+
+    private void LoseTargets()
+    {
         HealthBar.SetTargets();
 
         if (isServer)

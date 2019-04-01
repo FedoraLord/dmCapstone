@@ -483,6 +483,18 @@ PrefabInstance:
       propertyPath: sceneAfterLobbyName
       value: Battle
       objectReference: {fileID: 0}
+    - target: {fileID: 3162331145551321813, guid: 7fcc54fab411d4c488b2144a32ce10e0,
+        type: 3}
+      propertyPath: m_SpawnPrefabs.Array.data[4]
+      value: 
+      objectReference: {fileID: 5365767304399832582, guid: 2160ec161c577fd45bf809abbc9b19e1,
+        type: 3}
+    - target: {fileID: 3162331145551321813, guid: 7fcc54fab411d4c488b2144a32ce10e0,
+        type: 3}
+      propertyPath: m_SpawnPrefabs.Array.data[2]
+      value: 
+      objectReference: {fileID: 1054630008981005556, guid: e0ec02e4620468d42a2b2e314bb03e1d,
+        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7fcc54fab411d4c488b2144a32ce10e0, type: 3}
 --- !u!1 &414355778

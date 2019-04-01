@@ -6,8 +6,8 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using static BattleActorBase;
 using static EnemyPrefab;
-using static StatusEffect;
 
 #pragma warning disable CS0618, 0649
 public class BattleController : NetworkBehaviour
@@ -28,10 +28,9 @@ public class BattleController : NetworkBehaviour
     public BattleCamera battleCam;
 	public Canvas battleCanvas;
 
-    [SerializeField] private int totalAttackTime = 5;
+    [SerializeField] private float totalAttackTime = 5;
     [SerializeField] private RectTransform attackTimerBar;
-    [SerializeField] private Image[] abilityImages;
-    [SerializeField] private Text[] abilityTexts;
+    [SerializeField] private AbilityButton[] abilityButtons;
     [SerializeField] private Text attackTimerText;
     [SerializeField] private Text attacksLeftText;
     [SerializeField] private Text blockText;
@@ -46,13 +45,12 @@ public class BattleController : NetworkBehaviour
     [Header("Spawning")]
     [HideInInspector] public List<EnemyBase> aliveEnemies;
     
-    [Tooltip("Groups of enemies to spawn together.")]
     [SerializeField] private EnemyDataList enemyDataList;
+    [Tooltip("Groups of enemies to spawn together.")]
     [SerializeField] private Wave[] waves;
 
-    [Header("Misc")]
-    [SerializeField] private List<StatusEffect> statusEffects;
-    
+    //[Header("Misc")]
+    private Dictionary<StatusEffect, int> dotStatusEffects = new Dictionary<StatusEffect, int>();
     private int enemiesReady;
     private int playersReady;
 	private int waveIndex = -1;
@@ -88,7 +86,7 @@ public class BattleController : NetworkBehaviour
             }
         }
     }
-
+    
     protected void Start()
 	{
         if (Instance)
@@ -108,6 +106,10 @@ public class BattleController : NetworkBehaviour
 
         PersistentPlayer.localAuthority.CmdSpawnBattlePlayer();
 
+        dotStatusEffects.Add(StatusEffect.Bleed, 5);
+        dotStatusEffects.Add(StatusEffect.Burn, 0); //damage = duration
+        dotStatusEffects.Add(StatusEffect.Poison, 5);
+
         if (isServer)
         {
             StartBattle();
@@ -120,8 +122,7 @@ public class BattleController : NetworkBehaviour
         {
             for (int i = 0; i < player.Abilities.Count; i++)
             {
-                abilityImages[i].sprite = player.Abilities[i].ButtonIcon;
-                abilityTexts[i].text = player.Abilities[i].Name;
+                player.Abilities[i].SetButton(abilityButtons[i]);
             }
         }
 
@@ -167,9 +168,9 @@ public class BattleController : NetworkBehaviour
     {
         battlePhase = Phase.Player;
 
-        foreach (PersistentPlayer p in PersistentPlayer.players)
+        foreach (BattlePlayerBase p in BattlePlayerBase.players)
         {
-            p.battlePlayer.OnPlayerPhaseStart();
+            p.OnPlayerPhaseStart();
         }
 
         foreach (EnemyBase e in aliveEnemies)
@@ -186,6 +187,7 @@ public class BattleController : NetworkBehaviour
         StartCoroutine(TransitionPhase());
     }
 
+    [Server]
     private IEnumerator TransitionPhase()
     {
         float timeout = Time.time + 3;
@@ -196,11 +198,8 @@ public class BattleController : NetworkBehaviour
             RpcForceCancelAbility();
         }
 
-        foreach (PersistentPlayer p in PersistentPlayer.players)
-        {
-            yield return p.battlePlayer.ApplySatusEffects();
-        }
-        
+        yield return ApplyDOTs(BattlePlayerBase.players);
+
         StartEnemyPhase();
     }
 
@@ -237,35 +236,73 @@ public class BattleController : NetworkBehaviour
         StartCoroutine(ExecuteEnemyPhase());
 	}
 
+    public class AttackInfo
+    {
+        public bool containsMiss;
+        public List<BattleActorBase> attackers = new List<BattleActorBase>();
+    }
+
     [Server]
     private IEnumerator ExecuteEnemyPhase()
     {
         yield return new WaitForSeconds(0.5f);
+        
+        //get attack damage directed at each player
+        AttackInfo[] attacks = new AttackInfo[BattlePlayerBase.players.Count];
+        attacks.Initialize(() => new AttackInfo());
 
         foreach (EnemyBase e in aliveEnemies)
         {
             if (e.IsAlive && e.HasTargets)
+                e.AttackPlayers(attacks);
+        }
+
+        //apply attack damage on the players
+        for (int i = 0; i < BattlePlayerBase.players.Count; i++)
+        {
+            BattlePlayerBase bp = BattlePlayerBase.players[i];
+            if (attacks[i].containsMiss)
             {
-                e.Attack();
+                bp.RpcMiss();
+                yield return new WaitForSeconds(0.5f);
+            }
+
+            if (attacks[i].attackers.Count > 0)
+            {
+                bp.DispatchBlockableDamage(attacks[i].attackers);
                 yield return new WaitForSeconds(0.5f);
             }
         }
 
-        for (int i = 0; i < aliveEnemies.Count; i++)
-        {
-            EnemyBase e = aliveEnemies[i];
-            yield return e.ApplySatusEffects();
-
-            if (i >= aliveEnemies.Count || e != aliveEnemies[i])
-            {
-                //enemy died and was removed from aliveEnemies
-                i--;
-            }
-        }
-
+        //apply damage over time status effects on enemies
+        yield return ApplyDOTs(aliveEnemies);
+        
         if (aliveEnemies.Count > 0 && IsEnemyPhase)
         {
             StartPlayerPhase();
+        }
+    }
+
+    [Server]
+    private IEnumerator ApplyDOTs<T>(List<T> actors) where T : BattleActorBase
+    {
+        List<StatusEffect> dots = new List<StatusEffect>(dotStatusEffects.Keys);
+        for (int i = 0; i < dots.Count; i++)
+        {
+            bool tookStatDamage = false;
+            foreach (BattleActorBase actor in actors)
+            {
+                if (actor.ApplyDOT(dots[i]))
+                    tookStatDamage = true;
+            }
+
+            if (tookStatDamage)
+                yield return new WaitForSeconds(0.5f);
+        }
+
+        foreach (BattleActorBase actor in actors)
+        {
+            actor.RpcDecrementDurations();
         }
     }
 
@@ -419,16 +456,11 @@ public class BattleController : NetworkBehaviour
 
     #endregion
 
-    public StatusEffect GetStatusEffect(StatusEffectType type)
+    public int GetDOT(StatusEffect effect)
     {
-        foreach (StatusEffect s in statusEffects)
-        {
-            if (s.Type == type)
-                return s;
-        }
-
-        Debug.LogErrorFormat("Status Effect {0} not found on BattleController", type);
-        return null;
+        if (dotStatusEffects.ContainsKey(effect))
+            return dotStatusEffects[effect];
+        return 0;
     }
 
     protected void Win()
