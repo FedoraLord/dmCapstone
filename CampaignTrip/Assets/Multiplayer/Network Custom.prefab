@@ -69,7 +69,7 @@ MonoBehaviour:
   m_ScriptCRCCheck: 1
   m_MaxDelay: 0.01
   m_LogLevel: 2
-  m_PlayerPrefab: {fileID: 24, guid: 39428382a31b46f4fbe1d3d9bc364c10, type: 3}
+  m_PlayerPrefab: {fileID: 99, guid: 39428382a31b46f4fbe1d3d9bc364c10, type: 3}
   m_AutoCreatePlayer: 1
   m_PlayerSpawnMethod: 0
   m_OfflineScene: 
