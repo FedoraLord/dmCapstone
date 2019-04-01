@@ -101,8 +101,8 @@ MonoBehaviour:
   multiInputSwitches: []
   singleInputSwitches: []
   closedCollider: {fileID: 7814994563801701088}
-  openColliderLeft: {fileID: 0}
-  openColliderRight: {fileID: 0}
+  openColliderLeft: {fileID: 7814994563801701091}
+  openColliderRight: {fileID: 7814994563801701090}
 --- !u!61 &7814994563801701088
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -110,7 +110,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7814994563801701093}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
