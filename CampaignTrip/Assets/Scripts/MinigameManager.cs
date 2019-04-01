@@ -31,9 +31,9 @@ public abstract class MinigameManager : NetworkBehaviour
 				//using a range of i to the size avoids bias
 				int randomNum = Random.Range(i, randomPlayers.Count);
 				//now swap them
-				PersistentPlayer tmp = PersistentPlayer.players[i];
-				PersistentPlayer.players[i] = PersistentPlayer.players[randomNum];
-				PersistentPlayer.players[randomNum] = tmp;
+				PersistentPlayer tmp = randomPlayers[i];
+				randomPlayers[i] = randomPlayers[randomNum];
+				randomPlayers[randomNum] = tmp;
 			}
 
 			StartCoroutine(HandlePlayers(randomPlayers));

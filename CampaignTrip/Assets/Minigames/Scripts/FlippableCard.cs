@@ -7,20 +7,22 @@ using UnityEngine.Networking;
 #pragma warning disable 0618
 public class FlippableCard : NetworkBehaviour
 {
+	[SyncVar]
 	public bool isWinner;
 
 	protected void OnMouseUpAsButton()
 	{
-		if (((CardFlipManager)MinigameManager.Instance).CanFlip)
+		//the player who can flip them is the only one with authority to do so
+		if(hasAuthority)
 			CmdFlip();
 	}
 
 	public bool Flip()
 	{
 		if (isWinner)
-			GetComponent<Image>().sprite = ((CardFlipManager)MinigameManager.Instance).winningSprite;
+			GetComponent<SpriteRenderer>().sprite = ((CardFlipManager)MinigameManager.Instance).winningSprite;
 		else
-			GetComponent<Image>().sprite = ((CardFlipManager)MinigameManager.Instance).failSprite;
+			GetComponent<SpriteRenderer>().sprite = ((CardFlipManager)MinigameManager.Instance).failSprite;
 
 		return isWinner;
 	}
