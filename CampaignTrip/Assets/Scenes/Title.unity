@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311918, g: 0.3807398, b: 0.35872716, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -478,29 +478,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3162331145551321813, guid: 7fcc54fab411d4c488b2144a32ce10e0,
-        type: 3}
-      propertyPath: sceneAfterLobbyName
-      value: Battle
-      objectReference: {fileID: 0}
-    - target: {fileID: 3162331145551321813, guid: 7fcc54fab411d4c488b2144a32ce10e0,
-        type: 3}
-      propertyPath: m_SpawnPrefabs.Array.data[4]
-      value: 
-      objectReference: {fileID: 5365767304399832582, guid: 2160ec161c577fd45bf809abbc9b19e1,
-        type: 3}
-    - target: {fileID: 3162331145551321813, guid: 7fcc54fab411d4c488b2144a32ce10e0,
-        type: 3}
-      propertyPath: m_SpawnPrefabs.Array.data[2]
-      value: 
-      objectReference: {fileID: 1054630008981005556, guid: e0ec02e4620468d42a2b2e314bb03e1d,
-        type: 3}
-    - target: {fileID: 3162331145551321813, guid: 7fcc54fab411d4c488b2144a32ce10e0,
-        type: 3}
-      propertyPath: m_SpawnPrefabs.Array.data[3]
-      value: 
-      objectReference: {fileID: 8458088793063255194, guid: d1d4135aeebf79d42a00a5bd414fbaef,
-        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7fcc54fab411d4c488b2144a32ce10e0, type: 3}
 --- !u!1 &414355778

@@ -80,6 +80,7 @@ public abstract class BattleActorBase : NetworkBehaviour
         public int RemainingDuration;
         public int DOT;
         public bool HasDOT;
+        public Action OnRemove;
 
         public Stat(StatusEffect effect, BattleActorBase linkedActor, int duration, int healthGain = 0)
         {
@@ -152,8 +153,8 @@ public abstract class BattleActorBase : NetworkBehaviour
     {
         if (HasStatusEffect(StatusEffect.Freeze))
         {
-            RpcDisplayDOT(StatusEffect.Freeze);
             RpcDecrementDuration(StatusEffect.Freeze, attackers.Count);
+            RpcDisplayStat(StatusEffect.Freeze, 0);
         }
 
         if (HasStatusEffect(StatusEffect.Reflect))
@@ -230,7 +231,7 @@ public abstract class BattleActorBase : NetworkBehaviour
     protected virtual void OnAddReflect() {}
     protected virtual void OnAddStun() {}
     protected virtual void OnAddWeak() {}
-    protected virtual void OnAddCure() { }
+    protected virtual void OnAddCure() {}
 
     public bool HasStatusEffect(StatusEffect type)
     {
@@ -428,16 +429,16 @@ public abstract class BattleActorBase : NetworkBehaviour
             }
         }
 
-        RpcDisplayDOT(type);
+        RpcDisplayStat(type, -1);
         RpcTakeDamage(dot, 0);
         return true;
     }
 
     [ClientRpc]
-    private void RpcDisplayDOT(StatusEffect type)
+    public void RpcDisplayStat(StatusEffect type, int durationOffset)
     {
         List<Stat> stats = statusEffects[type];
-        damagePopup.DisplayStat(GetStatColor(type), stats[stats.Count - 1].RemainingDuration - 1);
+        damagePopup.DisplayStat(GetStatColor(type), stats[stats.Count - 1].RemainingDuration + durationOffset);
     }
 
     private Color GetStatColor(StatusEffect type)
@@ -466,7 +467,7 @@ public abstract class BattleActorBase : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void RpcDecrementDuration(StatusEffect type, int decBy)
+    public void RpcDecrementDuration(StatusEffect type, int decBy)
     {
         if (!HasStatusEffect(type))
             return;

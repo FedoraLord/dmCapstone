@@ -12,21 +12,21 @@ using static EnemyPrefab;
 #pragma warning disable CS0618, 0649
 public class BattleController : NetworkBehaviour
 {
-	public static BattleController Instance;
+    public static BattleController Instance;
 
     public bool IsEnemyPhase { get { return battlePhase == Phase.Enemy; } }
     public bool IsPlayerPhase { get { return battlePhase == Phase.Player; } }
     public bool IsWaitingPhase { get { return !IsEnemyPhase && !IsPlayerPhase; } }
     public Camera MainCamera { get { return battleCam.Cam; } }
-    
+
     private bool AllPlayersReady { get { return playersReady == PersistentPlayer.players.Count; } }
     private bool AllEnemiesReady { get { return enemiesReady == waves[waveIndex].members.Count; } }
 
-	private string homeSceneName; // we need this because you can only find the active scene, not the scene the object is in with Scene Manager
+    private string homeSceneName; // we need this because you can only find the active scene, not the scene the object is in with Scene Manager
 
-	[Header("UI")]
+    [Header("UI")]
     public BattleCamera battleCam;
-	public Canvas battleCanvas;
+    public Canvas battleCanvas;
 
     [SerializeField] private float totalAttackTime = 5;
     [SerializeField] private RectTransform attackTimerBar;
@@ -44,7 +44,7 @@ public class BattleController : NetworkBehaviour
 
     [Header("Spawning")]
     [HideInInspector] public List<EnemyBase> aliveEnemies;
-    
+
     [SerializeField] private EnemyDataList enemyDataList;
     [Tooltip("Groups of enemies to spawn together.")]
     [SerializeField] private Wave[] waves;
@@ -53,12 +53,12 @@ public class BattleController : NetworkBehaviour
     private Dictionary<StatusEffect, int> dotStatusEffects = new Dictionary<StatusEffect, int>();
     private int enemiesReady;
     private int playersReady;
-	private int waveIndex = -1;
+    private int waveIndex = -1;
     private Phase battlePhase;
 
     [Serializable]
-	public class Wave
-	{
+    public class Wave
+    {
         public List<EnemyType> members;
 
         public List<GameObject> GetEnemyPrefabs(EnemyDataList data)
@@ -86,9 +86,9 @@ public class BattleController : NetworkBehaviour
             }
         }
     }
-    
+
     protected void Start()
-	{
+    {
         if (Instance)
         {
             //coming back after a minigame:
@@ -97,11 +97,11 @@ public class BattleController : NetworkBehaviour
             return;
         }
 
-		Instance = this;
+        Instance = this;
         DontDestroyOnLoad(gameObject);
         DontDestroyOnLoad(battleCam.gameObject);
 
-		homeSceneName = SceneManager.GetActiveScene().name;
+        homeSceneName = SceneManager.GetActiveScene().name;
         NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
 
         PersistentPlayer.localAuthority.CmdSpawnBattlePlayer();
@@ -162,7 +162,7 @@ public class BattleController : NetworkBehaviour
             StartPlayerPhase();
         }
     }
-    
+
     [Server]
     private void StartPlayerPhase()
     {
@@ -234,7 +234,7 @@ public class BattleController : NetworkBehaviour
 
         battlePhase = Phase.Enemy;
         StartCoroutine(ExecuteEnemyPhase());
-	}
+    }
 
     public class AttackInfo
     {
@@ -246,7 +246,7 @@ public class BattleController : NetworkBehaviour
     private IEnumerator ExecuteEnemyPhase()
     {
         yield return new WaitForSeconds(0.5f);
-        
+
         //get attack damage directed at each player
         AttackInfo[] attacks = new AttackInfo[BattlePlayerBase.players.Count];
         attacks.Initialize(() => new AttackInfo());
@@ -281,7 +281,7 @@ public class BattleController : NetworkBehaviour
         DecrementStats(BattlePlayerBase.players);
 
         yield return new WaitForSeconds(0.1f);
-        
+
         if (aliveEnemies.Count > 0 && IsEnemyPhase)
         {
             StartPlayerPhase();
@@ -315,9 +315,9 @@ public class BattleController : NetworkBehaviour
         }
     }
 
-        #endregion
+    #endregion
 
-        #region Minigames
+    #region Minigames
 
     [Server]
     private void LoadMinigame(string sceneName)
@@ -357,18 +357,18 @@ public class BattleController : NetworkBehaviour
         enemy.transform.position = battleCam.EnemySpawnPoints[i].position;
         aliveEnemies.Add(enemy);
     }
-    
-	[Server]
-	public bool SpawnWave()
-	{
+
+    [Server]
+    public bool SpawnWave()
+    {
         waveIndex++;
 
         //Are all the waves done with?
         if (waveIndex == waves.Length)
-		{
-			Win();
-			return false;
-		}
+        {
+            Win();
+            return false;
+        }
 
         //Spawn the next wave then
         List<GameObject> enemyPrefabs = waves[waveIndex].GetEnemyPrefabs(enemyDataList);
@@ -404,7 +404,7 @@ public class BattleController : NetworkBehaviour
     #endregion
 
     #region Enemy
-    
+
     [ClientRpc]
     public void RpcStartAttackTimer(float time)
     {
@@ -430,7 +430,7 @@ public class BattleController : NetworkBehaviour
             yield return new WaitForEndOfFrame();
         }
         while (timeRemaining > 0);
-        
+
         attackTimerCountdown = null;
 
         if (isServer)
@@ -451,7 +451,7 @@ public class BattleController : NetworkBehaviour
     #endregion
 
     #region UI
-    
+
     public void UpdateAttackBlockUI(int attacks, int block)
     {
         attacksLeftText.text = attacks.ToString();

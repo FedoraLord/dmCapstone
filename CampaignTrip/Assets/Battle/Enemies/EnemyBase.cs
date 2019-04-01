@@ -34,13 +34,13 @@ public class EnemyBase : BattleActorBase
         BattleController.Instance.OnEnemySpawned(this);
         Initialize();
     }
-    
+
     #endregion
 
     #region Damage
 
-    private void OnMouseUpAsButton()
-	{
+    private void OnMouseDown()
+    {
         if (IsAlive)
         {
             BattlePlayerBase localPlayer = BattlePlayerBase.LocalAuthority;

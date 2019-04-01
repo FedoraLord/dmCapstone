@@ -17,9 +17,20 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     public static List<BattlePlayerBase> players { get { return PersistentPlayer.players.Select(x => x.battlePlayer).ToList(); } }
 
-    public bool CanPlayAbility { get; set; }
     public List<Ability> Abilities { get; private set; }
 
+    public bool CanPlayAbility
+    {
+        get { return canPlayAbility; }
+        set
+        {
+            canPlayAbility = value;
+            foreach (Ability a in Abilities)
+            {
+                a.UpdateButtonUI();
+            }
+        }
+    }
     public Ability SelectedAbility
     {
         get
@@ -57,7 +68,7 @@ public abstract class BattlePlayerBase : BattleActorBase
                 case TargetGroup.AllyAndSelf:
                     return new List<BattleActorBase>(players);
                 case TargetGroup.Enemy:
-                    return new List<BattleActorBase>(BattleController.Instance.aliveEnemies);
+                    return BattleController.Instance.aliveEnemies.Where(x => !x.HasStatusEffect(StatusEffect.Invisible)).ToList<BattleActorBase>();
                 default:
                     Debug.LogErrorFormat("Valid targets not implemented for {0}", SelectedAbility.Targets);
                     return new List<BattleActorBase>();
@@ -67,7 +78,9 @@ public abstract class BattlePlayerBase : BattleActorBase
     protected List<BattleActorBase> customTargets;
     protected int selectedAbilityIndex = -1;
 
-    private int attacksRemaining;
+    protected int attacksRemaining;
+
+    private bool canPlayAbility;
 
     public enum TargetGroup { Override, Ally, Self, AllyAndSelf, Enemy }
 
@@ -109,21 +122,20 @@ public abstract class BattlePlayerBase : BattleActorBase
         {
             LocalAuthority.CanPlayAbility = false;
             RemainingCooldown = cooldown + 1;
-            UpdateButtonUI();
         }
 
         public void DecrementCooldown()
         {
             if (RemainingCooldown > 0)
                 RemainingCooldown--;
-
-            if (AButton != null)
-                UpdateButtonUI();
+            UpdateButtonUI();
         }
 
-        private void UpdateButtonUI()
+        public void UpdateButtonUI()
         {
-            AButton.button.interactable = (RemainingCooldown <= 0);
+            if (AButton == null)
+                return;
+            AButton.button.interactable = (RemainingCooldown <= 0 && LocalAuthority.CanPlayAbility);
             AButton.UpdateCooldown(RemainingCooldown, cooldown + 1);
         }
     }
@@ -185,7 +197,7 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     #region Attack
 
-    private void OnMouseUpAsButton()
+    private void OnMouseDown()
     {
         if (IsAlive)
         {
@@ -193,15 +205,29 @@ public abstract class BattlePlayerBase : BattleActorBase
             {
                 LocalAuthority.OnAbilityTargetChosen(this);
             }
-            else if (HasStatusEffect(StatusEffect.Burn))
+            else if (LocalAuthority.attacksRemaining > 0)
             {
-
-            }
-            else if (HasStatusEffect(StatusEffect.Freeze))
-            {
-                //TODO: help with fire and ice
+                StatusEffect[] stats = { StatusEffect.Burn, StatusEffect.Freeze };
+                foreach (StatusEffect stat in stats)
+                {
+                    if (HasStatusEffect(stat))
+                    {
+                        LocalAuthority.CmdHelpWithStat(stat, gameObject);
+                        break;
+                    }
+                }
             }
         }
+    }
+
+    [Command]
+    public void CmdHelpWithStat(StatusEffect type, GameObject target)
+    {
+        BattleActorBase t = target.GetComponent<BattleActorBase>();
+        t.RpcDisplayStat(type, -1);
+        t.RpcDecrementDuration(type, 1);
+
+        RpcAttack();
     }
     
     [Command]
@@ -321,16 +347,7 @@ public abstract class BattlePlayerBase : BattleActorBase
     {
         CmdUseAbility(target?.gameObject, selectedAbilityIndex);
         SelectedAbility.Use();
-        DisableAbilityButtons();
         EndAbility();
-    }
-
-    private void DisableAbilityButtons()
-    {
-        foreach (Ability a in Abilities)
-        {
-            a.AButton.button.interactable = false;
-        }
     }
     
     [Command]
@@ -368,9 +385,13 @@ public abstract class BattlePlayerBase : BattleActorBase
         Ability a = SelectedAbility;
         if (a.Applies != StatusEffect.None)
         {
-            if (a.Applies == StatusEffect.Cure || a.Applies == StatusEffect.Focus)
+            if (a.Applies == StatusEffect.Cure)
             {
                 target.AddStatusEffect(a.Applies, this, a.Duration, a.Damage);
+            }
+            if (a.Applies == StatusEffect.Focus)
+            {
+                AddStatusEffect(a.Applies, target, a.Duration, a.Damage);
             }
             else
             {
@@ -421,6 +442,29 @@ public abstract class BattlePlayerBase : BattleActorBase
         foreach (EnemyBase enemy in BattleController.Instance.aliveEnemies)
         {
             enemy.RemoveTarget(playerNum);
+        }
+    }
+
+    protected override void OnAddStun()
+    {
+        base.OnAddStun();
+        SetPrivelages(false, false);
+    }
+
+    protected override void OnAddFreeze()
+    {
+        base.OnAddFreeze();
+        SetPrivelages(false, false);
+    }
+
+    private void SetPrivelages(bool ability, bool attack)
+    {
+        CanPlayAbility = ability;
+        if (!attack)
+        {
+            if (this == LocalAuthority)
+                BattleController.Instance.UpdateAttackBlockUI(0, blockAmount);
+            attacksRemaining = 0;
         }
     }
 
