@@ -122,7 +122,13 @@ public abstract class BattleActorBase : NetworkBehaviour
     #endregion
 
     #region Attack
-    
+
+    [Server]
+    public void PlayAttack()
+    {
+        animator.SetTrigger("Attack");
+    }
+
     [Server]
     protected bool TryAttack()
     {

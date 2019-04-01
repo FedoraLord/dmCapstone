@@ -259,7 +259,7 @@ public abstract class BattlePlayerBase : BattleActorBase
 
         if (this == LocalAuthority)
         {
-            animator.SetTrigger("Attack");
+            PlayAttack();
             BattleController.Instance.UpdateAttackBlockUI(attacksRemaining, blockAmount);
         }
     }

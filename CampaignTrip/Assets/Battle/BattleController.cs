@@ -269,6 +269,7 @@ public class BattleController : NetworkBehaviour
 
             if (attacks[i].attackers.Count > 0)
             {
+                attacks[i].attackers.ForEach(x => x.PlayAttack());
                 bp.DispatchBlockableDamage(attacks[i].attackers);
                 yield return new WaitForSeconds(0.5f);
             }
