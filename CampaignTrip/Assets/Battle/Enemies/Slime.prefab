@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3e9e6e04f7fa1b48ade92fd22cf82bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 0}
+  animator: {fileID: 6996310360008996432}
   damagePopup: {fileID: 3245608765852765489}
   healthBarUI: {fileID: 963320182993334783}
   overlays: {fileID: 692020140722269344}
@@ -224,6 +224,12 @@ PrefabInstance:
 --- !u!1 &7479651146532222750 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3291355430086226004, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+    type: 3}
+  m_PrefabInstance: {fileID: 5359337731261646666}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &6996310360008996432 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 3132203452215226650, guid: 4ab14dd3fb4643b49889b005e10b15ee,
     type: 3}
   m_PrefabInstance: {fileID: 5359337731261646666}
   m_PrefabAsset: {fileID: 0}
