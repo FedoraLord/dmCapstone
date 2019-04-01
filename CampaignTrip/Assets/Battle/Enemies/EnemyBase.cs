@@ -69,7 +69,7 @@ public class EnemyBase : BattleActorBase
             damage -= initialBlock - RemainingBlock;
         }
 
-        RpcTakeDamage(damage, initialBlock - RemainingBlock);
+        TakeDamage(damage, initialBlock - RemainingBlock);
         return damage;
     }
 
