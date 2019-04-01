@@ -8,10 +8,19 @@ using UnityEngine.Networking;
 public abstract class BattleActorBase : NetworkBehaviour
 {
     public bool IsAlive { get { return Health > 0; } }
-    public int BasicDamage { get { return basicDamage; } }
     public int BlockAmount { get { return blockAmount; } }
     public int MaxHealth { get; private set; }
     public Transform UITransform { get { return uiTransform; } }
+
+    public int AttackDamage
+    {
+        get
+        {
+            if (HasStatusEffect(StatusEffect.Weak))
+                return basicDamage / 2;
+            return basicDamage;
+        }
+    }
 
     public int Health
     {
@@ -47,6 +56,7 @@ public abstract class BattleActorBase : NetworkBehaviour
     
     public enum StatusEffect
     {
+        None = -1,
         Bleed,      //Low damage over time. Stacks Damage.
         Blind,      //High chance to miss when attacking.
         Burn,       //High damage over time. Can be put out by teammates.
@@ -106,20 +116,12 @@ public abstract class BattleActorBase : NetworkBehaviour
     }
 
     [Server]
-    public virtual void OnPlayerPhaseStart()
-    {
-        if (HasStatusEffect(StatusEffect.Focus))
-        {
-            Stat s = statusEffects[StatusEffect.Focus][0];
-            if (s.RemainingDuration <= 0)
-            {
-                RemoveStatusEffect(StatusEffect.Focus);
-            }
-        }
-    }
+    public virtual void OnPlayerPhaseStart() { }
 
     #endregion
 
+    #region Attack
+    
     [Server]
     protected bool TryAttack()
     {
@@ -130,9 +132,12 @@ public abstract class BattleActorBase : NetworkBehaviour
         return true;
     }
 
+    #endregion
+
     #region Damage
 
-    public abstract void TakeBlockedDamage(int damage);
+    [Server]
+    public abstract int TakeBlockedDamage(int damage);
 
     protected abstract void Die();
 
@@ -146,13 +151,16 @@ public abstract class BattleActorBase : NetworkBehaviour
     public void DispatchBlockableDamage(List<BattleActorBase> attackers, int damage = 0)
     {
         if (HasStatusEffect(StatusEffect.Freeze))
+        {
+            RpcDisplayDOT(StatusEffect.Freeze);
             RpcDecrementDuration(StatusEffect.Freeze, attackers.Count);
+        }
 
         if (HasStatusEffect(StatusEffect.Reflect))
         {
             foreach (BattleActorBase attacker in attackers)
             {
-                int damageDealt = (damage > 0) ? damage : attacker.basicDamage;
+                int damageDealt = (damage > 0) ? damage : attacker.AttackDamage;
                 attacker.TakeBlockedDamage(damageDealt);
             }
         }
@@ -167,7 +175,7 @@ public abstract class BattleActorBase : NetworkBehaviour
             {
                 foreach (BattleActorBase attacker in attackers)
                 {
-                    sumDamage += attacker.basicDamage;
+                    sumDamage += attacker.AttackDamage;
                 }
             }
 
@@ -210,6 +218,19 @@ public abstract class BattleActorBase : NetworkBehaviour
     #endregion
 
     #region StatusEffects
+    
+    protected virtual void OnAddBleed() {}
+    protected virtual void OnAddBlind() {}
+    protected virtual void OnAddBurn() {}
+    protected virtual void OnAddFocus() {}
+    protected virtual void OnAddFreeze() {}
+    protected virtual void OnAddInvisible() {}
+    protected virtual void OnAddPoison() {}
+    protected virtual void OnAddProtected() {}
+    protected virtual void OnAddReflect() {}
+    protected virtual void OnAddStun() {}
+    protected virtual void OnAddWeak() {}
+    protected virtual void OnAddCure() { }
 
     public bool HasStatusEffect(StatusEffect type)
     {
@@ -241,7 +262,7 @@ public abstract class BattleActorBase : NetworkBehaviour
             return;
         }
 
-        damagePopup.DisplayStat(GetStatColor(type), duration, true);
+        damagePopup.DisplayStat(GetStatColor(type), duration, "+");
         overlays.ToggleOverlay(type, true);
 
         if (HasStatusEffect(type))
@@ -251,14 +272,41 @@ public abstract class BattleActorBase : NetworkBehaviour
 
         switch (s.Type)
         {
+            case StatusEffect.Bleed:
+                OnAddBleed();
+                break;
+            case StatusEffect.Blind:
+                OnAddBlind();
+                break;
+            case StatusEffect.Burn:
+                OnAddBurn();
+                break;
+            case StatusEffect.Focus:
+                OnAddFocus();
+                break;
+            case StatusEffect.Freeze:
+                OnAddFreeze();
+                break;
             case StatusEffect.Invisible:
                 OnAddInvisible();
+                break;
+            case StatusEffect.Poison:
+                OnAddPoison();
+                break;
+            case StatusEffect.Protected:
+                OnAddProtected();
+                break;
+            case StatusEffect.Reflect:
+                OnAddReflect();
                 break;
             case StatusEffect.Stun:
                 OnAddStun();
                 break;
-            case StatusEffect.Freeze:
-                OnAddFreeze();
+            case StatusEffect.Weak:
+                OnAddWeak();
+                break;
+            case StatusEffect.Cure:
+                OnAddCure();
                 break;
             default:
                 break;
@@ -325,7 +373,7 @@ public abstract class BattleActorBase : NetworkBehaviour
     }
 
     [Server]
-    private void RemoveStatusEffect(StatusEffect type)
+    public void RemoveStatusEffect(StatusEffect type)
     {
         if (!HasStatusEffect(type))
             return;
@@ -359,11 +407,7 @@ public abstract class BattleActorBase : NetworkBehaviour
             s.LinkedActor.Heal(s.HealthOnRemove);
         }
     }
-
-    protected virtual void OnAddStun() { }
-    protected virtual void OnAddInvisible() { }
-    protected virtual void OnAddFreeze() { }
-
+    
     [Server]
     public bool ApplyDOT(StatusEffect type)
     {
@@ -438,17 +482,16 @@ public abstract class BattleActorBase : NetworkBehaviour
             s[i].RemainingDuration -= decBy;
             if (s[i].RemainingDuration <= 0)
             {
-                if (type == StatusEffect.Focus)
-                    return;
-
-                s.RemoveAt(i);
-                i--;
+                if (s.Count > 1)
+                {
+                    s.RemoveAt(i);
+                    i--;
+                }
+                else
+                {
+                    RemoveStatusEffect(type);
+                }
             }
-        }
-
-        if (s.Count == 0)
-        {
-            RemoveStatusEffect(type);
         }
     }
 

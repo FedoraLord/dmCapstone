@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static BattleActorBase;
 
+#pragma warning disable 0649
 public class StatusEffectOverlays : MonoBehaviour
 {
     [SerializeField] private ParticleSystem Bleed;

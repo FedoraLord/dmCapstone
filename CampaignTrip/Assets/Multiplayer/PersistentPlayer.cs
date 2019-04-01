@@ -74,7 +74,8 @@ public class PersistentPlayer : NetworkBehaviour
         if (NetworkWrapper.currentScene == NetworkWrapper.Scene.MainMenu)
         {
             players.Remove(this);
-            Destroy(lobbyPanel.gameObject);
+            if (lobbyPanel != null)
+                Destroy(lobbyPanel.gameObject);
         }
     }
 
@@ -152,4 +153,3 @@ public class PersistentPlayer : NetworkBehaviour
         localAuthority.minigameReady++;
     }
 }
-#pragma warning restore CS0618, 0649

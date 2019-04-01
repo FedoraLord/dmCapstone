@@ -57,8 +57,9 @@ public class EnemyBase : BattleActorBase
             }
         }
     }
-    
-    public override void TakeBlockedDamage(int damage)
+
+    [Server]
+    public override int TakeBlockedDamage(int damage)
     {
         int initialBlock = RemainingBlock;
 
@@ -69,6 +70,7 @@ public class EnemyBase : BattleActorBase
         }
 
         RpcTakeDamage(damage, initialBlock - RemainingBlock);
+        return damage;
     }
 
     [ClientRpc]
@@ -101,7 +103,7 @@ public class EnemyBase : BattleActorBase
     public override void OnPlayerPhaseStart()
     {
         base.OnPlayerPhaseStart();
-        RemainingBlock = blockAmount;
+        RemainingBlock = (HasStatusEffect(StatusEffect.Weak) ? 0 : blockAmount);
         
         if (HasStatusEffect(StatusEffect.Stun) || HasStatusEffect(StatusEffect.Freeze))
         {
@@ -190,6 +192,12 @@ public class EnemyBase : BattleActorBase
     {
         base.OnAddFreeze();
         LoseTargets();
+    }
+
+    protected override void OnAddWeak()
+    {
+        base.OnAddWeak();
+        RemainingBlock = 0;
     }
 
     private void LoseTargets()

@@ -161,22 +161,24 @@ public abstract class BattlePlayerBase : BattleActorBase
     [ClientRpc]
     private void RpcOnPlayerPhaseStart()
     {
-        if (HasStatusEffect(StatusEffect.Stun))
+        if (HasStatusEffect(StatusEffect.Stun) || HasStatusEffect(StatusEffect.Freeze))
         {
-            LocalAuthority.CanPlayAbility = false;
-            UpdateAttackBlock(0);
+            attacksRemaining = 0;
+            blockAmount = 90;
+            CanPlayAbility = false;
         }
         else
         {
-            LocalAuthority.CanPlayAbility = true;
+            attacksRemaining = attacksPerTurn;
+            blockAmount = (HasStatusEffect(StatusEffect.Weak) ? 0 : 90);
+            CanPlayAbility = true;
         }
-        
-        UpdateAttackBlock(attacksPerTurn);
+
+        if (this == LocalAuthority)
+            BattleController.Instance.UpdateAttackBlockUI(attacksRemaining, blockAmount);
 
         foreach (Ability a in Abilities)
-        {
             a.DecrementCooldown();
-        }
     }
 
     #endregion
@@ -224,20 +226,14 @@ public abstract class BattlePlayerBase : BattleActorBase
     [ClientRpc]
     private void RpcAttack()
     {
-        UpdateAttackBlock(attacksRemaining - 1);
-        if (localPlayerAuthority)
-        {
-            animator.SetTrigger("Attack");
-        }
-    }
-    
-    private void UpdateAttackBlock(int newAttacksRemaining)
-    {
-        attacksRemaining = newAttacksRemaining;
-        blockAmount = (int)Mathf.Min((float)attacksRemaining / attacksPerTurn * 100f, 90);
+        attacksRemaining--;
+
+        if (!HasStatusEffect(StatusEffect.Weak))
+            blockAmount = (int)Mathf.Min((float)attacksRemaining / attacksPerTurn * 100f, 90);
 
         if (this == LocalAuthority)
         {
+            animator.SetTrigger("Attack");
             BattleController.Instance.UpdateAttackBlockUI(attacksRemaining, blockAmount);
         }
     }
@@ -370,15 +366,17 @@ public abstract class BattlePlayerBase : BattleActorBase
         }
 
         Ability a = SelectedAbility;
-        if (a.Applies == StatusEffect.Cure || a.Applies == StatusEffect.Focus)
+        if (a.Applies != StatusEffect.None)
         {
-            target.AddStatusEffect(a.Applies, this, a.Duration, a.Damage);
+            if (a.Applies == StatusEffect.Cure || a.Applies == StatusEffect.Focus)
+            {
+                target.AddStatusEffect(a.Applies, this, a.Duration, a.Damage);
+            }
+            else
+            {
+                target.AddStatusEffect(a.Applies, this, a.Duration, 0);
+            }
         }
-        else
-        {
-            target.AddStatusEffect(a.Applies, this, a.Duration, 0);
-        }
-
     }
 
     public void EndAbility()
@@ -399,11 +397,13 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     #region Damage
 
-    public override void TakeBlockedDamage(int damage)
+    [Server]
+    public override int TakeBlockedDamage(int damage)
     {
         int blocked = damage * blockAmount / 100;
         int damageTaken = damage - blocked;
         RpcTakeDamage(damageTaken, blocked);
+        return damageTaken;
     }
 
     protected override void Die()

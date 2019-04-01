@@ -15,6 +15,7 @@ public class DamagePopup : BattleActorUI
     private Coroutine damageAnimation;
     private Coroutine blockAnimation;
     private Coroutine messageAnimation;
+    private Coroutine dotAnimation;
     private int animationsPlaying;
 
     private void Start()
@@ -63,16 +64,17 @@ public class DamagePopup : BattleActorUI
         messageAnimation = StartCoroutine(AnimatePopup(messageText, false, () => messageAnimation = null));
     }
 
-    public void DisplayStat(Color color, int remainingDuration, bool added = false)
+    public void DisplayStat(Color color, int remainingDuration, string prefix = "")
     {
         dotText.color = color;
-        string text = (added ? "+" : string.Empty);
-        dotText.text = text + remainingDuration.ToString();
+        dotText.text = prefix + remainingDuration.ToString();
         dotText.gameObject.SetActive(true);
-        StartCoroutine(AnimateDOT());
+
+        StopAnimation(dotAnimation);
+        dotAnimation = StartCoroutine(AnimateDOT(() => dotAnimation = null));
     }
 
-    private IEnumerator AnimateDOT()
+    private IEnumerator AnimateDOT(Action callback)
     {
         dotText.CrossFadeAlpha(1, 0, false);
         yield return new WaitForSeconds(0.5f);
@@ -81,6 +83,7 @@ public class DamagePopup : BattleActorUI
         yield return new WaitForSeconds(0.2f);
 
         dotText.gameObject.SetActive(false);
+        callback();
     }
 
     private void StopAnimation(Coroutine animation)

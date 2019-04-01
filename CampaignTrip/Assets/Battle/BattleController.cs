@@ -276,6 +276,11 @@ public class BattleController : NetworkBehaviour
 
         //apply damage over time status effects on enemies
         yield return ApplyDOTs(aliveEnemies);
+
+        DecrementStats(aliveEnemies);
+        DecrementStats(BattlePlayerBase.players);
+
+        yield return new WaitForSeconds(0.1f);
         
         if (aliveEnemies.Count > 0 && IsEnemyPhase)
         {
@@ -299,16 +304,20 @@ public class BattleController : NetworkBehaviour
             if (tookStatDamage)
                 yield return new WaitForSeconds(0.5f);
         }
+    }
 
+    [Server]
+    private void DecrementStats<T>(List<T> actors) where T : BattleActorBase
+    {
         foreach (BattleActorBase actor in actors)
         {
             actor.RpcDecrementDurations();
         }
     }
 
-    #endregion
+        #endregion
 
-    #region Minigames
+        #region Minigames
 
     [Server]
     private void LoadMinigame(string sceneName)
