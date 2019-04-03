@@ -56,6 +56,22 @@ public class BattleController : NetworkBehaviour
     private int waveIndex = -1;
     private Phase battlePhase;
 
+    [SerializeField] private AudioClip buttonClickAudio;
+    [SerializeField] private AudioClip bleedClip;
+    [SerializeField] private AudioClip blindClip;
+    [SerializeField] private AudioClip burnClip;
+    [SerializeField] private AudioClip cureClip;
+    [SerializeField] private AudioClip focusClip;
+    [SerializeField] private AudioClip freezeClip;
+    [SerializeField] private AudioClip invisibleClip;
+    [SerializeField] private AudioClip poisonClip;
+    [SerializeField] private AudioClip protectedClip;
+    [SerializeField] private AudioClip reflectClip;
+    [SerializeField] private AudioClip stunClip;
+    [SerializeField] private AudioClip weakClip;
+
+    private AudioSource audioSource;
+
     [Serializable]
     public class Wave
     {
@@ -460,6 +476,7 @@ public class BattleController : NetworkBehaviour
 
     public void OnAbilityButtonClicked(int i)
     {
+        audioSource.PlayOneShot(buttonClickAudio);
         BattlePlayerBase.LocalAuthority.AbilitySelected(i);
     }
 
@@ -475,6 +492,49 @@ public class BattleController : NetworkBehaviour
     protected void Win()
     {
         //TODO
+    }
+
+    public void PlaySoundEffect(StatusEffect type)
+    {
+        switch(type)
+        {
+            case StatusEffect.Bleed:
+                audioSource.PlayOneShot(bleedClip);
+                break;
+            case StatusEffect.Blind:
+                audioSource.PlayOneShot(blindClip);
+                break;
+            case StatusEffect.Burn:
+                audioSource.PlayOneShot(burnClip);
+                break;
+            case StatusEffect.Cure:
+                audioSource.PlayOneShot(cureClip);
+                break;
+            case StatusEffect.Focus:
+                audioSource.PlayOneShot(focusClip);
+                break;
+            case StatusEffect.Freeze:
+                audioSource.PlayOneShot(freezeClip);
+                break;
+            case StatusEffect.Invisible:
+                audioSource.PlayOneShot(invisibleClip);
+                break;
+            case StatusEffect.Poison:
+                audioSource.PlayOneShot(poisonClip);
+                break;
+            case StatusEffect.Protected:
+                audioSource.PlayOneShot(protectedClip);
+                break;
+            case StatusEffect.Reflect:
+                audioSource.PlayOneShot(reflectClip);
+                break;
+            case StatusEffect.Stun:
+                audioSource.PlayOneShot(stunClip);
+                break;
+            case StatusEffect.Weak:
+                audioSource.PlayOneShot(weakClip);
+                break;
+        }
     }
 }
 #pragma warning restore CS0618, 0649 

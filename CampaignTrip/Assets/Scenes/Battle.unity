@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657856, g: 0.49641234, b: 0.57481724, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -374,6 +374,11 @@ PrefabInstance:
       propertyPath: abilityButtons.Array.data[2]
       value: 
       objectReference: {fileID: 980754184}
+    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
+        type: 3}
+      propertyPath: buttonClickAudio
+      value: 
+      objectReference: {fileID: 8300000, guid: 5ba88182d620dbd468274251b82aaad8, type: 3}
     - target: {fileID: 978044166576981394, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1423,6 +1428,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Battle Camera
       objectReference: {fileID: 0}
+    - target: {fileID: 3294924218145096931, guid: 083a1209efc77c64f8d18f73b7aeb431,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 960
+      objectReference: {fileID: 0}
     - target: {fileID: 2566855479489172048, guid: 23d0ea33a7e253046b19f16dd339fcbc,
         type: 3}
       propertyPath: m_LocalPosition.y
@@ -1472,11 +1482,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3294924218145096931, guid: 083a1209efc77c64f8d18f73b7aeb431,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 960
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 23d0ea33a7e253046b19f16dd339fcbc, type: 3}

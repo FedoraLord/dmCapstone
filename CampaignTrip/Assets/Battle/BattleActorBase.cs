@@ -254,6 +254,8 @@ public abstract class BattleActorBase : NetworkBehaviour
     [ClientRpc]
     private void RpcAddStatusEffect(StatusEffect type, GameObject otherActor, int duration, int healthOnRemove)
     {
+        BattleController.Instance.PlaySoundEffect(type);
+
         Stat s = new Stat(type, otherActor.GetComponent<BattleActorBase>(), duration, healthOnRemove);
 
         RemoveOnAdd(type);
