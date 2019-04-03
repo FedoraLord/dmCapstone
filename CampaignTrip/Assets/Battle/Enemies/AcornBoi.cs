@@ -15,4 +15,11 @@ public class AcornBoi : EnemyBase
     {
         
     }
+
+    public override void OnMinigameFailed()
+    {
+        base.OnMinigameFailed();
+
+        this.blockAmount += 20;
+    }
 }
