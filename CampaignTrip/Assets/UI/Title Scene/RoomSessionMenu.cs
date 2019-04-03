@@ -16,6 +16,14 @@ public class RoomSessionMenu : NavigationMenu
     public Text roomNameText;
 	private int characterIndex = 0;
 
+    private AudioSource audioSource;
+    public AudioClip buttonClickAudio;
+
+    public void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
     public override void NavigateTo()
     {
         base.NavigateTo();
@@ -32,6 +40,7 @@ public class RoomSessionMenu : NavigationMenu
 
 	public void BackButtonClicked()
 	{
+        audioSource.PlayOneShot(buttonClickAudio);
         if (NetworkWrapper.discovery.isServer)
         {
             NetworkWrapper.discovery.StopBroadcast();
@@ -49,12 +58,14 @@ public class RoomSessionMenu : NavigationMenu
 
     public void ReadyButtonClicked()
 	{
+        audioSource.PlayOneShot(buttonClickAudio);
 		PersistentPlayer.localAuthority.isReady = !PersistentPlayer.localAuthority.isReady;
         PersistentPlayer.localAuthority.CmdUpdatePanel(characterIndex, PersistentPlayer.localAuthority.isReady);
     }
 
 	public void ClassCycleLeftButtonClicked()
 	{
+        audioSource.PlayOneShot(buttonClickAudio);
 		if (characterIndex == 0)
 			characterIndex = characters.Count - 1;
 		else
@@ -65,6 +76,7 @@ public class RoomSessionMenu : NavigationMenu
 
 	public void ClassCycleRightButtonClicked()
 	{
+        audioSource.PlayOneShot(buttonClickAudio);
 		if (characterIndex == (characters.Count - 1))
 			characterIndex = 0;
 		else
