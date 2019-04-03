@@ -54,6 +54,13 @@ public abstract class BattleActorBase : NetworkBehaviour
     //TODO: REMOVE AND REPLACE
     public GameObject tempAbilityTarget;
     
+    public enum BattleAnimation
+    {
+        Attack,
+        Hurt,
+        Die
+    }
+
     public enum StatusEffect
     {
         None = -1,
@@ -123,6 +130,23 @@ public abstract class BattleActorBase : NetworkBehaviour
 
     #region Attack
     
+    //Make sure this is called on the machine that owns this object: i.e. the LocalAuthority (for players) or the server (for enemies)
+    public virtual void PlayAnimation(BattleAnimation type)
+    {
+        switch (type)
+        {
+            case BattleAnimation.Attack:
+                animator.SetTrigger("Attack");
+                break;
+            case BattleAnimation.Hurt:
+                animator.SetTrigger("Hurt");
+                break;
+            case BattleAnimation.Die:
+                //need the real art before we can implement this
+                break;
+        }
+    }
+
     [Server]
     protected bool TryAttack()
     {
@@ -192,14 +216,17 @@ public abstract class BattleActorBase : NetworkBehaviour
         }
     }
     
+    [Server]
+    protected void TakeDamage(int damageTaken, int blocked)
+    {
+        if (damageTaken > 0)
+            PlayAnimation(BattleAnimation.Hurt);
+        RpcTakeDamage(damageTaken, blocked);
+    }
+
     [ClientRpc]
     protected void RpcTakeDamage(int damageTaken, int blocked)
     {
-        if (animator != null && damageTaken > 0)
-        {
-            animator.SetTrigger("Hurt");
-        }
-        
         Health -= damageTaken;
         damagePopup.DisplayDamage(damageTaken, blocked);
     }
@@ -432,8 +459,8 @@ public abstract class BattleActorBase : NetworkBehaviour
         }
 
         RpcDisplayStat(type, -1);
-        RpcTakeDamage(dot, 0);
         BattleController.Instance.RpcPlaySoundEffect(type);
+        TakeDamage(dot, 0);
         return true;
     }
 

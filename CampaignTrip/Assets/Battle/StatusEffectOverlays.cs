@@ -13,6 +13,7 @@ public class StatusEffectOverlays : MonoBehaviour
     [SerializeField] private ParticleSystem Poison;
     [SerializeField] private ParticleSystem Stun;
     [SerializeField] private ParticleSystem Weak;
+	[SerializeField] private ParticleSystem Aggro;
 
     [SerializeField] private SpriteRenderer Freeze;
     [SerializeField] private SpriteRenderer Protected;
@@ -99,4 +100,12 @@ public class StatusEffectOverlays : MonoBehaviour
                 return null;
         }
     }
+
+	public void ToggleAggro(bool toggle)
+	{
+		if (toggle)
+			Aggro.Play();
+		else
+			Aggro.Stop();
+	}
 }

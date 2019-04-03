@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class SwitchMazeManager : MinigameManager
@@ -8,8 +9,8 @@ public class SwitchMazeManager : MinigameManager
 	public GameObject playerPrefab;
     public Text timerText;
     public Camera cam;
-	
-	protected override void Win()
+
+    protected override void Win()
 	{
 		winText.text = "Success!";
 	}
@@ -48,4 +49,6 @@ public class SwitchMazeManager : MinigameManager
 			NetworkSpawner.Instance.NetworkSpawn(obj, p.gameObject);
 		}
 	}
+
+
 }

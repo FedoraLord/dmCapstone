@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -11,7 +12,7 @@ public class SM_Player : NetworkBehaviour
     public RuntimeAnimatorController alchemistController;
     public RuntimeAnimatorController mageController;
 
-    private Animator animator;
+    public Animator animator;
     public float speed = 3;
     public bool localAuthority;
     public Vector3 velocity;
@@ -38,27 +39,36 @@ public class SM_Player : NetworkBehaviour
 
             DPad.Instance.Setup(this);
 
-            switch(PersistentPlayer.localAuthority.character.CharacterName)
-            {
-                case CharacterData.Character.Warrior:
-                    animator.runtimeAnimatorController = warriorController;
-                    break;
-
-                case CharacterData.Character.Rogue:
-                    animator.runtimeAnimatorController = rogueController;
-                    break;
-
-                case CharacterData.Character.Alchemist:
-                    animator.runtimeAnimatorController = alchemistController;
-                    break;
-
-                case CharacterData.Character.Mage:
-                    animator.runtimeAnimatorController = mageController;
-                    break;
-            }
-            animator.SetBool("Moving", false);
-            animator.SetInteger("Direction", 2);
+            //SwitchMazeManager.Instance.CmdSetAnimatorForPlayer(playernum, PersistentPlayer.localAuthority.character.CharacterName);
         }
+
+        var player = PersistentPlayer.players.Where(x => x.playerNum == playernum).First();
+        SetAnimator(player.character.CharacterName);
+    }
+
+    public void SetAnimator(CharacterData.Character characterType)
+    {
+
+        switch (characterType)
+        {
+            case CharacterData.Character.Warrior:
+                animator.runtimeAnimatorController = warriorController;
+                break;
+
+            case CharacterData.Character.Rogue:
+                animator.runtimeAnimatorController = rogueController;
+                break;
+
+            case CharacterData.Character.Alchemist:
+                animator.runtimeAnimatorController = alchemistController;
+                break;
+
+            case CharacterData.Character.Mage:
+                animator.runtimeAnimatorController = mageController;
+                break;
+        }
+        animator.SetBool("Moving", false);
+        animator.SetInteger("Direction", 2);
     }
 
     void FixedUpdate()

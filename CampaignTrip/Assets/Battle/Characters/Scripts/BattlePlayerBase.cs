@@ -259,7 +259,7 @@ public abstract class BattlePlayerBase : BattleActorBase
 
         if (this == LocalAuthority)
         {
-            animator.SetTrigger("Attack");
+            PlayAnimation(BattleAnimation.Attack);
             BattleController.Instance.UpdateAttackBlockUI(attacksRemaining, blockAmount);
         }
     }
@@ -423,7 +423,7 @@ public abstract class BattlePlayerBase : BattleActorBase
     {
         int blocked = damage * blockAmount / 100;
         int damageTaken = damage - blocked;
-        RpcTakeDamage(damageTaken, blocked);
+        TakeDamage(damageTaken, blocked);
         return damageTaken;
     }
 
