@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657856, g: 0.49641234, b: 0.57481724, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -337,7 +337,7 @@ PrefabInstance:
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
       propertyPath: TEST_GoToMinigame
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
@@ -379,6 +379,11 @@ PrefabInstance:
       propertyPath: buttonClickAudio
       value: 
       objectReference: {fileID: 8300000, guid: 5ba88182d620dbd468274251b82aaad8, type: 3}
+    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
+        type: 3}
+      propertyPath: freezeClip
+      value: 
+      objectReference: {fileID: 8300000, guid: b923a4ca1dca04a25945d8b7929aca96, type: 3}
     - target: {fileID: 978044166576981394, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
       propertyPath: m_LocalPosition.x
