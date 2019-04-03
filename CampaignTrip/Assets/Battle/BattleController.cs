@@ -338,7 +338,13 @@ public class BattleController : NetworkBehaviour
     [Server]
     public void UnloadMinigame(bool succ)
     {
-        StartPlayerPhase();
+		if (succ)
+			foreach (EnemyBase enemy in aliveEnemies)
+				enemy.OnMinigameSuccess();
+		else
+			foreach (EnemyBase enemy in aliveEnemies)
+				enemy.OnMinigameFailed();
+		StartPlayerPhase();
         RpcLoadScene(true);
         NetworkWrapper.manager.ServerChangeScene("Battle");
     }
