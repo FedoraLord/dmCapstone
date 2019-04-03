@@ -34,7 +34,7 @@ public class Slime : EnemyBase
 				trigger = "Hurt";
 				break;
 			case BattleAnimation.Die:
-				//need the real art before we can implement this
+				trigger = "Die"
 				break;
 		}
 		foreach (GameObject smallSlime in smallSlimes)
