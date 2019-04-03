@@ -433,6 +433,7 @@ public abstract class BattleActorBase : NetworkBehaviour
 
         RpcDisplayStat(type, -1);
         RpcTakeDamage(dot, 0);
+        BattleController.Instance.RpcPlaySoundEffect(type);
         return true;
     }
 

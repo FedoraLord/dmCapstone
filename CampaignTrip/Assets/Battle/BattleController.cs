@@ -494,6 +494,12 @@ public class BattleController : NetworkBehaviour
         //TODO
     }
 
+    [ClientRpc]
+    public void RpcPlaySoundEffect(StatusEffect type)
+    {
+        PlaySoundEffect(type);
+    }
+
     public void PlaySoundEffect(StatusEffect type)
     {
         switch(type)
