@@ -15,7 +15,7 @@ public class RoomSessionMenu : NavigationMenu
 	public Text flavorText;
     public Text roomNameText;
 	private int characterIndex = 0;
-
+    
     public override void NavigateTo()
     {
         base.NavigateTo();
@@ -32,6 +32,7 @@ public class RoomSessionMenu : NavigationMenu
 
 	public void BackButtonClicked()
 	{
+        TitleUIManager.PlayButtonSound();
         if (NetworkWrapper.discovery.isServer)
         {
             NetworkWrapper.discovery.StopBroadcast();
@@ -49,13 +50,15 @@ public class RoomSessionMenu : NavigationMenu
 
     public void ReadyButtonClicked()
 	{
-		PersistentPlayer.localAuthority.isReady = !PersistentPlayer.localAuthority.isReady;
+        TitleUIManager.PlayButtonSound();
+        PersistentPlayer.localAuthority.isReady = !PersistentPlayer.localAuthority.isReady;
         PersistentPlayer.localAuthority.CmdUpdatePanel(characterIndex, PersistentPlayer.localAuthority.isReady);
     }
 
 	public void ClassCycleLeftButtonClicked()
 	{
-		if (characterIndex == 0)
+        TitleUIManager.PlayButtonSound();
+        if (characterIndex == 0)
 			characterIndex = characters.Count - 1;
 		else
 			characterIndex--;
@@ -65,7 +68,8 @@ public class RoomSessionMenu : NavigationMenu
 
 	public void ClassCycleRightButtonClicked()
 	{
-		if (characterIndex == (characters.Count - 1))
+        TitleUIManager.PlayButtonSound();
+        if (characterIndex == (characters.Count - 1))
 			characterIndex = 0;
 		else
 			characterIndex++;

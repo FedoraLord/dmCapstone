@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -55,6 +56,22 @@ public class BattleController : NetworkBehaviour
     private int playersReady;
     private int waveIndex = -1;
     private Phase battlePhase;
+
+    [SerializeField] private AudioClip buttonClickAudio;
+    [SerializeField] private AudioClip bleedClip;
+    [SerializeField] private AudioClip blindClip;
+    [SerializeField] private AudioClip burnClip;
+    [SerializeField] private AudioClip cureClip;
+    [SerializeField] private AudioClip focusClip;
+    [SerializeField] private AudioClip freezeClip;
+    [SerializeField] private AudioClip invisibleClip;
+    [SerializeField] private AudioClip poisonClip;
+    [SerializeField] private AudioClip protectedClip;
+    [SerializeField] private AudioClip reflectClip;
+    [SerializeField] private AudioClip stunClip;
+    [SerializeField] private AudioClip weakClip;
+
+    private AudioSource audioSource;
 
     [Serializable]
     public class Wave
@@ -236,10 +253,12 @@ public class BattleController : NetworkBehaviour
         StartCoroutine(ExecuteEnemyPhase());
     }
 
-    public class AttackInfo
+    public class EnemyAttack
     {
-        public bool containsMiss;
-        public List<BattleActorBase> attackers = new List<BattleActorBase>();
+        public bool hit;
+        public BattleActorBase attacker;
+        public StatusEffect apply;
+        public int duration;
     }
 
     [Server]
@@ -248,29 +267,56 @@ public class BattleController : NetworkBehaviour
         yield return new WaitForSeconds(0.5f);
 
         //get attack damage directed at each player
-        AttackInfo[] attacks = new AttackInfo[BattlePlayerBase.players.Count];
-        attacks.Initialize(() => new AttackInfo());
-
-        foreach (EnemyBase e in aliveEnemies)
+        List<EnemyAttack>[] groupAttacks = new List<EnemyAttack>[BattlePlayerBase.players.Count];
+        groupAttacks.Initialize(() => new List<EnemyAttack>());
+            
+        for (int i = 0; i < groupAttacks.Length; i++)
         {
-            if (e.IsAlive && e.HasTargets)
-                e.AttackPlayers(attacks);
+            foreach (EnemyBase e in aliveEnemies)
+            {
+                if (e.IsAlive && e.HasTargets)
+                    e.AttackPlayer(groupAttacks[i], i);
+            }
         }
-
+        
         //apply attack damage on the players
         for (int i = 0; i < BattlePlayerBase.players.Count; i++)
         {
             BattlePlayerBase bp = BattlePlayerBase.players[i];
-            if (attacks[i].containsMiss)
+            List<EnemyAttack> hits = new List<EnemyAttack>();
+            bool containedMiss = false;
+
+            foreach (EnemyAttack attack in groupAttacks[i])
+            {
+                if (attack.hit)
+                {
+                    hits.Add(attack);
+                }
+                else
+                {
+                    containedMiss = true;
+                    attack.attacker.PlayAnimation(BattleAnimation.Attack);
+                }
+            }
+            
+            if (containedMiss)
             {
                 bp.RpcMiss();
                 yield return new WaitForSeconds(0.5f);
             }
 
-            if (attacks[i].attackers.Count > 0)
+            if (hits.Count > 0)
             {
-                attacks[i].attackers.ForEach(x => x.PlayAnimation(BattleAnimation.Attack));
-                bp.DispatchBlockableDamage(attacks[i].attackers);
+                List<BattleActorBase> attackers = new List<BattleActorBase>();
+                foreach (EnemyAttack hit in hits)
+                {
+                    if (hit.apply != StatusEffect.None)
+                        bp.AddStatusEffect(hit.apply, hit.attacker, hit.duration);
+                    hit.attacker.PlayAnimation(BattleAnimation.Attack);
+                    attackers.Add(hit.attacker);
+                }
+
+                bp.DispatchBlockableDamage(attackers);
                 yield return new WaitForSeconds(0.5f);
             }
         }
@@ -467,6 +513,7 @@ public class BattleController : NetworkBehaviour
 
     public void OnAbilityButtonClicked(int i)
     {
+        audioSource.PlayOneShot(buttonClickAudio);
         BattlePlayerBase.LocalAuthority.AbilitySelected(i);
     }
 
@@ -482,6 +529,55 @@ public class BattleController : NetworkBehaviour
     protected void Win()
     {
         //TODO
+    }
+
+    [ClientRpc]
+    public void RpcPlaySoundEffect(StatusEffect type)
+    {
+        PlaySoundEffect(type);
+    }
+
+    public void PlaySoundEffect(StatusEffect type)
+    {
+        switch(type)
+        {
+            case StatusEffect.Bleed:
+                audioSource.PlayOneShot(bleedClip);
+                break;
+            case StatusEffect.Blind:
+                audioSource.PlayOneShot(blindClip);
+                break;
+            case StatusEffect.Burn:
+                audioSource.PlayOneShot(burnClip);
+                break;
+            case StatusEffect.Cure:
+                audioSource.PlayOneShot(cureClip);
+                break;
+            case StatusEffect.Focus:
+                audioSource.PlayOneShot(focusClip);
+                break;
+            case StatusEffect.Freeze:
+                audioSource.PlayOneShot(freezeClip);
+                break;
+            case StatusEffect.Invisible:
+                audioSource.PlayOneShot(invisibleClip);
+                break;
+            case StatusEffect.Poison:
+                audioSource.PlayOneShot(poisonClip);
+                break;
+            case StatusEffect.Protected:
+                audioSource.PlayOneShot(protectedClip);
+                break;
+            case StatusEffect.Reflect:
+                audioSource.PlayOneShot(reflectClip);
+                break;
+            case StatusEffect.Stun:
+                audioSource.PlayOneShot(stunClip);
+                break;
+            case StatusEffect.Weak:
+                audioSource.PlayOneShot(weakClip);
+                break;
+        }
     }
 }
 #pragma warning restore CS0618, 0649 

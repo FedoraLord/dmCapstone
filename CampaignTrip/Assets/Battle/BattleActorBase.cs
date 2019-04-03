@@ -142,7 +142,7 @@ public abstract class BattleActorBase : NetworkBehaviour
                 animator.SetTrigger("Hurt");
                 break;
             case BattleAnimation.Die:
-                //need the real art before we can implement this
+                animator.SetTrigger("Die");
                 break;
         }
     }
@@ -164,7 +164,10 @@ public abstract class BattleActorBase : NetworkBehaviour
     [Server]
     public abstract int TakeBlockedDamage(int damage);
 
-    protected abstract void Die();
+    protected virtual void Die()
+    {
+        PlayAnimation(BattleAnimation.Die);
+    }
 
     [Server]
     public void DispatchBlockableDamage(BattleActorBase attacker, int damage = 0)
@@ -281,6 +284,8 @@ public abstract class BattleActorBase : NetworkBehaviour
     [ClientRpc]
     private void RpcAddStatusEffect(StatusEffect type, GameObject otherActor, int duration, int healthOnRemove)
     {
+        BattleController.Instance.PlaySoundEffect(type);
+
         Stat s = new Stat(type, otherActor.GetComponent<BattleActorBase>(), duration, healthOnRemove);
 
         RemoveOnAdd(type);
@@ -457,6 +462,7 @@ public abstract class BattleActorBase : NetworkBehaviour
         }
 
         RpcDisplayStat(type, -1);
+        BattleController.Instance.RpcPlaySoundEffect(type);
         TakeDamage(dot, 0);
         return true;
     }

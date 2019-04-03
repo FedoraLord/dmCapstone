@@ -720,14 +720,7 @@ MonoBehaviour:
   battleCanvas: {fileID: 978044166576981395}
   totalAttackTime: 5
   attackTimerBar: {fileID: 978044165425556926}
-  abilityImages:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  abilityTexts:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  abilityButtons: []
   attackTimerText: {fileID: 978044165974690376}
   attacksLeftText: {fileID: 978044166622188987}
   blockText: {fileID: 978044166606812425}
@@ -740,6 +733,19 @@ MonoBehaviour:
   - members: 
   - members: 
   - members: 
+  buttonClickAudio: {fileID: 8300000, guid: 5ba88182d620dbd468274251b82aaad8, type: 3}
+  bleedClip: {fileID: 8300000, guid: 8a82b268259b7471b8a3da0fce9a017e, type: 3}
+  blindClip: {fileID: 0}
+  burnClip: {fileID: 8300000, guid: eb8a5b1d7e47a46e09a13e403f470f53, type: 3}
+  cureClip: {fileID: 8300000, guid: 4380a780a723c4eb08bacacdd6800bb1, type: 3}
+  focusClip: {fileID: 0}
+  freezeClip: {fileID: 0}
+  invisibleClip: {fileID: 0}
+  poisonClip: {fileID: 8300000, guid: 823252fe7bf594ac4998cd3410269239, type: 3}
+  protectedClip: {fileID: 8300000, guid: 81aae57f2be6546e8a77df676a33f3b5, type: 3}
+  reflectClip: {fileID: 8300000, guid: e96c553c3d6ab486f86b670903bacf40, type: 3}
+  stunClip: {fileID: 0}
+  weakClip: {fileID: 0}
 --- !u!1 &978044166595590772
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,15 +8,14 @@ using UnityEngine.UI;
 /// Controls the UI in the object named "Host-Join Room Menu".
 /// All button clicks etc. are handled by this script.
 /// </summary>
+/// #pragma warning disable CS0649
 public class HostJoinRoomMenu : NavigationMenu
 {
-#pragma warning disable CS0649
     [SerializeField] private GameObject roomButtonTemplate;
-#pragma warning restore CS0649
 
     private List<GameObject> roomButtons = new List<GameObject>();
     private Coroutine listenRoutine;
-
+    
     public override void NavigateTo()
     {
         base.NavigateTo();
@@ -79,6 +78,7 @@ public class HostJoinRoomMenu : NavigationMenu
     /// <param name="buttonClicked"></param>
     public void RoomSelected(GameObject buttonClicked)
     {
+        TitleUIManager.PlayButtonSound();
         Text t = buttonClicked.GetComponentInChildren<Text>();
         if (t != null)
         {
@@ -107,6 +107,8 @@ public class HostJoinRoomMenu : NavigationMenu
     {
         if (roomName.text.Length == 0)
             return;
+
+        TitleUIManager.PlayButtonSound();
 
         NetworkWrapper.StartServer(roomName.text);
         NavigateToRoomSessionMenu(roomName.text);
