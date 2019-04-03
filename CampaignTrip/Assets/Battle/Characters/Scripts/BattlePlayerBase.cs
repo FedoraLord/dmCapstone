@@ -429,7 +429,7 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     protected override void Die()
     {
-        
+        base.Die();
     }
 
     #endregion

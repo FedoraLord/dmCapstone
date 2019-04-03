@@ -81,6 +81,7 @@ public class EnemyBase : BattleActorBase
 
     protected override void Die()
     {
+        base.Die();
         BattleController.Instance.OnEnemyDeath(this);
         StartCoroutine(DelayDeath());
     }
