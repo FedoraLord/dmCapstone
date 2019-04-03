@@ -14,6 +14,7 @@ public class TitleUIManager : UIManager
 
     private static TitleUIManager Instance;
 
+    [SerializeField] private AudioSource buttonAudio;
     [SerializeField] private HostJoinRoomMenu hostJoinRoomMenu;
     [SerializeField] private RoomSessionMenu roomSessionMenu;
     
@@ -32,6 +33,11 @@ public class TitleUIManager : UIManager
         HostJoinRoomMenu = hostJoinRoomMenu;
         RoomSessionMenu = roomSessionMenu;
         NetworkWrapper.currentScene = NetworkWrapper.Scene.MainMenu;
+    }
+
+    public static void PlayButtonSound()
+    {
+        Instance.buttonAudio.Play();
     }
     
     public static void Navigate_HostJoinRoomMenu()
