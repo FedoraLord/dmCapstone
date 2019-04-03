@@ -17,6 +17,14 @@ public class HostJoinRoomMenu : NavigationMenu
     private List<GameObject> roomButtons = new List<GameObject>();
     private Coroutine listenRoutine;
 
+    public AudioClip buttonClickAudio;
+    private AudioSource audioSource;
+
+    public void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
     public override void NavigateTo()
     {
         base.NavigateTo();
@@ -79,6 +87,7 @@ public class HostJoinRoomMenu : NavigationMenu
     /// <param name="buttonClicked"></param>
     public void RoomSelected(GameObject buttonClicked)
     {
+        audioSource.PlayOneShot(buttonClickAudio);
         Text t = buttonClicked.GetComponentInChildren<Text>();
         if (t != null)
         {
@@ -107,6 +116,8 @@ public class HostJoinRoomMenu : NavigationMenu
     {
         if (roomName.text.Length == 0)
             return;
+
+        audioSource.PlayOneShot(buttonClickAudio);
 
         NetworkWrapper.StartServer(roomName.text);
         NavigateToRoomSessionMenu(roomName.text);

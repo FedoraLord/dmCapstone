@@ -1,11 +1,12 @@
 fileFormatVersion: 2
-guid: 763faeedae7d9274e8b3244d24be0ccf
+guid: b4805aed8f52bc74f84ff4bb4e8fc21c
 TextureImporter:
   fileIDToRecycleName:
-    21300000: AcornHurt_0
-    21300002: AcornHurt_1
-    21300004: AcornHurt_2
-    21300006: AcornHurt_3
+    21300000: AcornAttack_0
+    21300002: AcornAttack_1
+    21300004: AcornAttack_2
+    21300006: AcornAttack_3
+    21300008: AcornAttack_4
   externalObjects: {}
   serializedVersion: 9
   mipmaps:
@@ -35,7 +36,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: -1
     aniso: -1
     mipBias: -100
     wrapU: 1
@@ -49,7 +50,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 64
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -67,7 +68,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -78,7 +79,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -89,7 +90,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -99,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: AcornHurt_0
+      name: AcornAttack_0
       rect:
         serializedVersion: 2
         x: 0
@@ -113,13 +114,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5a2d1165b071e06489f94a2f91bd63bb
+      spriteID: f622ed73bf45d4a419085824824c706e
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AcornHurt_1
+      name: AcornAttack_1
       rect:
         serializedVersion: 2
         x: 64
@@ -133,13 +134,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 96dfe13a7d15aa94da2948f008ed7de0
+      spriteID: cadf451f500b63b419c751f9b0a6e64b
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AcornHurt_2
+      name: AcornAttack_2
       rect:
         serializedVersion: 2
         x: 128
@@ -153,13 +154,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6012aa4ab9060084b9e193af2d9898af
+      spriteID: 11ee32e5d4b695940b59aab89c7112c7
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AcornHurt_3
+      name: AcornAttack_3
       rect:
         serializedVersion: 2
         x: 192
@@ -173,7 +174,27 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4fa4e3495e62b9f4ba198a2df0cb6024
+      spriteID: 57ad76f2cab0d0749bee86841f3d060d
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: AcornAttack_4
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d913a75dbd23ba34fa083dc5ecddf6a9
       vertices: []
       indices: 
       edges: []
@@ -181,7 +202,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: c3458e005522a594090926338c1387ff
+    spriteID: 803bea7303af78249bb8671f74b6ca9f
     vertices: []
     indices: 
     edges: []

@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 39}
   - component: {fileID: 854968600512077322}
   - component: {fileID: 5501900201046908409}
+  - component: {fileID: 7523400437449648029}
   m_Layer: 0
   m_Name: BattlePlayerBase
   m_TagString: Untagged
@@ -186,6 +187,102 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!82 &7523400437449648029
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 28}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &3119505480427420302
 GameObject:
   m_ObjectHideFlags: 0
@@ -302,11 +399,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 34}
     m_Modifications:
-    - target: {fileID: 1665753913249771026, guid: f4d29fe1c2f5fc948b8d691e458a8015,
-        type: 3}
-      propertyPath: m_Name
-      value: HealthBarUI
-      objectReference: {fileID: 0}
     - target: {fileID: 6045472781469882529, guid: f4d29fe1c2f5fc948b8d691e458a8015,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -412,6 +504,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1665753913249771026, guid: f4d29fe1c2f5fc948b8d691e458a8015,
+        type: 3}
+      propertyPath: m_Name
+      value: HealthBarUI
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f4d29fe1c2f5fc948b8d691e458a8015, type: 3}
 --- !u!224 &6394970755267096762 stripped
@@ -427,11 +524,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 34}
     m_Modifications:
-    - target: {fileID: 4632699813934859906, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
-        type: 3}
-      propertyPath: m_Name
-      value: DamagePopup
-      objectReference: {fileID: 0}
     - target: {fileID: 4964402801478723068, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -537,6 +629,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 4632699813934859906, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
+        type: 3}
+      propertyPath: m_Name
+      value: DamagePopup
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa2af7e17aa701a4daa6a03da0e3f58d, type: 3}
 --- !u!224 &7675312742041444183 stripped
@@ -552,11 +649,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 34}
     m_Modifications:
-    - target: {fileID: 7258902256873901116, guid: e63f07229e56fef4793ace7ddcbfa0a1,
-        type: 3}
-      propertyPath: m_Name
-      value: StatusEffectOverlays
-      objectReference: {fileID: 0}
     - target: {fileID: 7356145978160666732, guid: e63f07229e56fef4793ace7ddcbfa0a1,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -611,6 +703,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7258902256873901116, guid: e63f07229e56fef4793ace7ddcbfa0a1,
+        type: 3}
+      propertyPath: m_Name
+      value: StatusEffectOverlays
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e63f07229e56fef4793ace7ddcbfa0a1, type: 3}

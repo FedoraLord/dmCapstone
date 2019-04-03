@@ -1,14 +1,11 @@
 fileFormatVersion: 2
-guid: 19b367c3001196847b561db286bbe0db
+guid: 0fac8f6410c37f54ca45af03fd4732df
 TextureImporter:
   fileIDToRecycleName:
-    21300000: AcornDeath_0
-    21300002: AcornDeath_1
-    21300004: AcornDeath_2
-    21300006: AcornDeath_3
-    21300008: AcornDeath_4
-    21300010: AcornDeath_5
-    21300012: AcornDeath_6
+    21300000: AcornHurt_0
+    21300002: AcornHurt_1
+    21300004: AcornHurt_2
+    21300006: AcornHurt_3
   externalObjects: {}
   serializedVersion: 9
   mipmaps:
@@ -38,7 +35,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: -1
     aniso: -1
     mipBias: -100
     wrapU: 1
@@ -52,7 +49,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 64
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -70,7 +67,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -81,7 +78,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -92,7 +89,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -102,7 +99,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: AcornDeath_0
+      name: AcornHurt_0
       rect:
         serializedVersion: 2
         x: 0
@@ -116,13 +113,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c28dd4a01d80af248be53dc5d67f12e4
+      spriteID: 0c95d0d22eaeb564dbfaa8b3ed8dcd06
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AcornDeath_1
+      name: AcornHurt_1
       rect:
         serializedVersion: 2
         x: 64
@@ -136,13 +133,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: dac32f4dd93b55f43a19b3a5291f0d97
+      spriteID: 109e2ca1a33d3d543a775e707161e5b1
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AcornDeath_2
+      name: AcornHurt_2
       rect:
         serializedVersion: 2
         x: 128
@@ -156,13 +153,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c11eb5be367fb4d48be4726a0ffa4b8d
+      spriteID: b075a1a67131ada45b42a4df2f41d974
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: AcornDeath_3
+      name: AcornHurt_3
       rect:
         serializedVersion: 2
         x: 192
@@ -176,67 +173,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6977e8b8b30d3d44296a0580d1bb6d11
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: AcornDeath_4
-      rect:
-        serializedVersion: 2
-        x: 256
-        y: 0
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c33e1c35262569a47bce5fa828d72bf5
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: AcornDeath_5
-      rect:
-        serializedVersion: 2
-        x: 320
-        y: 0
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 1ac353decb557f744813f3aa4d1e4c77
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: AcornDeath_6
-      rect:
-        serializedVersion: 2
-        x: 384
-        y: 0
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 309f2422a4245d64b8002935ef003b3d
+      spriteID: 3e3f12428abe5804dab45c36af7509f0
       vertices: []
       indices: 
       edges: []
@@ -244,7 +181,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 885af7cb949b41c4d910327f2798d947
+    spriteID: b23393c2adcebd54a95f4d2c8734a942
     vertices: []
     indices: 
     edges: []

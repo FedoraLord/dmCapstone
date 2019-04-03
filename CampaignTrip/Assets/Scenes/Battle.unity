@@ -374,6 +374,11 @@ PrefabInstance:
       propertyPath: abilityButtons.Array.data[2]
       value: 
       objectReference: {fileID: 980754184}
+    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
+        type: 3}
+      propertyPath: buttonClickAudio
+      value: 
+      objectReference: {fileID: 8300000, guid: 5ba88182d620dbd468274251b82aaad8, type: 3}
     - target: {fileID: 978044166576981394, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
       propertyPath: m_LocalPosition.x

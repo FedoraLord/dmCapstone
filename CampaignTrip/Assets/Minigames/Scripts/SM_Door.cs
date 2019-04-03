@@ -15,12 +15,17 @@ public class SM_Door : MonoBehaviour
     public BoxCollider2D openColliderLeft;
     public BoxCollider2D openColliderRight;
 
+    public AudioClip doorOpenAudio;
+    public AudioClip doorCloseAudio;
+    private AudioSource audioSource;
+
     private bool isOpen;
     private int multiInputDown;
     private int singleInputDown;
 
     private void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         for (int i = 0; i < singleInputSwitches.Count; i++)
         {
             singleInputSwitches[i].RegisterDoor(this);
@@ -76,7 +81,8 @@ public class SM_Door : MonoBehaviour
     {
         if (isOpen)
             return;
-
+        
+        audioSource.PlayOneShot(doorOpenAudio);
         isOpen = true;
 
         spriteRenderer.sprite = openSprite;
@@ -91,6 +97,7 @@ public class SM_Door : MonoBehaviour
         if (!isOpen)
             return;
 
+        audioSource.PlayOneShot(doorCloseAudio);
         isOpen = false;
 
         spriteRenderer.sprite = closedSprite;
