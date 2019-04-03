@@ -199,7 +199,7 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     private void OnMouseDown()
     {
-        if (IsAlive)
+        if (LocalAuthority.IsAlive && IsAlive)
         {
             if (LocalAuthority.SelectedAbility != null && LocalAuthority.IsValidTarget(this))
             {

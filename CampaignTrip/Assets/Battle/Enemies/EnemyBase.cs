@@ -41,7 +41,7 @@ public class EnemyBase : BattleActorBase
 
     private void OnMouseDown()
     {
-        if (IsAlive)
+        if (BattlePlayerBase.LocalAuthority.IsAlive && IsAlive)
         {
             BattlePlayerBase localPlayer = BattlePlayerBase.LocalAuthority;
             if (localPlayer.IsValidTarget(this))
@@ -88,7 +88,6 @@ public class EnemyBase : BattleActorBase
 
     private IEnumerator DelayDeath()
     {
-        //TODO: play death animation
         if (isServer)
         {
             yield return new WaitForSeconds(0.5f);
@@ -156,28 +155,45 @@ public class EnemyBase : BattleActorBase
         targets = newTargets;
         HealthBar.SetTargets(targets);
 		bool doWeDisplayAggro = false;
-		foreach (int i in newTargets)
-			if (i == PersistentPlayer.localAuthority.playerNum - 1)
-			{
-				doWeDisplayAggro = true;
-				break;
-			}
-		overlays.ToggleAggro(doWeDisplayAggro);
 
+        foreach (int i in newTargets)
+        {
+            if (i == PersistentPlayer.localAuthority.playerNum - 1)
+            {
+                doWeDisplayAggro = true;
+                break;
+            }
+        }
+
+		overlays.ToggleAggro(doWeDisplayAggro);
 	}
     
     [Server]
-    public void AttackPlayers(BattleController.AttackInfo[] attacks)
+    public void AttackPlayer(List<BattleController.EnemyAttack> groupAttack, int playerIndex)
     {
-        foreach (int t in targets)
+        if (targets.Contains(playerIndex))
         {
-            if (TryAttack())
-                attacks[t].attackers.Add(this);
-            else
-                attacks[t].containsMiss = true;
+            BattleController.EnemyAttack attack = new BattleController.EnemyAttack();
+            attack.hit = TryAttack();
+            attack.apply = StatusEffect.None;
+
+            if (attack.hit)
+            {
+                if (chanceToApply > Random.Range(0, 100))
+                {
+                    attack.apply = applies;
+                    attack.duration = statDuration;
+                }
+                attack.attacker = this;
+            }
+            groupAttack.Add(attack);
         }
     }
 
+    [SerializeField] private StatusEffect applies = StatusEffect.None;
+    [SerializeField] private int chanceToApply;
+    [SerializeField] private int statDuration;
+    
     public void RemoveTarget(int playerNum)
     {
         List<int> targetsCopy = new List<int>(targets);
