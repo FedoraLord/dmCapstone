@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -252,10 +253,12 @@ public class BattleController : NetworkBehaviour
         StartCoroutine(ExecuteEnemyPhase());
     }
 
-    public class AttackInfo
+    public class EnemyAttack
     {
-        public bool containsMiss;
-        public List<BattleActorBase> attackers = new List<BattleActorBase>();
+        public bool hit;
+        public BattleActorBase attacker;
+        public StatusEffect apply;
+        public int duration;
     }
 
     [Server]
@@ -264,29 +267,56 @@ public class BattleController : NetworkBehaviour
         yield return new WaitForSeconds(0.5f);
 
         //get attack damage directed at each player
-        AttackInfo[] attacks = new AttackInfo[BattlePlayerBase.players.Count];
-        attacks.Initialize(() => new AttackInfo());
-
-        foreach (EnemyBase e in aliveEnemies)
+        List<EnemyAttack>[] groupAttacks = new List<EnemyAttack>[BattlePlayerBase.players.Count];
+        groupAttacks.Initialize(() => new List<EnemyAttack>());
+            
+        for (int i = 0; i < groupAttacks.Length; i++)
         {
-            if (e.IsAlive && e.HasTargets)
-                e.AttackPlayers(attacks);
+            foreach (EnemyBase e in aliveEnemies)
+            {
+                if (e.IsAlive && e.HasTargets)
+                    e.AttackPlayer(groupAttacks[i], i);
+            }
         }
-
+        
         //apply attack damage on the players
         for (int i = 0; i < BattlePlayerBase.players.Count; i++)
         {
             BattlePlayerBase bp = BattlePlayerBase.players[i];
-            if (attacks[i].containsMiss)
+            List<EnemyAttack> hits = new List<EnemyAttack>();
+            bool containedMiss = false;
+
+            foreach (EnemyAttack attack in groupAttacks[i])
+            {
+                if (attack.hit)
+                {
+                    hits.Add(attack);
+                }
+                else
+                {
+                    containedMiss = true;
+                    attack.attacker.PlayAnimation(BattleAnimation.Attack);
+                }
+            }
+            
+            if (containedMiss)
             {
                 bp.RpcMiss();
                 yield return new WaitForSeconds(0.5f);
             }
 
-            if (attacks[i].attackers.Count > 0)
+            if (hits.Count > 0)
             {
-                attacks[i].attackers.ForEach(x => x.PlayAnimation(BattleAnimation.Attack));
-                bp.DispatchBlockableDamage(attacks[i].attackers);
+                List<BattleActorBase> attackers = new List<BattleActorBase>();
+                foreach (EnemyAttack hit in hits)
+                {
+                    if (hit.apply != StatusEffect.None)
+                        bp.AddStatusEffect(hit.apply, hit.attacker, hit.duration);
+                    hit.attacker.PlayAnimation(BattleAnimation.Attack);
+                    attackers.Add(hit.attacker);
+                }
+
+                bp.DispatchBlockableDamage(attackers);
                 yield return new WaitForSeconds(0.5f);
             }
         }
