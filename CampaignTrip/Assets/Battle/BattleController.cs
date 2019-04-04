@@ -372,6 +372,7 @@ public class BattleController : NetworkBehaviour
         RpcLoadScene(false);
         PersistentPlayer.localAuthority.minigameReady = 0;
         NetworkWrapper.manager.ServerChangeScene(sceneName);
+        CheatMenu.Instance.ToggleMinigameCheats(true);
     }
 
     [ClientRpc]
@@ -393,6 +394,7 @@ public class BattleController : NetworkBehaviour
 		StartPlayerPhase();
         RpcLoadScene(true);
         NetworkWrapper.manager.ServerChangeScene("Battle");
+        CheatMenu.Instance.ToggleMinigameCheats(false);
     }
 
     #endregion

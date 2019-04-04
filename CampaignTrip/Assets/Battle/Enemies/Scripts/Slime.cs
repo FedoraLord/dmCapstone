@@ -5,8 +5,9 @@ using UnityEngine.Networking;
 
 public class Slime : EnemyBase
 {
+	public List<Animator> smallSlimes;
 
-	public List<GameObject> smallSlimes;
+    private bool isSplit;
 
     public override void OnMinigameFailed()
     {
@@ -17,13 +18,23 @@ public class Slime : EnemyBase
 	private void RpcSplit()
 	{
 		attacksPerTurn = 4;
+        isSplit = true;
 		GetComponent<SpriteRenderer>().enabled = false;
-		foreach (GameObject smallSlime in smallSlimes)
-			smallSlime.GetComponent<SpriteRenderer>().enabled = true;
+
+        foreach (Animator smallSlime in smallSlimes)
+        {
+            smallSlime.gameObject.SetActive(true);
+        }
 	}
 
     public override void PlayAnimation(BattleAnimation type)
     {
+        if (!isSplit)
+        {
+            base.PlayAnimation(type);
+            return;
+        }
+
 		string trigger = "";
 		switch (type)
 		{
@@ -37,7 +48,10 @@ public class Slime : EnemyBase
 				trigger = "Die";
 				break;
 		}
-		foreach (GameObject smallSlime in smallSlimes)
-			smallSlime.GetComponent<Animator>().SetTrigger(trigger);
+
+        foreach (Animator smallSlime in smallSlimes)
+        {
+            smallSlime.SetTrigger(trigger);
+        }
 	}
 }
