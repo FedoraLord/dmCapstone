@@ -12,4 +12,10 @@ public static class Extensions
             collection[i] = value();
         }
     }
+
+    public static void TryPlay(this AudioSource audioSource, AudioClip audioClip)
+    {
+        if (audioSource != null)
+            audioSource.PlayOneShot(audioClip);
+    }
 }

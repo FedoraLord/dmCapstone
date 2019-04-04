@@ -82,7 +82,7 @@ public class SM_Door : MonoBehaviour
         if (isOpen)
             return;
         
-        audioSource.PlayOneShot(doorOpenAudio);
+        audioSource.TryPlay(doorOpenAudio);
         isOpen = true;
 
         spriteRenderer.sprite = openSprite;
@@ -97,7 +97,7 @@ public class SM_Door : MonoBehaviour
         if (!isOpen)
             return;
 
-        audioSource.PlayOneShot(doorCloseAudio);
+        audioSource.TryPlay(doorCloseAudio);
         isOpen = false;
 
         spriteRenderer.sprite = closedSprite;
