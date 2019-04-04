@@ -169,13 +169,14 @@ public class EnemyBase : BattleActorBase
 	}
     
     [Server]
-    public void AttackPlayer(List<BattleController.EnemyAttack> groupAttack, int playerIndex)
+    public void AttackPlayer(List<EnemyAttack> groupAttack, int playerIndex)
     {
         if (targets.Contains(playerIndex))
         {
-            BattleController.EnemyAttack attack = new BattleController.EnemyAttack();
+            EnemyAttack attack = new EnemyAttack();
             attack.hit = TryAttack();
             attack.apply = StatusEffect.None;
+            attack.attacker = this;
 
             if (attack.hit)
             {
@@ -184,7 +185,6 @@ public class EnemyBase : BattleActorBase
                     attack.apply = applies;
                     attack.duration = statDuration;
                 }
-                attack.attacker = this;
             }
             groupAttack.Add(attack);
         }
@@ -248,4 +248,3 @@ public class EnemyBase : BattleActorBase
 
     }
 }
-#pragma warning restore CS0618, 0649

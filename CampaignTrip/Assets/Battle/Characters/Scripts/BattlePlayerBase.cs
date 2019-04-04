@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
+using static Ability;
 
 #pragma warning disable CS0618, 0649
 public abstract class BattlePlayerBase : BattleActorBase
@@ -75,71 +76,13 @@ public abstract class BattlePlayerBase : BattleActorBase
             }
         }
     }
+
     protected List<BattleActorBase> customTargets;
     protected int selectedAbilityIndex = -1;
-
     protected int attacksRemaining;
 
     private bool canPlayAbility;
-
-    public enum TargetGroup { Override, Ally, Self, AllyAndSelf, Enemy }
-
-    [Serializable]
-    public class Ability
-    {
-        public AbilityButton AButton { get; set; }
-        public bool TargetAll { get { return targetAll; } }
-        public int Damage { get { return damage; } }
-        public int Duration { get { return duration; } }
-        public TargetGroup Targets { get { return targetGroup; } }
-        public StatusEffect Applies { get { return applies; } }
-
-        [HideInInspector] public int RemainingCooldown;
-        
-        [SerializeField] private string abilityName;
-        [SerializeField] private int damage;
-        [SerializeField] private int duration;
-        [SerializeField] private int cooldown;
-        [SerializeField] private bool targetAll;
-        [SerializeField] private TargetGroup targetGroup;
-        [SerializeField] private StatusEffect applies;
-        [SerializeField] private Sprite buttonIcon;
-        
-        //TODO:
-        [HideInInspector] public bool IsUpgraded;
-        
-        public void SetButton(AbilityButton button)
-        {
-            AButton = button;
-            AButton.nameText.text = abilityName;
-            if (buttonIcon != null)
-            {
-                AButton.iconImage.sprite = buttonIcon;
-            }
-        }
-
-        public void Use()
-        {
-            LocalAuthority.CanPlayAbility = false;
-            RemainingCooldown = cooldown + 1;
-        }
-
-        public void DecrementCooldown()
-        {
-            if (RemainingCooldown > 0)
-                RemainingCooldown--;
-            UpdateButtonUI();
-        }
-
-        public void UpdateButtonUI()
-        {
-            if (AButton == null)
-                return;
-            AButton.button.interactable = (RemainingCooldown <= 0 && LocalAuthority.CanPlayAbility);
-            AButton.UpdateCooldown(RemainingCooldown, cooldown + 1);
-        }
-    }
-
+    
     #region Initialization
 
     public override void OnStartClient()
@@ -268,6 +211,9 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     #region Abilities
 
+    protected abstract void OverrideTargeting();
+    protected abstract void OnAbilityUsed();
+
     public bool IsValidTarget(BattleActorBase target)
     {
         return ValidTargets.Contains(target);
@@ -316,9 +262,6 @@ public abstract class BattlePlayerBase : BattleActorBase
             ToggleTargetIndicators(true);
         }
     }
-
-    protected abstract void OverrideTargeting();
-    protected abstract void OnAbilityUsed();
     
     protected void ToggleTargetIndicators(bool active)
     {

@@ -72,23 +72,7 @@ public class BattleController : NetworkBehaviour
     [SerializeField] private AudioClip weakClip;
 
     private AudioSource audioSource;
-
-    [Serializable]
-    public class Wave
-    {
-        public List<EnemyType> members;
-
-        public List<GameObject> GetEnemyPrefabs(EnemyDataList data)
-        {
-            List<GameObject> prefabs = new List<GameObject>();
-            foreach (EnemyType type in members)
-            {
-                prefabs.Add(data.GetPrefab(type));
-            }
-            return prefabs;
-        }
-    }
-
+    
     private enum Phase { StartingBattle, Player, Transition, Enemy }
 
     #region Initialization
@@ -252,15 +236,7 @@ public class BattleController : NetworkBehaviour
         battlePhase = Phase.Enemy;
         StartCoroutine(ExecuteEnemyPhase());
     }
-
-    public class EnemyAttack
-    {
-        public bool hit;
-        public BattleActorBase attacker;
-        public StatusEffect apply;
-        public int duration;
-    }
-
+    
     [Server]
     private IEnumerator ExecuteEnemyPhase()
     {
