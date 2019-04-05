@@ -43,17 +43,17 @@ public class HealthBarUI : BattleActorUI
 
         SetTargets();
 
-        int block = (actor is EnemyBase) ? actor.BlockAmount : 0;
+        int block = (actor is EnemyBase) ? actor.BattleStats.BlockAmount : 0;
         if (actor is EnemyBase)
         {
-            int max = Mathf.Max(actor.BlockAmount, actor.MaxHealth);
-            blockData = new BarData(this, blockBar, null, max, actor.BlockAmount);
-            healthData = new BarData(this, healthBar, healthText, max, actor.MaxHealth);
+            int max = Mathf.Max(actor.BattleStats.BlockAmount, actor.BattleStats.MaxHealth);
+            blockData = new BarData(this, blockBar, null, max, actor.BattleStats.BlockAmount);
+            healthData = new BarData(this, healthBar, healthText, max, actor.BattleStats.MaxHealth);
         }
         else
         {
-            blockData = new BarData(this, blockBar, null, 0, actor.BlockAmount);
-            healthData = new BarData(this, healthBar, healthText, actor.MaxHealth, actor.MaxHealth);
+            blockData = new BarData(this, blockBar, null, 0, actor.BattleStats.BlockAmount);
+            healthData = new BarData(this, healthBar, healthText, actor.BattleStats.MaxHealth, actor.BattleStats.MaxHealth);
         }
     }
 

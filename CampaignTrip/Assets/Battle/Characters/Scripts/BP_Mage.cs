@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using static StatusEffect;
 
 #pragma warning disable 0618, 0649
 public class BP_Mage : BattlePlayerBase
@@ -28,12 +29,12 @@ public class BP_Mage : BattlePlayerBase
     public override int TakeBlockedDamage(int damage)
     {
         int damageTaken = base.TakeBlockedDamage(damage);
-        if (HasStatusEffect(StatusEffect.Focus))
+        if (HasStatusEffect(Stat.Focus))
         {
             damageWhileFocused += damageTaken;
             if (damageWhileFocused >= damageBeforeFocusBreaks)
             {
-                RemoveStatusEffect(StatusEffect.Focus);
+                RemoveStatusEffect(Stat.Focus);
             }
         }
         return damageTaken;

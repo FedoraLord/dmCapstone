@@ -348,8 +348,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1825837995
+  m_SortingLayer: 4
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 588bf5bb0ffcff44a9aba91938e158fe, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
@@ -399,6 +399,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 34}
     m_Modifications:
+    - target: {fileID: 1665753913249771026, guid: f4d29fe1c2f5fc948b8d691e458a8015,
+        type: 3}
+      propertyPath: m_Name
+      value: HealthBarUI
+      objectReference: {fileID: 0}
     - target: {fileID: 6045472781469882529, guid: f4d29fe1c2f5fc948b8d691e458a8015,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -504,11 +509,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 1665753913249771026, guid: f4d29fe1c2f5fc948b8d691e458a8015,
-        type: 3}
-      propertyPath: m_Name
-      value: HealthBarUI
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f4d29fe1c2f5fc948b8d691e458a8015, type: 3}
 --- !u!224 &6394970755267096762 stripped
@@ -524,6 +524,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 34}
     m_Modifications:
+    - target: {fileID: 4632699813934859906, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
+        type: 3}
+      propertyPath: m_Name
+      value: DamagePopup
+      objectReference: {fileID: 0}
     - target: {fileID: 4964402801478723068, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -629,11 +634,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 4632699813934859906, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
-        type: 3}
-      propertyPath: m_Name
-      value: DamagePopup
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa2af7e17aa701a4daa6a03da0e3f58d, type: 3}
 --- !u!224 &7675312742041444183 stripped
@@ -649,6 +649,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 34}
     m_Modifications:
+    - target: {fileID: 7258902256873901116, guid: e63f07229e56fef4793ace7ddcbfa0a1,
+        type: 3}
+      propertyPath: m_Name
+      value: StatusEffectOverlays
+      objectReference: {fileID: 0}
     - target: {fileID: 7356145978160666732, guid: e63f07229e56fef4793ace7ddcbfa0a1,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -703,11 +708,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7258902256873901116, guid: e63f07229e56fef4793ace7ddcbfa0a1,
-        type: 3}
-      propertyPath: m_Name
-      value: StatusEffectOverlays
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e63f07229e56fef4793ace7ddcbfa0a1, type: 3}

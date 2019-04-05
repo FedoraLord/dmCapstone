@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using static StatusEffect;
 
 #pragma warning disable 0618
 public class BP_Alchemist : BattlePlayerBase
@@ -14,7 +15,7 @@ public class BP_Alchemist : BattlePlayerBase
             //Molotov Flask (burn all enemies)
             foreach (EnemyBase enemy in BattleController.Instance.aliveEnemies)
             {
-                enemy.AddStatusEffect(StatusEffect.Burn, this, SelectedAbility.Duration);
+                enemy.AddStatusEffect(Stat.Burn, this, SelectedAbility.Duration);
             }
         }
     }

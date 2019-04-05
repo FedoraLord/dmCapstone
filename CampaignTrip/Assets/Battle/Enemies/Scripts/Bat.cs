@@ -19,7 +19,5 @@ public class Bat : EnemyBase
     public override void OnMinigameFailed()
     {
         base.OnMinigameFailed();
-
-        this.attacksPerTurn += 1;
     }
 }

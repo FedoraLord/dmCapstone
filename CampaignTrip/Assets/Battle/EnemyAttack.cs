@@ -1,12 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static BattleActorBase;
+using static StatusEffect;
 
 public class EnemyAttack
 {
     public bool hit;
     public BattleActorBase attacker;
-    public StatusEffect apply;
+    public Stat apply;
     public int duration;
 }

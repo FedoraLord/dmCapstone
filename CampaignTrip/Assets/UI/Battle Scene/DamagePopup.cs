@@ -127,10 +127,10 @@ public class DamagePopup : BattleActorUI
 
         float fadeOutTime = 1f;
         text.CrossFadeAlpha(0, fadeOutTime, false);
-        animationsPlaying--;
 
         yield return new WaitForSeconds(fadeOutTime);
 
+        animationsPlaying--;
         callback?.Invoke();
         text.gameObject.SetActive(false);
     }

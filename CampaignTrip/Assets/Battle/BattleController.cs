@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using static BattleActorBase;
-using static EnemyPrefab;
+using static StatusEffect;
 
 #pragma warning disable CS0618, 0649
 public class BattleController : NetworkBehaviour
@@ -50,13 +50,14 @@ public class BattleController : NetworkBehaviour
     [Tooltip("Groups of enemies to spawn together.")]
     [SerializeField] private Wave[] waves;
 
-    //[Header("Misc")]
-    private Dictionary<StatusEffect, int> dotStatusEffects = new Dictionary<StatusEffect, int>();
+    public Dictionary<Type, BuffStatNum> buffStats = new Dictionary<Type, BuffStatNum>();
+
     private int enemiesReady;
     private int playersReady;
     private int waveIndex = -1;
     private Phase battlePhase;
 
+    [Header("Audio")]
     [SerializeField] private AudioClip buttonClickAudio;
     [SerializeField] private AudioClip bleedClip;
     [SerializeField] private AudioClip blindClip;
@@ -106,11 +107,7 @@ public class BattleController : NetworkBehaviour
         NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
 
         PersistentPlayer.localAuthority.CmdSpawnBattlePlayer();
-
-        dotStatusEffects.Add(StatusEffect.Bleed, 5);
-        dotStatusEffects.Add(StatusEffect.Burn, 0); //damage = duration
-        dotStatusEffects.Add(StatusEffect.Poison, 5);
-
+        
         if (isServer)
         {
             StartBattle();
@@ -216,23 +213,6 @@ public class BattleController : NetworkBehaviour
     [Server]
     private void StartEnemyPhase()
     {
-        if (TEST_GoToMinigame)
-        {
-            TEST_GoToMinigame = false;
-
-            if (string.IsNullOrEmpty(TEST_ForceMinigameSceneName))
-            {
-                int randomIndex = UnityEngine.Random.Range(0, minigameSceneNames.Count);
-                LoadMinigame(minigameSceneNames[randomIndex]);
-            }
-            else
-            {
-                LoadMinigame(TEST_ForceMinigameSceneName);
-            }
-
-            return;
-        }
-
         battlePhase = Phase.Enemy;
         StartCoroutine(ExecuteEnemyPhase());
     }
@@ -286,8 +266,13 @@ public class BattleController : NetworkBehaviour
                 List<BattleActorBase> attackers = new List<BattleActorBase>();
                 foreach (EnemyAttack hit in hits)
                 {
-                    if (hit.apply != StatusEffect.None)
-                        bp.AddStatusEffect(hit.apply, hit.attacker, hit.duration);
+                    if (hit.apply != Stat.None)
+                    {
+                        if (bp.HasStatusEffect(Stat.Reflect))
+                            hit.attacker.AddStatusEffect(hit.apply, hit.attacker, hit.duration);
+                        else
+                            bp.AddStatusEffect(hit.apply, hit.attacker, hit.duration);
+                    }
                     hit.attacker.PlayAnimation(BattleAnimation.Attack);
                     attackers.Add(hit.attacker);
                 }
@@ -314,7 +299,7 @@ public class BattleController : NetworkBehaviour
     [Server]
     private IEnumerator ApplyDOTs<T>(List<T> actors) where T : BattleActorBase
     {
-        List<StatusEffect> dots = new List<StatusEffect>(dotStatusEffects.Keys);
+        List<Stat> dots = DOTs;
         for (int i = 0; i < dots.Count; i++)
         {
             bool tookStatDamage = false;
@@ -341,10 +326,16 @@ public class BattleController : NetworkBehaviour
     #endregion
 
     #region Minigames
-
+    
     [Server]
-    private void LoadMinigame(string sceneName)
+    private void LoadMinigame()
     {
+        string sceneName = TEST_ForceMinigameSceneName;
+        if (string.IsNullOrEmpty(sceneName))
+        {
+            sceneName = minigameSceneNames.Random();
+        }
+
         RpcLoadScene(false);
         PersistentPlayer.localAuthority.minigameReady = 0;
         NetworkWrapper.manager.ServerChangeScene(sceneName);
@@ -359,15 +350,14 @@ public class BattleController : NetworkBehaviour
     }
 
     [Server]
-    public void UnloadMinigame(bool succ)
+    public void UnloadMinigame(bool won)
     {
-		if (succ)
-			foreach (EnemyBase enemy in aliveEnemies)
-				enemy.OnMinigameSuccess();
-		else
-			foreach (EnemyBase enemy in aliveEnemies)
-				enemy.OnMinigameFailed();
-		StartPlayerPhase();
+		if (!won)
+        {
+            BuffStatTracker.Instance.ApplyRandomEnemyBuffs();
+        }
+
+        StartBattle();
         RpcLoadScene(true);
         NetworkWrapper.manager.ServerChangeScene("Battle");
         CheatMenu.Instance.ToggleMinigameCheats(false);
@@ -420,7 +410,7 @@ public class BattleController : NetworkBehaviour
     public void EndWave()
     {
         RpcStopAttackTimer();
-        StartBattle();
+        LoadMinigame();
     }
 
     [ClientRpc]
@@ -496,63 +486,56 @@ public class BattleController : NetworkBehaviour
     }
 
     #endregion
-
-    public int GetDOT(StatusEffect effect)
-    {
-        if (dotStatusEffects.ContainsKey(effect))
-            return dotStatusEffects[effect];
-        return -1;
-    }
-
+    
     protected void Win()
     {
         //TODO
     }
 
     [ClientRpc]
-    public void RpcPlaySoundEffect(StatusEffect type)
+    public void RpcPlaySoundEffect(Stat type)
     {
         PlaySoundEffect(type);
     }
 
-    public void PlaySoundEffect(StatusEffect type)
+    public void PlaySoundEffect(Stat type)
     {
         switch(type)
         {
-            case StatusEffect.Bleed:
+            case Stat.Bleed:
                 audioSource.TryPlay(bleedClip);
                 break;
-            case StatusEffect.Blind:
+            case Stat.Blind:
                 audioSource.TryPlay(blindClip);
                 break;
-            case StatusEffect.Burn:
+            case Stat.Burn:
                 audioSource.TryPlay(burnClip);
                 break;
-            case StatusEffect.Cure:
+            case Stat.Cure:
                 audioSource.TryPlay(cureClip);
                 break;
-            case StatusEffect.Focus:
+            case Stat.Focus:
                 audioSource.TryPlay(focusClip);
                 break;
-            case StatusEffect.Freeze:
+            case Stat.Freeze:
                 audioSource.TryPlay(freezeClip);
                 break;
-            case StatusEffect.Invisible:
+            case Stat.Invisible:
                 audioSource.TryPlay(invisibleClip);
                 break;
-            case StatusEffect.Poison:
+            case Stat.Poison:
                 audioSource.TryPlay(poisonClip);
                 break;
-            case StatusEffect.Protected:
+            case Stat.Protected:
                 audioSource.TryPlay(protectedClip);
                 break;
-            case StatusEffect.Reflect:
+            case Stat.Reflect:
                 audioSource.TryPlay(reflectClip);
                 break;
-            case StatusEffect.Stun:
+            case Stat.Stun:
                 audioSource.TryPlay(stunClip);
                 break;
-            case StatusEffect.Weak:
+            case Stat.Weak:
                 audioSource.TryPlay(weakClip);
                 break;
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+#pragma warning disable 0618
 public class Slime : EnemyBase
 {
 	public List<Animator> smallSlimes;
@@ -11,13 +12,17 @@ public class Slime : EnemyBase
 
     public override void OnMinigameFailed()
     {
-		RpcSplit();
+        if (isSplit)
+            base.OnMinigameFailed();
+		else
+            RpcSplit();
     }
 
 	[ClientRpc]
 	private void RpcSplit()
 	{
-		attacksPerTurn = 4;
+        battleStats.AttacksPerTurn.Buff();
+        BuffStatTracker.Instance.RpcUpdateEnemyStats(enemyType, battleStats);
         isSplit = true;
 		GetComponent<SpriteRenderer>().enabled = false;
 

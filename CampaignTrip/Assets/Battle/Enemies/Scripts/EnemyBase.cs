@@ -3,35 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
+using static StatusEffect;
 
-#pragma warning disable CS0618, 0649
+#pragma warning disable 0618, 0649
 public class EnemyBase : BattleActorBase
 {
     public bool HasTargets { get { return targets != null && targets.Length > 0; } }
-    public int RemainingBlock
-    {
-        get { return remainingBlock; }
-        private set
-        {
-            if (remainingBlock != value)
-            {
-                remainingBlock = value;
-                HealthBar.UpdateBlock();
 
-                if (isServer)
-                    RpcUpdateBlock(value);
-            }
-        }
+    public EnemyType enemyType;
+    public enum EnemyType
+    {
+        None, GreenSlime, RedSlime, BlueSlime, KingSlime,
+        AcornBoi, Bat, CaveBug, Lich
     }
 
     private int[] targets;
-    private int remainingBlock;
 
     #region Initialization
 
     private void Start()
     {
         BattleController.Instance.OnEnemySpawned(this);
+        battleStats = BuffStatTracker.Instance.GetEnemyStats(enemyType);
         Initialize();
     }
 
@@ -41,9 +34,9 @@ public class EnemyBase : BattleActorBase
 
     private void OnMouseDown()
     {
-        if (BattlePlayerBase.LocalAuthority.IsAlive && IsAlive)
+        BattlePlayerBase localPlayer = BattlePlayerBase.LocalAuthority;
+        if (localPlayer.IsAlive && IsAlive)
         {
-            BattlePlayerBase localPlayer = BattlePlayerBase.LocalAuthority;
             if (localPlayer.IsValidTarget(this))
             {
                 if (localPlayer.SelectedAbility != null)
@@ -72,13 +65,7 @@ public class EnemyBase : BattleActorBase
         TakeDamage(damage, initialBlock - RemainingBlock);
         return damage;
     }
-
-    [ClientRpc]
-    private void RpcUpdateBlock(int value)
-    {
-        RemainingBlock = value;
-    }
-
+    
     protected override void Die()
     {
         base.Die();
@@ -103,9 +90,9 @@ public class EnemyBase : BattleActorBase
     public override void OnPlayerPhaseStart()
     {
         base.OnPlayerPhaseStart();
-        RemainingBlock = (HasStatusEffect(StatusEffect.Weak) ? 0 : blockAmount);
+        RemainingBlock = (HasStatusEffect(Stat.Weak) ? 0 : battleStats.BlockAmount);
         
-        if (HasStatusEffect(StatusEffect.Stun) || HasStatusEffect(StatusEffect.Freeze))
+        if (HasStatusEffect(Stat.Stun) || HasStatusEffect(Stat.Freeze))
         {
             RpcUpdateTargets(new int[0]);
         }
@@ -116,7 +103,7 @@ public class EnemyBase : BattleActorBase
             {
                 if (!p.IsAlive)
                     continue;
-                if (p.HasStatusEffect(StatusEffect.Invisible))
+                if (p.HasStatusEffect(Stat.Invisible))
                     continue;
                 validTargets.Add(p);
             }
@@ -129,7 +116,7 @@ public class EnemyBase : BattleActorBase
     //picks targets randomly unless overridden
     protected virtual int[] ChooseTargets(List<BattlePlayerBase> validTargets)
     {
-        int n = Mathf.Clamp(attacksPerTurn, 0, validTargets.Count);
+        int n = Mathf.Clamp(battleStats.AttacksPerTurn, 0, validTargets.Count);
         List<int> choices = new List<int>();
 
         for (int i = 0; i < validTargets.Count; i++)
@@ -175,24 +162,20 @@ public class EnemyBase : BattleActorBase
         {
             EnemyAttack attack = new EnemyAttack();
             attack.hit = TryAttack();
-            attack.apply = StatusEffect.None;
+            attack.apply = Stat.None;
             attack.attacker = this;
 
             if (attack.hit)
             {
-                if (chanceToApply > Random.Range(0, 100))
+                if (battleStats.AppliedEffects.Stats.Length > 0 && battleStats.ChanceToApply > Random.Range(0, 100))
                 {
-                    attack.apply = applies;
-                    attack.duration = statDuration;
+                    attack.apply = battleStats.AppliedEffects.Stats.Random();
+                    attack.duration = battleStats.ApplyDuration;
                 }
             }
             groupAttack.Add(attack);
         }
     }
-
-    [SerializeField] private StatusEffect applies = StatusEffect.None;
-    [SerializeField] private int chanceToApply;
-    [SerializeField] private int statDuration;
     
     public void RemoveTarget(int playerNum)
     {
@@ -237,7 +220,7 @@ public class EnemyBase : BattleActorBase
     }
 
     #endregion
-
+    
     public virtual void OnMinigameSuccess()
     {
 
@@ -245,6 +228,7 @@ public class EnemyBase : BattleActorBase
 
     public virtual void OnMinigameFailed()
     {
-
+        battleStats.ApplyRandomBuff();
+        BuffStatTracker.Instance.RpcUpdateEnemyStats(enemyType, battleStats);
     }
 }

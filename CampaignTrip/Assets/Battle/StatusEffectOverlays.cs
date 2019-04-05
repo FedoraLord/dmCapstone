@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static BattleActorBase;
+using static StatusEffect;
 
 #pragma warning disable 0649
 public class StatusEffectOverlays : MonoBehaviour
@@ -27,9 +27,9 @@ public class StatusEffectOverlays : MonoBehaviour
         Invisible = transform.parent.GetComponent<SpriteRenderer>();
     }
 
-    public void ToggleOverlay(StatusEffect type, bool active)
+    public void ToggleOverlay(Stat type, bool active)
     {
-        if (type == StatusEffect.Cure)
+        if (type == Stat.Cure)
             return;
 
         ParticleSystem ps = GetParticleSystem(type);
@@ -45,7 +45,7 @@ public class StatusEffectOverlays : MonoBehaviour
         SpriteRenderer sr = GetSpriteRenderer(type);
         if (sr != null)
         {
-            if (type == StatusEffect.Invisible)
+            if (type == Stat.Invisible)
             {
                 Color c = sr.color;
                 c.a = (active ? 0.5f : 1);
@@ -61,40 +61,40 @@ public class StatusEffectOverlays : MonoBehaviour
         Debug.LogFormat("Failed to toggle overlay for system {0}", type);
     }
 
-    private ParticleSystem GetParticleSystem(StatusEffect type)
+    private ParticleSystem GetParticleSystem(Stat type)
     {
         switch (type)
         {
-            case StatusEffect.Bleed:
+            case Stat.Bleed:
                 return Bleed;
-            case StatusEffect.Blind:
+            case Stat.Blind:
                 return Blind;
-            case StatusEffect.Burn:
+            case Stat.Burn:
                 return Burn;
-            case StatusEffect.Focus:
+            case Stat.Focus:
                 return Focus;
-            case StatusEffect.Poison:
+            case Stat.Poison:
                 return Poison;
-            case StatusEffect.Stun:
+            case Stat.Stun:
                 return Stun;
-            case StatusEffect.Weak:
+            case Stat.Weak:
                 return Weak;
             default:
                 return null;
         }
     }
 
-    private SpriteRenderer GetSpriteRenderer(StatusEffect type)
+    private SpriteRenderer GetSpriteRenderer(Stat type)
     {
         switch (type)
         {
-            case StatusEffect.Freeze:
+            case Stat.Freeze:
                 return Freeze;
-            case StatusEffect.Protected:
+            case Stat.Protected:
                 return Protected;
-            case StatusEffect.Reflect:
+            case Stat.Reflect:
                 return Reflect;
-            case StatusEffect.Invisible:
+            case Stat.Invisible:
                 return Invisible;
             default:
                 return null;

@@ -6,23 +6,51 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1054630008981005327}
+  m_GameObject: {fileID: 1054630008981005556}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3bb1808a0a7178f47a5973d30dbb539a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 1054630008981006060}
-  damagePopup: {fileID: 1054630008981006263}
-  healthBarUI: {fileID: 1054630008981006255}
-  overlays: {fileID: 1054630008981006267}
-  uiTransform: {fileID: 1054630008981005663}
-  attacksPerTurn: 3
-  basicDamage: 20
-  blockAmount: 0
-  health: 100
-  tempAbilityTarget: {fileID: 1054630008981005775}
+  animator: {fileID: 396238763109726946}
+  damagePopup: {fileID: 4189140951269461541}
+  healthBarUI: {fileID: 1999941409511524497}
+  overlays: {fileID: 2807686952095126696}
+  uiTransform: {fileID: 2966475051797436724}
+  battleStats:
+    AttacksPerTurn:
+      value: 3
+      max: 4
+      buffAmmount: 1
+    BasicDamage:
+      value: 20
+      max: 100
+      buffAmmount: 10
+    BlockAmount:
+      value: 30
+      max: 100
+      buffAmmount: 15
+    MaxHealth:
+      value: 100
+      max: 200
+      buffAmmount: 20
+    Immunities:
+      Stats: 07000000
+      BuffPool: 
+    AppliedEffects:
+      Stats: 07000000
+      BuffPool: 
+    ChanceToApply:
+      value: 10
+      max: 100
+      buffAmmount: 5
+    ApplyDuration:
+      value: 0
+      max: 0
+      buffAmmount: 0
+  tempAbilityTarget: {fileID: 2731567121900576358}
   playerNum: 0
+  characterType: 2
   persistentPlayer: {fileID: 0}
   ability1:
     RemainingCooldown: 0
@@ -32,7 +60,7 @@ MonoBehaviour:
     cooldown: 2
     targetAll: 0
     targetGroup: 3
-    applies: 11
+    applies: 12
     buttonIcon: {fileID: 0}
     IsUpgraded: 0
   ability2:
@@ -43,7 +71,7 @@ MonoBehaviour:
     cooldown: 2
     targetAll: 0
     targetGroup: 4
-    applies: 10
+    applies: 11
     buttonIcon: {fileID: 0}
     IsUpgraded: 0
   ability3:
@@ -54,7 +82,7 @@ MonoBehaviour:
     cooldown: 2
     targetAll: 0
     targetGroup: 4
-    applies: -1
+    applies: 12
     buttonIcon: {fileID: 0}
     IsUpgraded: 0
 --- !u!1001 &1054630008981005544
@@ -182,31 +210,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
---- !u!1 &1054630008981005327 stripped
+--- !u!1 &1054630008981005556 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 28, guid: 54e2aa1d050673e459432da61c3d9441,
     type: 3}
   m_PrefabInstance: {fileID: 1054630008981005544}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &1054630008981006060 stripped
+--- !u!95 &396238763109726946 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 854968600512077322, guid: 54e2aa1d050673e459432da61c3d9441,
     type: 3}
   m_PrefabInstance: {fileID: 1054630008981005544}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &1054630008981005663 stripped
+--- !u!4 &2966475051797436724 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2849025051380317660, guid: 54e2aa1d050673e459432da61c3d9441,
     type: 3}
   m_PrefabInstance: {fileID: 1054630008981005544}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1054630008981005775 stripped
+--- !u!1 &2731567121900576358 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3119505480427420302, guid: 54e2aa1d050673e459432da61c3d9441,
     type: 3}
   m_PrefabInstance: {fileID: 1054630008981005544}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1054630008981006263 stripped
+--- !u!114 &4189140951269461541 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3783056568265927373, guid: 54e2aa1d050673e459432da61c3d9441,
     type: 3}
@@ -218,7 +246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6c443beac50599429afa7927ea33cc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1054630008981006255 stripped
+--- !u!114 &1999941409511524497 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1541344304113446009, guid: 54e2aa1d050673e459432da61c3d9441,
     type: 3}
@@ -230,7 +258,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa247792934443c47b99b6b2f43f7c95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1054630008981006267 stripped
+--- !u!114 &2807686952095126696 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2905987310479126592, guid: 54e2aa1d050673e459432da61c3d9441,
     type: 3}

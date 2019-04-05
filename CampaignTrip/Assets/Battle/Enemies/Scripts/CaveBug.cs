@@ -19,7 +19,5 @@ public class CaveBug : EnemyBase
     public override void OnMinigameFailed()
     {
         base.OnMinigameFailed();
-
-        this.basicDamage += 20;
     }
 }

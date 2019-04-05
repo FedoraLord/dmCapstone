@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static EnemyBase;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -11,7 +12,7 @@ public class EnemyDataList : ScriptableObject
 {
     public List<EnemyPrefab> EnemyPrefabList;
 
-    public GameObject GetPrefab(EnemyPrefab.EnemyType type)
+    public GameObject GetPrefab(EnemyType type)
     {
         EnemyPrefab result = EnemyPrefabList.Find(x => x.Type == type);
         if (result == null)
@@ -25,8 +26,6 @@ public class EnemyPrefab
 {
     public GameObject Prefab;
     public EnemyType Type;
-
-    public enum EnemyType { None, Slime, Wolf, KingSlime }
 }
 
 #if UNITY_EDITOR
@@ -45,7 +44,11 @@ public class EnemyDataListEditor : Editor
             {
                 EditorGUILayout.LabelField(string.Format("[{0}]", i), GUILayout.MaxWidth(30));
                 GameObject prefab = (GameObject)EditorGUILayout.ObjectField(list[i].Prefab, typeof(GameObject), false);
-                EnemyPrefab.EnemyType type = (EnemyPrefab.EnemyType)EditorGUILayout.EnumPopup(list[i].Type);
+
+                EnemyBase enemy = prefab.GetComponent<EnemyBase>();
+                if (enemy != null)
+                    EditorGUILayout.EnumPopup(enemy.enemyType);
+                //EnemyType type = (EnemyType)EditorGUILayout.EnumPopup(list[i].Type);
 
                 if (prefab != list[i].Prefab)
                 {
@@ -59,18 +62,18 @@ public class EnemyDataListEditor : Editor
                         list[i].Prefab = prefab;
                     }
                 }
-                else if (type != list[i].Type)
-                {
-                    //changed type
-                    if (list.Find(x => x.Type == type) != null)
-                    {
-                        Debug.LogWarningFormat(string.Format("Type '{0}' is already registered on this list.", type));
-                    }
-                    else
-                    {
-                        list[i].Type = type;
-                    }
-                }
+                //else if (type != list[i].Type)
+                //{
+                //    //changed type
+                //    if (list.Find(x => x.Type == type) != null)
+                //    {
+                //        Debug.LogWarningFormat(string.Format("Type '{0}' is already registered on this list.", type));
+                //    }
+                //    else
+                //    {
+                //        list[i].Type = type;
+                //    }
+                //}
 
                 if (GUILayout.Button("Remove"))
                 {
@@ -92,7 +95,7 @@ public class EnemyDataListEditor : Editor
         List<EnemyPrefab> list = (target as EnemyDataList).EnemyPrefabList;
         for (int i = 0; i < list.Count; i++)
         {
-            if (list[i].Prefab == null || list[i].Type == EnemyPrefab.EnemyType.None)
+            if (list[i].Prefab == null/* || list[i].Type == EnemyType.None*/)
             {
                 list.RemoveAt(i);
                 i--;

@@ -12,6 +12,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75f4ae6eb85e94599939d8e8890bb5fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 0}
+  damagePopup: {fileID: 0}
+  healthBarUI: {fileID: 0}
+  overlays: {fileID: 0}
+  uiTransform: {fileID: 0}
+  battleStats:
+    AttacksPerTurn:
+      value: 1
+      max: 4
+      buffAmmount: 1
+    BasicDamage:
+      value: 20
+      max: 40
+      buffAmmount: 5
+    BlockAmount:
+      value: 20
+      max: 40
+      buffAmmount: 5
+    MaxHealth:
+      value: 150
+      max: 300
+      buffAmmount: 37
+    Immunities:
+      Stats: 
+      BuffPool: 
+    AppliedEffects:
+      Stats: 
+      BuffPool: 
+    ChanceToApply:
+      value: 10
+      max: 20
+      buffAmmount: 2
+    ApplyDuration:
+      value: 5
+      max: 10
+      buffAmmount: 1
+  tempAbilityTarget: {fileID: 0}
+  enemyType: 7
 --- !u!1001 &6843987479098277486
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -79,6 +117,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3132203452215226650, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 22100000, guid: a5be92baf36db4b878d93fda3842a519,
+        type: 2}
     - target: {fileID: 3719451401222448736, guid: 4ab14dd3fb4643b49889b005e10b15ee,
         type: 3}
       propertyPath: m_AssetId.i0
@@ -159,12 +203,6 @@ PrefabInstance:
       propertyPath: m_AssetId.i15
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3132203452215226650, guid: 4ab14dd3fb4643b49889b005e10b15ee,
-        type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 22100000, guid: a5be92baf36db4b878d93fda3842a519,
-        type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4ab14dd3fb4643b49889b005e10b15ee, type: 3}
 --- !u!1 &8311256818723065402 stripped

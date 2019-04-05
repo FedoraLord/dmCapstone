@@ -215,14 +215,39 @@ MonoBehaviour:
   healthBarUI: {fileID: 963320182993334783}
   overlays: {fileID: 692020140722269344}
   uiTransform: {fileID: 3989840763669419232}
-  attacksPerTurn: 1
-  basicDamage: 5
-  blockAmount: 50
-  health: 100
+  battleStats:
+    AttacksPerTurn:
+      value: 1
+      max: 4
+      buffAmmount: 3
+    BasicDamage:
+      value: 10
+      max: 20
+      buffAmmount: 10
+    BlockAmount:
+      value: 25
+      max: 100
+      buffAmmount: 25
+    MaxHealth:
+      value: 100
+      max: 200
+      buffAmmount: 25
+    Immunities:
+      Stats: 
+      BuffPool: 
+    AppliedEffects:
+      Stats: 
+      BuffPool: 
+    ChanceToApply:
+      value: 10
+      max: 20
+      buffAmmount: 2
+    ApplyDuration:
+      value: 2
+      max: 10
+      buffAmmount: 2
   tempAbilityTarget: {fileID: 4488493214754744244}
-  applies: -1
-  chanceToApply: 0
-  statDuration: 0
+  enemyType: 1
   smallSlimes:
   - {fileID: 6406805706072784382}
   - {fileID: 8435844177067936548}
@@ -436,7 +461,7 @@ PrefabInstance:
     - target: {fileID: 3291355430086226004, guid: 4ab14dd3fb4643b49889b005e10b15ee,
         type: 3}
       propertyPath: m_Name
-      value: Slime
+      value: GreenSlime
       objectReference: {fileID: 0}
     - target: {fileID: 3291355430086226004, guid: 4ab14dd3fb4643b49889b005e10b15ee,
         type: 3}

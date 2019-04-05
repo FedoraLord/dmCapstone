@@ -8,7 +8,7 @@ using UnityEngine.UI;
 /// Controls the UI in the object named "Host-Join Room Menu".
 /// All button clicks etc. are handled by this script.
 /// </summary>
-/// #pragma warning disable CS0649
+#pragma warning disable 0649
 public class HostJoinRoomMenu : NavigationMenu
 {
     [SerializeField] private GameObject roomButtonTemplate;

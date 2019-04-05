@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
+using static BattlePlayerBase;
 
 #pragma warning disable CS0618
 public class SM_Player : NetworkBehaviour
@@ -42,28 +43,28 @@ public class SM_Player : NetworkBehaviour
             //SwitchMazeManager.Instance.CmdSetAnimatorForPlayer(playernum, PersistentPlayer.localAuthority.character.CharacterName);
         }
 
-        var player = PersistentPlayer.players.Where(x => x.playerNum == playernum).First();
-        SetAnimator(player.character.CharacterName);
+        BattlePlayerBase player = BattlePlayerBase.players.Where(x => x.playerNum == playernum).First();
+        SetAnimator(player.characterType);
     }
 
-    public void SetAnimator(CharacterData.Character characterType)
+    public void SetAnimator(CharacterType type)
     {
 
-        switch (characterType)
+        switch (type)
         {
-            case CharacterData.Character.Warrior:
+            case CharacterType.Warrior:
                 animator.runtimeAnimatorController = warriorController;
                 break;
 
-            case CharacterData.Character.Rogue:
+            case CharacterType.Rogue:
                 animator.runtimeAnimatorController = rogueController;
                 break;
 
-            case CharacterData.Character.Alchemist:
+            case CharacterType.Alchemist:
                 animator.runtimeAnimatorController = alchemistController;
                 break;
 
-            case CharacterData.Character.Mage:
+            case CharacterType.Mage:
                 animator.runtimeAnimatorController = mageController;
                 break;
         }

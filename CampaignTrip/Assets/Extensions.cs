@@ -18,4 +18,22 @@ public static class Extensions
         if (audioSource != null)
             audioSource.PlayOneShot(audioClip);
     }
+
+    public static T Random<T>(this List<T> list)
+    {
+        if (list == null || list.Count == 0)
+            return default;
+
+        int i = UnityEngine.Random.Range(0, list.Count);
+        return list[i];
+    }
+
+    public static T Random<T>(this T[] list)
+    {
+        if (list == null || list.Length == 0)
+            return default;
+
+        int i = UnityEngine.Random.Range(0, list.Length);
+        return list[i];
+    }
 }

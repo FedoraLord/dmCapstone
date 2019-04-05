@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static EnemyBase;
 using static EnemyPrefab;
 
 [Serializable]

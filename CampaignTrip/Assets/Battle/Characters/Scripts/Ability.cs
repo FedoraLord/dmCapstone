@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static BattleActorBase;
+using static StatusEffect;
 
+#pragma warning disable 0649
 [Serializable]
 public class Ability
 {
@@ -12,7 +13,7 @@ public class Ability
     public int Damage { get { return damage; } }
     public int Duration { get { return duration; } }
     public TargetGroup Targets { get { return targetGroup; } }
-    public StatusEffect Applies { get { return applies; } }
+    public Stat Applies { get { return applies; } }
 
     public enum TargetGroup { Override, Ally, Self, AllyAndSelf, Enemy }
 
@@ -24,7 +25,7 @@ public class Ability
     [SerializeField] private int cooldown;
     [SerializeField] private bool targetAll;
     [SerializeField] private TargetGroup targetGroup;
-    [SerializeField] private StatusEffect applies;
+    [SerializeField] private Stat applies;
     [SerializeField] private Sprite buttonIcon;
 
     //TODO:
