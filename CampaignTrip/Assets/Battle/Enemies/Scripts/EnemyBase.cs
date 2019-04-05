@@ -117,18 +117,13 @@ public class EnemyBase : BattleActorBase
     protected virtual int[] ChooseTargets(List<BattlePlayerBase> validTargets)
     {
         int n = Mathf.Clamp(battleStats.AttacksPerTurn, 0, validTargets.Count);
-        List<int> choices = new List<int>();
-
-        for (int i = 0; i < validTargets.Count; i++)
-        {
-            choices.Add(i);
-        }
+        List<BattlePlayerBase> choices = new List<BattlePlayerBase>(validTargets);
 
         List<int> result = new List<int>();
         while (n > 0)
         {
             int i = Random.Range(0, choices.Count);
-            result.Add(choices[i]);
+            result.Add(choices[i].playerNum - 1);
             choices.RemoveAt(i);
             n--;
         }
