@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -10,28 +11,20 @@ public class Slime : EnemyBase
 
     private bool isSplit;
 
-    public override void OnMinigameFailed()
+    protected override void Start()
     {
-        if (isSplit)
-            base.OnMinigameFailed();
-		else
-            RpcSplit();
-    }
-
-	[ClientRpc]
-	private void RpcSplit()
-	{
-        battleStats.AttacksPerTurn.Buff();
-        BuffStatTracker.Instance.RpcUpdateEnemyStats(enemyType, battleStats);
-        isSplit = true;
-		GetComponent<SpriteRenderer>().enabled = false;
-
-        foreach (Animator smallSlime in smallSlimes)
+        base.Start();
+        if (battleStats.AttacksPerTurn > 1)
         {
-            smallSlime.gameObject.SetActive(true);
+            isSplit = true;
+            GetComponent<SpriteRenderer>().enabled = false;
+            for (int i = 0; i < smallSlimes.Count && i < battleStats.AttacksPerTurn; i++)
+            {
+                smallSlimes[i].gameObject.SetActive(true);
+            }
         }
-	}
-
+    }
+    
     public override void PlayAnimation(BattleAnimation type)
     {
         if (!isSplit)
@@ -54,9 +47,18 @@ public class Slime : EnemyBase
 				break;
 		}
 
-        foreach (Animator smallSlime in smallSlimes)
-        {
-            smallSlime.SetTrigger(trigger);
-        }
+        StartCoroutine(DelayAnimationTrigger(trigger));
 	}
+
+    private IEnumerator DelayAnimationTrigger(string trigger)
+    {
+        List<Animator> visible = smallSlimes.Where(x => x.isActiveAndEnabled).ToList();
+        while (visible.Count > 0 && IsAlive)
+        {
+            Animator rand = visible.Random();
+            rand.SetTrigger(trigger);
+            visible.Remove(rand);
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
 }

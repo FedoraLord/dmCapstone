@@ -170,7 +170,7 @@ public class BuffStatEffects : IBuffStat
 {
     public bool IsBuffable { get { return BuffPool.Length > 0; } }
     public Stat[] Stats;
-    [HideInInspector]
+    //[HideInInspector]
     public Stat[] BuffPool;
 
     public IBuffStat Buff()

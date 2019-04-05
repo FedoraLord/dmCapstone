@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using static BattlePlayerBase;
@@ -15,11 +16,7 @@ public class BuffStatTracker : NetworkBehaviour
 
     private Dictionary<CharacterType, BattleStats> playerStats;
     private Dictionary<EnemyType, BattleStats> enemyStats;
-
-    //testing:
-    //public List<EnemyType> types;
-    //public List<BattleStats> stats;
-
+    
     private void Start()
     {
         if (Instance != null)
@@ -34,21 +31,10 @@ public class BuffStatTracker : NetworkBehaviour
         enemyStats = new Dictionary<EnemyType, BattleStats>();
         playerStats = new Dictionary<CharacterType, BattleStats>();
 
-        foreach (EnemyPrefab enemy in enemies.EnemyPrefabList)
+        foreach (GameObject enemy in enemies.list)
         {
-            EnemyBase script = enemy.Prefab.GetComponent<EnemyBase>();
-            if (script == null)
-            {
-                Debug.LogError("BuffStatTracker.Start() : Enemy prefab does not have an enemy script on it.");
-                continue;
-            }
-
-            script.BattleStats.Immunities.BuffPool = StatusEffect.Debuffs.ToArray();
-            script.BattleStats.AppliedEffects.BuffPool = StatusEffect.All.ToArray();
+            EnemyBase script = enemy.GetComponent<EnemyBase>();
             enemyStats.Add(script.enemyType, script.BattleStats);
-
-            //types.Add(script.enemyType);
-            //stats.Add(script.BattleStats);
         }
     }
 
@@ -65,7 +51,7 @@ public class BuffStatTracker : NetworkBehaviour
             }
         }
     }
-
+    
     public BattleStats GetPlayerStats(CharacterType type, BattleStats currentStats)
     {
         if (playerStats.ContainsKey(type))

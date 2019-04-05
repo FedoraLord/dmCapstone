@@ -57,8 +57,14 @@ public class DamagePopup : BattleActorUI
         DisplayMessage("Interrupt");
     }
 
-    private void DisplayMessage(string msg)
+    public void DisplayMessage(string msg)
     {
+        DisplayMessage(msg, Color.gray);
+    }
+
+    public void DisplayMessage(string msg, Color color)
+    {
+        messageText.CrossFadeColor(color, 0, false, false);
         messageText.text = msg;
         StopAnimation(messageAnimation);
         messageAnimation = StartCoroutine(AnimatePopup(messageText, false, () => messageAnimation = null));

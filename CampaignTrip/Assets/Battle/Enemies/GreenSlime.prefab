@@ -26,11 +26,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2228620696005731025}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0.25, z: 0}
+  m_LocalPosition: {x: 0.3, y: 0.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6601500650074735880}
-  m_RootOrder: 5
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &6406805706072784382
 Animator:
@@ -87,7 +87,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 526470245
   m_SortingLayer: 3
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_Sprite: {fileID: 21300000, guid: 5ad1f185d6a6434418a6fe7d3499cf76, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -111,7 +111,7 @@ GameObject:
   - component: {fileID: 8892714193608038005}
   - component: {fileID: 5009714976669811927}
   m_Layer: 0
-  m_Name: SmallSlime (3)
+  m_Name: SmallSlime
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -129,7 +129,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6601500650074735880}
-  m_RootOrder: 8
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &8892714193608038005
 Animator:
@@ -186,7 +186,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 526470245
   m_SortingLayer: 3
-  m_SortingOrder: 0
+  m_SortingOrder: 4
   m_Sprite: {fileID: 21300000, guid: 5ad1f185d6a6434418a6fe7d3499cf76, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -219,7 +219,7 @@ MonoBehaviour:
     AttacksPerTurn:
       value: 1
       max: 4
-      buffAmmount: 3
+      buffAmmount: 1
     BasicDamage:
       value: 10
       max: 20
@@ -234,10 +234,10 @@ MonoBehaviour:
       buffAmmount: 25
     Immunities:
       Stats: 
-      BuffPool: 
+      BuffPool: 01000000020000000300000005000000070000000a0000000b000000
     AppliedEffects:
       Stats: 
-      BuffPool: 
+      BuffPool: 0100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c000000
     ChanceToApply:
       value: 10
       max: 20
@@ -249,10 +249,10 @@ MonoBehaviour:
   tempAbilityTarget: {fileID: 4488493214754744244}
   enemyType: 1
   smallSlimes:
-  - {fileID: 6406805706072784382}
-  - {fileID: 8435844177067936548}
-  - {fileID: 2986405002175575968}
   - {fileID: 8892714193608038005}
+  - {fileID: 8435844177067936548}
+  - {fileID: 6406805706072784382}
+  - {fileID: 2986405002175575968}
 --- !u!1 &6278735766481018366
 GameObject:
   m_ObjectHideFlags: 0
@@ -265,7 +265,7 @@ GameObject:
   - component: {fileID: 8435844177067936548}
   - component: {fileID: 1635660847925156280}
   m_Layer: 0
-  m_Name: SmallSlime (1)
+  m_Name: SmallSlime
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -279,7 +279,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6278735766481018366}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.5, y: 0.25, z: 0}
+  m_LocalPosition: {x: -0.3, y: 0.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6601500650074735880}
@@ -340,7 +340,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 526470245
   m_SortingLayer: 3
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: 5ad1f185d6a6434418a6fe7d3499cf76, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -364,7 +364,7 @@ GameObject:
   - component: {fileID: 2986405002175575968}
   - component: {fileID: 8116196445541621678}
   m_Layer: 0
-  m_Name: SmallSlime (2)
+  m_Name: SmallSlime
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -378,11 +378,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7024872235130952884}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0.4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6601500650074735880}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &2986405002175575968
 Animator:
@@ -607,6 +607,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3481610247651453320, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 5133637243884992181, guid: 4ab14dd3fb4643b49889b005e10b15ee,
         type: 3}

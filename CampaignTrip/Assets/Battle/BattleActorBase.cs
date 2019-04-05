@@ -78,6 +78,25 @@ public abstract class BattleActorBase : NetworkBehaviour
     [Server]
     public virtual void OnPlayerPhaseStart() { }
 
+    private void OnValidate()
+    {
+        //Validate Debuffs
+        for (int i = 0; i < BattleStats.Immunities.Stats.Length; i++)
+        {
+            if (BattleStats.Immunities.Stats[i] != Stat.None && !Debuffs.Contains(BattleStats.Immunities.Stats[i]))
+            {
+                List<Stat> temp = BattleStats.Immunities.Stats.ToList();
+                temp.RemoveAt(i);
+                i--;
+                BattleStats.Immunities.Stats = temp.ToArray();
+            }
+        }
+
+        //Serialize Stat Pools
+        BattleStats.Immunities.BuffPool = Debuffs.Where(x => !BattleStats.Immunities.Stats.Contains(x)).ToArray();
+        BattleStats.AppliedEffects.BuffPool = All.Where(x => !BattleStats.AppliedEffects.Stats.Contains(x)).ToArray();
+    }
+
     public void Initialize()
     {
         health = battleStats.MaxHealth;
@@ -253,7 +272,19 @@ public abstract class BattleActorBase : NetworkBehaviour
     public void AddStatusEffect(Stat effect, BattleActorBase otherActor, int duration, int healthOnRemove = 0)
     {
         if (!battleStats.Immunities.Stats.Any(x => x == effect))
+        {
             RpcAddStatusEffect(effect, otherActor.gameObject, duration, healthOnRemove);
+        }
+        else
+        {
+            RpcDisplayImmunePopup(effect);
+        }
+    }
+
+    [ClientRpc]
+    private void RpcDisplayImmunePopup(Stat effect)
+    {
+        damagePopup.DisplayMessage("Immune", GetStatColor(effect));
     }
 
     [ClientRpc]
@@ -424,18 +455,10 @@ public abstract class BattleActorBase : NetworkBehaviour
         if (!HasStatusEffect(type))
             return false;
 
-        int dot;
-        if (type == Stat.Burn)
+        int dot = 0;
+        for (int i = 0; i < statusEffects[type].Count; i++)
         {
-            dot = statusEffects[type][0].RemainingDuration;
-        }
-        else
-        {
-            dot = 0;
-            for (int i = 0; i < statusEffects[type].Count; i++)
-            {
-                dot += statusEffects[type][i].DOT;
-            }
+            dot += statusEffects[type][i].DOT;
         }
 
         RpcDisplayStat(type, -1);
@@ -456,11 +479,24 @@ public abstract class BattleActorBase : NetworkBehaviour
         switch (type)
         {
             case Stat.Bleed:
+            case Stat.Weak:
                 return Color.red;
             case Stat.Burn:
                 return new Color(1, 0.5f, 0);
+            case Stat.Blind:
+            case Stat.Invisible:
+                return Color.white;
             case Stat.Poison:
+            case Stat.Cure:
                 return Color.green;
+            case Stat.Focus:
+            case Stat.Protected:
+            case Stat.Stun:
+                return Color.yellow;
+            case Stat.Freeze:
+                return Color.cyan;
+            case Stat.Reflect:
+                return Color.magenta;
             default:
                 return Color.black;
         }

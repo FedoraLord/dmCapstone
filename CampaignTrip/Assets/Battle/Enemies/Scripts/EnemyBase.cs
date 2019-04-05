@@ -21,7 +21,7 @@ public class EnemyBase : BattleActorBase
 
     #region Initialization
 
-    private void Start()
+    protected virtual void Start()
     {
         BattleController.Instance.OnEnemySpawned(this);
         battleStats = BuffStatTracker.Instance.GetEnemyStats(enemyType);
@@ -216,14 +216,4 @@ public class EnemyBase : BattleActorBase
 
     #endregion
     
-    public virtual void OnMinigameSuccess()
-    {
-
-    }
-
-    public virtual void OnMinigameFailed()
-    {
-        battleStats.ApplyRandomBuff();
-        BuffStatTracker.Instance.RpcUpdateEnemyStats(enemyType, battleStats);
-    }
 }
