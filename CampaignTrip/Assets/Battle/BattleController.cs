@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using static BattleActorBase;
+using static EnemyBase;
 using static StatusEffect;
 
 #pragma warning disable CS0618, 0649
@@ -49,6 +50,8 @@ public class BattleController : NetworkBehaviour
     [SerializeField] private EnemyDataList enemyDataList;
     [Tooltip("Groups of enemies to spawn together.")]
     [SerializeField] private Wave[] waves;
+    public List<SpawnGroup> spawnGroups = new List<SpawnGroup>();
+    public int numWaves;
 
     public Dictionary<Type, BuffStatNum> buffStats = new Dictionary<Type, BuffStatNum>();
 
@@ -106,6 +109,16 @@ public class BattleController : NetworkBehaviour
         homeSceneName = SceneManager.GetActiveScene().name;
         NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
 
+        int waveIndex = 0;
+        int stepSize = numWaves / (spawnGroups.Count - 1);
+        foreach (SpawnGroup spawn in spawnGroups)
+        {
+            spawn.WaveIndex = waveIndex;
+            spawn.NumWaves = numWaves;
+            waveIndex += stepSize;
+        }
+        spawnGroups[spawnGroups.Count - 1].WaveIndex = numWaves;
+
         PersistentPlayer.localAuthority.CmdSpawnBattlePlayer();
         
         if (isServer)
@@ -146,17 +159,11 @@ public class BattleController : NetworkBehaviour
     private IEnumerator ExecuteStartingBattlePhase()
     {
         yield return new WaitUntil(() => AllPlayersReady);
-
-        //simulate a pause where something will happen
         yield return new WaitForSeconds(1);
 
         if (SpawnWave())
         {
-            yield return new WaitUntil(() => AllEnemiesReady);
-
-            //simulate a pause where something will happen
             yield return new WaitForSeconds(1);
-
             StartPlayerPhase();
         }
     }
@@ -339,7 +346,7 @@ public class BattleController : NetworkBehaviour
         RpcLoadScene(false);
         PersistentPlayer.localAuthority.minigameReady = 0;
         NetworkWrapper.manager.ServerChangeScene(sceneName);
-        CheatMenu.Instance.ToggleMinigameCheats(true);
+        CheatMenu.Instance.ToggleCheats(false);
     }
 
     [ClientRpc]
@@ -360,7 +367,7 @@ public class BattleController : NetworkBehaviour
         StartBattle();
         RpcLoadScene(true);
         NetworkWrapper.manager.ServerChangeScene("Battle");
-        CheatMenu.Instance.ToggleMinigameCheats(false);
+        CheatMenu.Instance.ToggleCheats(true);
     }
 
     #endregion
@@ -391,18 +398,30 @@ public class BattleController : NetworkBehaviour
             return false;
         }
 
-        //Spawn the next wave then
-        List<GameObject> enemyPrefabs = waves[waveIndex].GetEnemyPrefabs(enemyDataList);
+        int prevGroup = waveIndex / (numWaves / (spawnGroups.Count - 1));
+        int nextGroup = Mathf.Clamp(prevGroup + 1, 0, spawnGroups.Count - 1);
+        SpawnGroup averageGroup = SpawnGroup.Average(spawnGroups[prevGroup], spawnGroups[nextGroup], waveIndex);
+        
+        float minEnemies = 3.5f;
+        float maxEnemies = 6.9f;
+        float spawnRange = maxEnemies - minEnemies;
+        float scaleAmount = numWaves / spawnRange;
+        int numEnemies = (int)(waveIndex / scaleAmount + minEnemies);
 
-        for (int i = 0; i < enemyPrefabs.Count; i++)
+        for (int i = 0; i < numEnemies; i++)
         {
-            if (enemyPrefabs[i] == null)
+            EnemyType type = averageGroup.ChooseRandom();
+            GameObject prefab = enemyDataList.GetPrefab(type);
+            if (prefab == null)
+            {
+                Debug.LogErrorFormat("{0} enemy prefab was null", type);
                 continue;
+            }
 
-            GameObject newEnemy = Instantiate(enemyPrefabs[i]);
+            GameObject newEnemy = Instantiate(prefab);
             NetworkServer.Spawn(newEnemy);
         }
-
+        
         return true;
     }
 

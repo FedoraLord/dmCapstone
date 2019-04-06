@@ -6,6 +6,7 @@ public class CheatMenu : MonoBehaviour
 {
     public static CheatMenu Instance;
 
+    public GameObject[] battleCheats;
     public GameObject[] minigameCheats;
 
     private bool isEditor;
@@ -15,7 +16,7 @@ public class CheatMenu : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            ToggleMinigameCheats(false);
+            ToggleCheats(true);
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -28,14 +29,28 @@ public class CheatMenu : MonoBehaviour
 #endif
     }
 
-    public void ToggleMinigameCheats(bool on)
+    public void ToggleCheats(bool isBattleScene)
+    {
+        ToggleCheats(battleCheats, isBattleScene);
+        ToggleCheats(minigameCheats, !isBattleScene);
+    }
+
+    private void ToggleCheats(GameObject[] cheats, bool on)
     {
         if (!isEditor && on)
             return;
 
-        foreach (GameObject obj in minigameCheats)
+        foreach (GameObject obj in cheats)
         {
             obj.SetActive(on);
+        }
+    }
+
+    public void KillEnemies()
+    {
+        foreach (EnemyBase enemy in BattleController.Instance.aliveEnemies)
+        {
+            enemy.TakeBlockedDamage(9999);
         }
     }
 

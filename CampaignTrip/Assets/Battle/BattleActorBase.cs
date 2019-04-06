@@ -80,6 +80,15 @@ public abstract class BattleActorBase : NetworkBehaviour
 
     private void OnValidate()
     {
+        if (name == "GreenSlime")
+        {
+            if (BattleStats.AppliedEffects.Stats.ToList().Contains(Stat.Blind))
+            {
+                //BattleStats.AppliedEffects.Stats = new Stat[0];
+                Debug.LogWarning("IT CAME BACKKKKKKKKKKK");
+            }
+        }
+
         //Validate Debuffs
         for (int i = 0; i < BattleStats.Immunities.Stats.Length; i++)
         {
