@@ -11,9 +11,9 @@ public class Slime : EnemyBase
 
     private bool isSplit;
 
-    protected override void Start()
+    protected override void Initialize()
     {
-        base.Start();
+        base.Initialize();
         if (battleStats.AttacksPerTurn > 1)
         {
             isSplit = true;

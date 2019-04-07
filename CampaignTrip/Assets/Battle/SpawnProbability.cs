@@ -9,7 +9,7 @@ using static EnemyBase;
 public class SpawnProbability
 {
     public EnemyType enemy;
-    public float probability;
+    public float probability = 1;
 }
 
 [Serializable]

@@ -225,7 +225,7 @@ MonoBehaviour:
       max: 20
       buffAmmount: 10
     BlockAmount:
-      value: 25
+      value: 0
       max: 100
       buffAmmount: 25
     MaxHealth:

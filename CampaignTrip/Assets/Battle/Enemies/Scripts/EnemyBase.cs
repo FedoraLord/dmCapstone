@@ -10,6 +10,9 @@ public class EnemyBase : BattleActorBase
 {
     public bool HasTargets { get { return targets != null && targets.Length > 0; } }
 
+    [SyncVar]
+    public int spawnPosition;
+
     public EnemyType enemyType;
     public enum EnemyType
     {
@@ -21,11 +24,14 @@ public class EnemyBase : BattleActorBase
 
     #region Initialization
 
-    protected virtual void Start()
+    protected override void Initialize()
     {
-        BattleController.Instance.OnEnemySpawned(this);
-        battleStats = BuffStatTracker.Instance.GetEnemyStats(enemyType);
-        Initialize();
+        if (!(this is Boss))
+        {
+            BattleController.Instance.OnEnemySpawned(this);
+            battleStats = BuffStatTracker.Instance.GetEnemyStats(enemyType);
+        }
+        base.Initialize();
     }
 
     #endregion
@@ -77,7 +83,8 @@ public class EnemyBase : BattleActorBase
     {
         if (isServer)
         {
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1f);
+            BattleController.Instance.OnEnemyDestroy(this);
             NetworkServer.Destroy(gameObject);
         }
     }

@@ -50,8 +50,7 @@ public abstract class BattleActorBase : NetworkBehaviour
             }
         }
     }
-    
-    protected HealthBarUI HealthBar { get { return healthBarUI; } }
+    public HealthBarUI HealthBar { get { return healthBarUI; } }
 
     [SerializeField] protected Animator animator;
     [SerializeField] protected DamagePopup damagePopup;
@@ -59,6 +58,7 @@ public abstract class BattleActorBase : NetworkBehaviour
     [SerializeField] protected StatusEffectOverlays overlays;
     [SerializeField] protected Transform uiTransform;
     [SerializeField] protected BattleStats battleStats;
+    [SerializeField] protected bool TEST_immortal;
 
     private int health;
     private int remainingBlock;
@@ -70,13 +70,20 @@ public abstract class BattleActorBase : NetworkBehaviour
     
     public enum BattleAnimation
     {
-        Attack, Hurt, Die
+        Attack, Hurt, Die, Revive
     }
     
     #region Initialization
 
     [Server]
-    public virtual void OnPlayerPhaseStart() { }
+    public virtual void OnPlayerPhaseStart()
+    {
+        if (!IsAlive && TEST_immortal)
+        {
+            Heal(battleStats.MaxHealth);
+            PlayAnimation(BattleAnimation.Revive);
+        }
+    }
 
     private void OnValidate()
     {
@@ -106,12 +113,32 @@ public abstract class BattleActorBase : NetworkBehaviour
         BattleStats.AppliedEffects.BuffPool = All.Where(x => !BattleStats.AppliedEffects.Stats.Contains(x)).ToArray();
     }
 
-    public void Initialize()
+    public void SetReferences(Animator a, DamagePopup d, HealthBarUI h, StatusEffectOverlays o, Transform UITransform, GameObject abilityTarget)
+    {
+        animator = a;
+        damagePopup = d;
+        healthBarUI = h;
+        overlays = o;
+        uiTransform = UITransform;
+        tempAbilityTarget = abilityTarget;
+    }
+
+    public override void OnStartClient()
+    {
+        StartCoroutine(DelayInitialize());
+    }
+
+    private IEnumerator DelayInitialize()
+    {
+        yield return new WaitUntil(() => BattleController.Instance != null);
+        Initialize();
+    }
+
+    protected virtual void Initialize()
     {
         health = battleStats.MaxHealth;
         healthBarUI.Init(this);
         damagePopup.Init(this);
-        DontDestroyOnLoad(gameObject);
     }
 
     private void OnDestroy()
@@ -139,6 +166,9 @@ public abstract class BattleActorBase : NetworkBehaviour
                 break;
             case BattleAnimation.Die:
                 animator.SetTrigger("Die");
+                break;
+            case BattleAnimation.Revive:
+                animator.SetTrigger("Revive");
                 break;
         }
     }

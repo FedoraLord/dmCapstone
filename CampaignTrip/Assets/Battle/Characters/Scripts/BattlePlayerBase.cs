@@ -83,27 +83,20 @@ public abstract class BattlePlayerBase : BattleActorBase
 
     #region Initialization
 
-    public override void OnStartClient()
+    protected override void Initialize()
     {
-        StartCoroutine(DelayInitialize());
-    }
-
-    private IEnumerator DelayInitialize()
-    {
-        yield return new WaitUntil(() => BattleController.Instance != null);
-
         int i = playerNum - 1;
         persistentPlayer = PersistentPlayer.players[i];
         persistentPlayer.battlePlayer = this;
 
-        transform.position = BattleController.Instance.battleCam.PlayerSpawnPoints[i].position;
+        transform.parent = BattleController.Instance.battleCam.PlayerSpawnPoints[i];
+        transform.localPosition = Vector3.zero;
 
         Abilities = new List<Ability>() { ability1, ability2, ability3 };
         BattleController.Instance.OnBattlePlayerSpawned(this);
 
-        battleStats = BuffStatTracker.Instance.GetPlayerStats(CharacterType.Alchemist, battleStats); 
-
-        Initialize();
+        battleStats = BuffStatTracker.Instance.GetPlayerStats(CharacterType.Alchemist, battleStats);
+        base.Initialize();
     }
 
     [Server]

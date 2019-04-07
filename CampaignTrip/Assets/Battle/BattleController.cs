@@ -18,13 +18,11 @@ public class BattleController : NetworkBehaviour
 
     public bool IsEnemyPhase { get { return battlePhase == Phase.Enemy; } }
     public bool IsPlayerPhase { get { return battlePhase == Phase.Player; } }
-    public bool IsWaitingPhase { get { return !IsEnemyPhase && !IsPlayerPhase; } }
+    //public bool IsWaitingPhase { get { return !IsEnemyPhase && !IsPlayerPhase; } }
     public Camera MainCamera { get { return battleCam.Cam; } }
+    public int RemainingEnemySpawnPoints { get; private set; }
 
     private bool AllPlayersReady { get { return playersReady == PersistentPlayer.players.Count; } }
-    private bool AllEnemiesReady { get { return enemiesReady == waves[waveIndex].members.Count; } }
-
-    private string homeSceneName; // we need this because you can only find the active scene, not the scene the object is in with Scene Manager
 
     [Header("UI")]
     public BattleCamera battleCam;
@@ -41,24 +39,24 @@ public class BattleController : NetworkBehaviour
 
     [Header("Minigames")]
     public List<string> minigameSceneNames;
-    public bool TEST_GoToMinigame;
+    public bool TEST_SkipMinigame;
     public string TEST_ForceMinigameSceneName;
-
+    
     [Header("Spawning")]
-    [HideInInspector] public List<EnemyBase> aliveEnemies;
-
-    [SerializeField] private EnemyDataList enemyDataList;
-    [Tooltip("Groups of enemies to spawn together.")]
-    [SerializeField] private Wave[] waves;
-    public List<SpawnGroup> spawnGroups = new List<SpawnGroup>();
-    public int numWaves;
-
     public Dictionary<Type, BuffStatNum> buffStats = new Dictionary<Type, BuffStatNum>();
 
-    private int enemiesReady;
+    [SerializeField] private int numWaves;
+    [SerializeField] private Boss boss;
+    [SerializeField] private EnemyDataList enemyDataList;
+    [SerializeField] private List<SpawnGroup> spawnGroups = new List<SpawnGroup>();
+
+    [HideInInspector] public List<EnemyBase> aliveEnemies;
+
     private int playersReady;
     private int waveIndex = -1;
+    private List<bool> availableSpawnPoints;
     private Phase battlePhase;
+    private enum Phase { StartingBattle, Player, Transition, Enemy }
 
     [Header("Audio")]
     [SerializeField] private AudioClip buttonClickAudio;
@@ -77,21 +75,8 @@ public class BattleController : NetworkBehaviour
 
     private AudioSource audioSource;
     
-    private enum Phase { StartingBattle, Player, Transition, Enemy }
-
     #region Initialization
-
-    private void OnValidate()
-    {
-        foreach (Wave w in waves)
-        {
-            if (w.members.Count > 6)
-            {
-                w.members.RemoveRange(6, w.members.Count - 6);
-            }
-        }
-    }
-
+    
     protected void Start()
     {
         if (Instance)
@@ -106,18 +91,24 @@ public class BattleController : NetworkBehaviour
         DontDestroyOnLoad(gameObject);
         DontDestroyOnLoad(battleCam.gameObject);
 
-        homeSceneName = SceneManager.GetActiveScene().name;
         NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
 
-        int waveIndex = 0;
+        int wave = 0;
         int stepSize = numWaves / (spawnGroups.Count - 1);
         foreach (SpawnGroup spawn in spawnGroups)
         {
-            spawn.WaveIndex = waveIndex;
+            spawn.WaveIndex = wave;
             spawn.NumWaves = numWaves;
-            waveIndex += stepSize;
+            wave += stepSize;
         }
-        spawnGroups[spawnGroups.Count - 1].WaveIndex = numWaves;
+        spawnGroups[spawnGroups.Count - 1].WaveIndex = numWaves - 1;
+
+        availableSpawnPoints = new List<bool>();
+        for (int i = 0; i < battleCam.EnemySpawnPoints.Count; i++)
+        {
+            availableSpawnPoints.Add(true);
+        }
+        RemainingEnemySpawnPoints = availableSpawnPoints.Count;
 
         PersistentPlayer.localAuthority.CmdSpawnBattlePlayer();
         
@@ -151,8 +142,6 @@ public class BattleController : NetworkBehaviour
     public void StartBattle()
     {
         battlePhase = Phase.StartingBattle;
-        //playersReady = 0;
-        enemiesReady = 0;
         StartCoroutine(ExecuteStartingBattlePhase());
     }
 
@@ -169,7 +158,7 @@ public class BattleController : NetworkBehaviour
     }
 
     [Server]
-    private void StartPlayerPhase()
+    public void StartPlayerPhase()
     {
         battlePhase = Phase.Player;
 
@@ -297,7 +286,11 @@ public class BattleController : NetworkBehaviour
 
         yield return new WaitForSeconds(0.1f);
 
-        if (aliveEnemies.Count > 0 && IsEnemyPhase)
+        if (boss.Started)
+        {
+            yield return boss.ExecuteTurn();
+        }
+        else if (aliveEnemies.Count > 0 && IsEnemyPhase)
         {
             StartPlayerPhase();
         }
@@ -376,13 +369,8 @@ public class BattleController : NetworkBehaviour
 
     public void OnEnemySpawned(EnemyBase enemy)
     {
-        if (isServer)
-        {
-            enemiesReady++;
-        }
-
-        int i = aliveEnemies.Count;
-        enemy.transform.position = battleCam.EnemySpawnPoints[i].position;
+        enemy.transform.parent = battleCam.EnemySpawnPoints[enemy.spawnPosition];
+        enemy.transform.localPosition = Vector3.zero;
         aliveEnemies.Add(enemy);
     }
 
@@ -392,9 +380,9 @@ public class BattleController : NetworkBehaviour
         waveIndex++;
 
         //Are all the waves done with?
-        if (waveIndex == waves.Length)
+        if (waveIndex >= numWaves)
         {
-            Win();
+            boss.Begin();
             return false;
         }
 
@@ -406,30 +394,63 @@ public class BattleController : NetworkBehaviour
         float maxEnemies = 6.9f;
         float spawnRange = maxEnemies - minEnemies;
         float scaleAmount = numWaves / spawnRange;
-        int numEnemies = (int)(waveIndex / scaleAmount + minEnemies);
+        int numEnemies = (int)(waveIndex * spawnRange / (numWaves - 1) + minEnemies);
 
+        SpawnEnemies(averageGroup, numEnemies);
+        return true;
+    }
+
+    [Server]
+    public void SpawnEnemies(SpawnGroup group, int numEnemies)
+    {
         for (int i = 0; i < numEnemies; i++)
         {
-            EnemyType type = averageGroup.ChooseRandom();
+            EnemyType type = group.ChooseRandom();
             GameObject prefab = enemyDataList.GetPrefab(type);
             if (prefab == null)
             {
                 Debug.LogErrorFormat("{0} enemy prefab was null", type);
                 continue;
             }
-
-            GameObject newEnemy = Instantiate(prefab);
-            NetworkServer.Spawn(newEnemy);
+            SpawnEnemy(prefab);
         }
-        
-        return true;
+    }
+
+    [Server]
+    public void SpawnEnemy(GameObject prefab)
+    {
+        int spawnPoint = ClaimSpawnPoint();
+        if (spawnPoint < 0)
+        {
+            Debug.LogError("No more available spawn points.");
+            return;
+        }
+
+        GameObject obj = Instantiate(prefab);
+        EnemyBase enemy = obj.GetComponent<EnemyBase>();
+        enemy.spawnPosition = spawnPoint;
+        NetworkServer.Spawn(obj);
+    }
+
+    private int ClaimSpawnPoint()
+    {
+        int i = availableSpawnPoints.IndexOf(true);
+        if (i >= 0)
+        {
+            availableSpawnPoints[i] = false;
+            RemainingEnemySpawnPoints--;
+        }
+        return i;
     }
 
     [Server]
     public void EndWave()
     {
         RpcStopAttackTimer();
-        LoadMinigame();
+        if (TEST_SkipMinigame)
+            StartBattle();
+        else
+            LoadMinigame();
     }
 
     [ClientRpc]
@@ -458,7 +479,7 @@ public class BattleController : NetworkBehaviour
     private IEnumerator AttackTimerCountdown(float totalTime)
     {
         float timeRemaining = totalTime;
-        do
+        while (timeRemaining > 0)
         {
             //update UI
             attackTimerBar.localScale = new Vector3(timeRemaining / totalTime, 1, 1);
@@ -469,7 +490,6 @@ public class BattleController : NetworkBehaviour
 
             yield return new WaitForEndOfFrame();
         }
-        while (timeRemaining > 0);
 
         attackTimerCountdown = null;
 
@@ -482,7 +502,13 @@ public class BattleController : NetworkBehaviour
     public void OnEnemyDeath(EnemyBase dead)
     {
         aliveEnemies.Remove(dead);
-        if (isServer && aliveEnemies.Count == 0)
+    }
+
+    public void OnEnemyDestroy(EnemyBase destroyed)
+    {
+        availableSpawnPoints[destroyed.spawnPosition] = true;
+        RemainingEnemySpawnPoints++;
+        if (isServer && aliveEnemies.Count == 0 && battlePhase != Phase.StartingBattle && !boss.Started)
         {
             EndWave();
         }
