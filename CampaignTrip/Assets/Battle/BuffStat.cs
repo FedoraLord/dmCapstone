@@ -59,47 +59,47 @@ public struct BattleStats
         }
     }
 
-    public void SetStat(BuffType type, IBuffStat stat)
-    {
-        if (stat is BuffStatNum)
-        {
-            BuffStatNum b = (BuffStatNum)stat;
-            switch (type)
-            {
-                case BuffType.AttacksPerTurn:
-                    AttacksPerTurn = b;
-                    break;
-                case BuffType.BasicDamage:
-                    BasicDamage = b;
-                    break;
-                case BuffType.BlockAmount:
-                    BlockAmount = b;
-                    break;
-                case BuffType.MaxHealth:
-                    MaxHealth = b;
-                    break;
-                case BuffType.ChanceToApply:
-                    ChanceToApply = b;
-                    break;
-                case BuffType.ApplyDuration:
-                    ApplyDuration = b;
-                    break;
-            }
-        }
-        else
-        {
-            BuffStatEffects b = (BuffStatEffects)stat;
-            switch (type)
-            {
-                case BuffType.Immunities:
-                    Immunities = b;
-                    break;
-                case BuffType.AppliedEffects:
-                    AppliedEffects = b;
-                    break;
-            }
-        }
-    }
+    //public void SetStat(BuffType type, IBuffStat stat)
+    //{
+    //    if (stat is BuffStatNum)
+    //    {
+    //        BuffStatNum b = (BuffStatNum)stat;
+    //        switch (type)
+    //        {
+    //            case BuffType.AttacksPerTurn:
+    //                AttacksPerTurn = b;
+    //                break;
+    //            case BuffType.BasicDamage:
+    //                BasicDamage = b;
+    //                break;
+    //            case BuffType.BlockAmount:
+    //                BlockAmount = b;
+    //                break;
+    //            case BuffType.MaxHealth:
+    //                MaxHealth = b;
+    //                break;
+    //            case BuffType.ChanceToApply:
+    //                ChanceToApply = b;
+    //                break;
+    //            case BuffType.ApplyDuration:
+    //                ApplyDuration = b;
+    //                break;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        BuffStatEffects b = (BuffStatEffects)stat;
+    //        switch (type)
+    //        {
+    //            case BuffType.Immunities:
+    //                Immunities = b;
+    //                break;
+    //            case BuffType.AppliedEffects:
+    //                AppliedEffects = b;
+    //                break;
+    //        }
+    //    }
+    //}
 
     public BattleStats ApplyRandomBuff()
     {
@@ -125,17 +125,17 @@ public struct BattleStats
         if (stats.Count > 0)
         {
             BuffType type = stats.Random();
-            IBuffStat buffedValue = GetStat(type).Buff();
-            SetStat(type, buffedValue);
+            /*IBuffStat buffedValue = */GetStat(type).Buff();
+            //SetStat(type, buffedValue);
         }
         return this;
     }
 
-    public BattleStats ApplyBuff(BuffType type)
+    public /*BattleStats*/void ApplyBuff(BuffType type)
     {
-        IBuffStat buffedValue = GetStat(type).Buff();
-        SetStat(type, buffedValue);
-        return this;
+        /*IBuffStat buffedValue = */GetStat(type).Buff();
+        //SetStat(type, buffedValue);
+        //return this;
     }
 }
 
@@ -146,7 +146,7 @@ public interface IBuffStat
 }
 
 [Serializable]
-public struct BuffStatNum : IBuffStat
+public class BuffStatNum : IBuffStat
 {
     public bool IsBuffable { get { return value < max; } }
     public int value;

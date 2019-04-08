@@ -68,14 +68,12 @@ public abstract class MinigameManager : NetworkBehaviour
     [Command]
 	public void CmdWin()
 	{
-		Win();
 		RpcWin();
 	}
 
     [Command]
     public void CmdLose()
     {
-        Lose();
         RpcLose();
     }
 

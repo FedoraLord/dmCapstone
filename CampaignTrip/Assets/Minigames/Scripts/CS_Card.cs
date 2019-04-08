@@ -20,7 +20,7 @@ public class CS_Card : MonoBehaviour
     {
         if (isSelectable)
         {
-            CS_Manager.Instance.CardSelected(this);
+            (MinigameManager.Instance as CS_Manager).CardSelected(this);
         }
     }
 }

@@ -7,8 +7,6 @@ using UnityEngine.UI;
 #pragma warning disable 0618
 public class CS_Manager : MinigameManager
 {
-    public static new CS_Manager Instance;
-
     public Text timerText;
     public List<CS_Card> selectableCards;
     public List<CS_Card> sequenceCards;
@@ -103,9 +101,15 @@ public class CS_Manager : MinigameManager
         userSequence.Add(card.index);
         if (userSequence.Count == randomSequence.Count)
         {
-            //compare
-            //CmdWin();
-            //CmdLose();
+            for (int i = 0; i < randomSequence.Count; i++)
+            {
+                if (userSequence[i] != randomSequence[i].index)
+                {
+                    CmdLose();
+                    return;
+                }
+            }
+            CmdWin();
         }
     }
 
@@ -127,10 +131,21 @@ public class CS_Manager : MinigameManager
     protected override void Win()
     {
         winText.text = "Success!";
+        StartCoroutine(EndGame(true));
     }
 
     protected override void Lose()
     {
         winText.text = "Lose";
+        StartCoroutine(EndGame(false));
+    }
+
+    private IEnumerator EndGame(bool won)
+    {
+        if (isServer)
+        {
+            yield return new WaitForSeconds(1);
+            BattleController.Instance.UnloadMinigame(won);
+        }
     }
 }
