@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5397a1fa60caea548a850c11cf4117a8, type: 3}
   m_Name: EnemyList
   m_EditorClassIdentifier: 
-  EnemyPrefabList:
-  - Prefab: {fileID: 7479651146532222750, guid: 8ab6a0ccef6b49843aaa4aead30a0378,
-      type: 3}
-    Type: 1
+  path: Assets/Battle/Enemies
+  list:
+  - {fileID: 6937235629143217428, guid: 1742517238275674986532af7418d883, type: 3}
+  - {fileID: 1986955822417415775, guid: 5bf3bbf368e824a18b8239e1f245e73f, type: 3}
+  - {fileID: 2309045038468197896, guid: 0a8aaa5c85a427a4f96d7bcd9031da31, type: 3}
+  - {fileID: 8311256818723065402, guid: d02bf1aca06274cbcb3c77ee5cf82b34, type: 3}
+  - {fileID: 7479651146532222750, guid: 8ab6a0ccef6b49843aaa4aead30a0378, type: 3}
+  - {fileID: 795638715784478346, guid: dfb38494795040b4db36c565b08a6aa3, type: 3}

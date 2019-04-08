@@ -10,8 +10,13 @@ public abstract class BattleActorUI : MonoBehaviour
     {
         owner = actor;
         transform.SetParent(BattleController.Instance.transform);
-        Vector3 camPosition = BattleController.Instance.MainCamera.WorldToScreenPoint(actor.UITransform.position);
-        transform.position = camPosition;
+        UpdatePosition();
         (transform as RectTransform).sizeDelta = Vector2.zero;
+    }
+
+    public void UpdatePosition()
+    {
+        Vector3 camPosition = BattleController.Instance.MainCamera.WorldToScreenPoint(owner.UITransform.position);
+        transform.position = camPosition;
     }
 }

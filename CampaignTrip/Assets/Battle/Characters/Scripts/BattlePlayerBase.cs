@@ -4,21 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
+using static Ability;
+using static StatusEffect;
 
 #pragma warning disable CS0618, 0649
 public abstract class BattlePlayerBase : BattleActorBase
 {
     public static BattlePlayerBase LocalAuthority { get { return PersistentPlayer.localAuthority.battlePlayer; } }
-    //public static BP_Mage Mage { get; protected set; }
-    //public static BP_Rogue Rogue { get; protected set; }
-    //public static BP_Warrior Warrior { get; protected set; }
-    //public static BP_Alchemist Alchemist { get; protected set; }
-    public static int PlayersUsingAbility;
-
     public static List<BattlePlayerBase> players { get { return PersistentPlayer.players.Select(x => x.battlePlayer).ToList(); } }
-
-    public List<Ability> Abilities { get; private set; }
-
+    public static int PlayersUsingAbility;
+    
     public bool CanPlayAbility
     {
         get { return canPlayAbility; }
@@ -31,6 +26,7 @@ public abstract class BattlePlayerBase : BattleActorBase
             }
         }
     }
+    public List<Ability> Abilities { get; private set; }
     public Ability SelectedAbility
     {
         get
@@ -42,6 +38,7 @@ public abstract class BattlePlayerBase : BattleActorBase
     }
     
     [SyncVar] public int playerNum;
+    public CharacterType characterType;
 
     [HideInInspector] public PersistentPlayer persistentPlayer;
 
@@ -68,99 +65,38 @@ public abstract class BattlePlayerBase : BattleActorBase
                 case TargetGroup.AllyAndSelf:
                     return new List<BattleActorBase>(players);
                 case TargetGroup.Enemy:
-                    return BattleController.Instance.aliveEnemies.Where(x => !x.HasStatusEffect(StatusEffect.Invisible)).ToList<BattleActorBase>();
+                    return BattleController.Instance.aliveEnemies.Where(x => !x.HasStatusEffect(Stat.Invisible)).ToList<BattleActorBase>();
                 default:
                     Debug.LogErrorFormat("Valid targets not implemented for {0}", SelectedAbility.Targets);
                     return new List<BattleActorBase>();
             }
         }
     }
+
     protected List<BattleActorBase> customTargets;
     protected int selectedAbilityIndex = -1;
-
     protected int attacksRemaining;
 
     private bool canPlayAbility;
 
-    public enum TargetGroup { Override, Ally, Self, AllyAndSelf, Enemy }
-
-    [Serializable]
-    public class Ability
-    {
-        public AbilityButton AButton { get; set; }
-        public bool TargetAll { get { return targetAll; } }
-        public int Damage { get { return damage; } }
-        public int Duration { get { return duration; } }
-        public TargetGroup Targets { get { return targetGroup; } }
-        public StatusEffect Applies { get { return applies; } }
-
-        [HideInInspector] public int RemainingCooldown;
-        
-        [SerializeField] private string abilityName;
-        [SerializeField] private int damage;
-        [SerializeField] private int duration;
-        [SerializeField] private int cooldown;
-        [SerializeField] private bool targetAll;
-        [SerializeField] private TargetGroup targetGroup;
-        [SerializeField] private StatusEffect applies;
-        [SerializeField] private Sprite buttonIcon;
-        
-        //TODO:
-        [HideInInspector] public bool IsUpgraded;
-        
-        public void SetButton(AbilityButton button)
-        {
-            AButton = button;
-            AButton.nameText.text = abilityName;
-            if (buttonIcon != null)
-            {
-                AButton.iconImage.sprite = buttonIcon;
-            }
-        }
-
-        public void Use()
-        {
-            LocalAuthority.CanPlayAbility = false;
-            RemainingCooldown = cooldown + 1;
-        }
-
-        public void DecrementCooldown()
-        {
-            if (RemainingCooldown > 0)
-                RemainingCooldown--;
-            UpdateButtonUI();
-        }
-
-        public void UpdateButtonUI()
-        {
-            if (AButton == null)
-                return;
-            AButton.button.interactable = (RemainingCooldown <= 0 && LocalAuthority.CanPlayAbility);
-            AButton.UpdateCooldown(RemainingCooldown, cooldown + 1);
-        }
-    }
+    public enum CharacterType { Warrior, Rogue, Alchemist, Mage };
 
     #region Initialization
 
-    public override void OnStartClient()
+    protected override void Initialize()
     {
-        StartCoroutine(DelayInitialize());
-    }
-
-    private IEnumerator DelayInitialize()
-    {
-        yield return new WaitUntil(() => BattleController.Instance != null);
-
         int i = playerNum - 1;
         persistentPlayer = PersistentPlayer.players[i];
         persistentPlayer.battlePlayer = this;
 
-        transform.position = BattleController.Instance.battleCam.PlayerSpawnPoints[i].position;
+        transform.parent = BattleController.Instance.battleCam.PlayerSpawnPoints[i];
+        transform.localPosition = Vector3.zero;
 
         Abilities = new List<Ability>() { ability1, ability2, ability3 };
         BattleController.Instance.OnBattlePlayerSpawned(this);
 
-        Initialize();
+        battleStats = BuffStatTracker.Instance.GetPlayerStats(CharacterType.Alchemist, battleStats);
+        base.Initialize();
     }
 
     [Server]
@@ -173,21 +109,20 @@ public abstract class BattlePlayerBase : BattleActorBase
     [ClientRpc]
     private void RpcOnPlayerPhaseStart()
     {
-        if (HasStatusEffect(StatusEffect.Stun) || HasStatusEffect(StatusEffect.Freeze))
+        if (HasStatusEffect(Stat.Stun) || HasStatusEffect(Stat.Freeze))
         {
             attacksRemaining = 0;
-            blockAmount = 90;
             CanPlayAbility = false;
         }
         else
         {
-            attacksRemaining = attacksPerTurn;
-            blockAmount = (HasStatusEffect(StatusEffect.Weak) ? 0 : 90);
+            attacksRemaining = battleStats.AttacksPerTurn;
             CanPlayAbility = true;
         }
+        RemainingBlock = (HasStatusEffect(Stat.Weak) ? 0 : battleStats.BlockAmount);
 
         if (this == LocalAuthority)
-            BattleController.Instance.UpdateAttackBlockUI(attacksRemaining, blockAmount);
+            BattleController.Instance.UpdateAttackBlockUI(attacksRemaining, RemainingBlock);
 
         foreach (Ability a in Abilities)
             a.DecrementCooldown();
@@ -207,8 +142,8 @@ public abstract class BattlePlayerBase : BattleActorBase
             }
             else if (LocalAuthority.attacksRemaining > 0)
             {
-                StatusEffect[] stats = { StatusEffect.Burn, StatusEffect.Freeze };
-                foreach (StatusEffect stat in stats)
+                Stat[] stats = { Stat.Burn, Stat.Freeze };
+                foreach (Stat stat in stats)
                 {
                     if (HasStatusEffect(stat))
                     {
@@ -221,7 +156,7 @@ public abstract class BattlePlayerBase : BattleActorBase
     }
 
     [Command]
-    public void CmdHelpWithStat(StatusEffect type, GameObject target)
+    public void CmdHelpWithStat(Stat type, GameObject target)
     {
         BattleActorBase t = target.GetComponent<BattleActorBase>();
         t.RpcDisplayStat(type, -1);
@@ -254,19 +189,22 @@ public abstract class BattlePlayerBase : BattleActorBase
     {
         attacksRemaining--;
 
-        if (!HasStatusEffect(StatusEffect.Weak))
-            blockAmount = (int)Mathf.Min((float)attacksRemaining / attacksPerTurn * 100f, 90);
+        if (!HasStatusEffect(Stat.Weak))
+            RemainingBlock = (int)((float)attacksRemaining / battleStats.AttacksPerTurn * battleStats.BlockAmount / 100f);
 
         if (this == LocalAuthority)
         {
             PlayAnimation(BattleAnimation.Attack);
-            BattleController.Instance.UpdateAttackBlockUI(attacksRemaining, blockAmount);
+            BattleController.Instance.UpdateAttackBlockUI(attacksRemaining, RemainingBlock);
         }
     }
 
     #endregion
 
     #region Abilities
+
+    protected abstract void OverrideTargeting();
+    protected abstract void OnAbilityUsed();
 
     public bool IsValidTarget(BattleActorBase target)
     {
@@ -316,9 +254,6 @@ public abstract class BattlePlayerBase : BattleActorBase
             ToggleTargetIndicators(true);
         }
     }
-
-    protected abstract void OverrideTargeting();
-    protected abstract void OnAbilityUsed();
     
     protected void ToggleTargetIndicators(bool active)
     {
@@ -383,13 +318,13 @@ public abstract class BattlePlayerBase : BattleActorBase
         }
 
         Ability a = SelectedAbility;
-        if (a.Applies != StatusEffect.None)
+        if (a.Applies != Stat.None)
         {
-            if (a.Applies == StatusEffect.Cure)
+            if (a.Applies == Stat.Cure)
             {
                 target.AddStatusEffect(a.Applies, this, a.Duration, a.Damage);
             }
-            if (a.Applies == StatusEffect.Focus)
+            if (a.Applies == Stat.Focus)
             {
                 AddStatusEffect(a.Applies, target, a.Duration, a.Damage);
             }
@@ -421,7 +356,7 @@ public abstract class BattlePlayerBase : BattleActorBase
     [Server]
     public override int TakeBlockedDamage(int damage)
     {
-        int blocked = damage * blockAmount / 100;
+        int blocked = damage * RemainingBlock / 100;
         int damageTaken = damage - blocked;
         TakeDamage(damageTaken, blocked);
         return damageTaken;
@@ -463,7 +398,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         if (!attack)
         {
             if (this == LocalAuthority)
-                BattleController.Instance.UpdateAttackBlockUI(0, blockAmount);
+                BattleController.Instance.UpdateAttackBlockUI(0, RemainingBlock);
             attacksRemaining = 0;
         }
     }

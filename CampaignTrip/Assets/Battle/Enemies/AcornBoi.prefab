@@ -1,24 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!95 &3936570275272466059
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6937235629143217428}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &2096013311007412432
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31,16 +12,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d80cf3bf8c5e034c8632bff0c0d5822, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 3936570275272466059}
+  animator: {fileID: 7394047669688996954}
   damagePopup: {fileID: 3062935794318241595}
   healthBarUI: {fileID: 780647209328612341}
   overlays: {fileID: 1013732939290906282}
   uiTransform: {fileID: 3518946366019942122}
-  attacksPerTurn: 1
-  basicDamage: 5
-  blockAmount: 50
-  health: 100
-  tempAbilityTarget: {fileID: 0}
+  battleStats:
+    AttacksPerTurn:
+      value: 1
+      max: 4
+      buffAmmount: 1
+    BasicDamage:
+      value: 5
+      max: 10
+      buffAmmount: 1
+    BlockAmount:
+      value: 50
+      max: 100
+      buffAmmount: 12
+    MaxHealth:
+      value: 100
+      max: 200
+      buffAmmount: 25
+    Immunities:
+      Stats: 
+      BuffPool: 01000000020000000300000005000000070000000a0000000b000000
+    AppliedEffects:
+      Stats: 
+      BuffPool: 0100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c000000
+    ChanceToApply:
+      value: 10
+      max: 20
+      buffAmmount: 2
+    ApplyDuration:
+      value: 0
+      max: 0
+      buffAmmount: 0
+  tempAbilityTarget: {fileID: 4161705208098031038}
+  enemyType: 5
 --- !u!1001 &5614648842731676992
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -52,6 +61,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: AcornBoi
+      objectReference: {fileID: 0}
+    - target: {fileID: 6596556092980879836, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6596556092980879836, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6596556092980879836, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.newSize.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6596556092980879836, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.newSize.y
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1296206118871482946, guid: 4ab14dd3fb4643b49889b005e10b15ee,
         type: 3}
@@ -108,6 +137,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3132203452215226650, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 22100000, guid: a0827c474b777c448948cb905a37ef82,
+        type: 2}
     - target: {fileID: 3719451401222448736, guid: 4ab14dd3fb4643b49889b005e10b15ee,
         type: 3}
       propertyPath: m_AssetId.i0
@@ -188,6 +223,22 @@ PrefabInstance:
       propertyPath: m_AssetId.i15
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3481610247651453320, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300008, guid: 97185bd0498900f42ac7b456079e6f64,
+        type: 3}
+    - target: {fileID: 3481610247651453320, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: m_Size.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3481610247651453320, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4ab14dd3fb4643b49889b005e10b15ee, type: 3}
 --- !u!1 &6937235629143217428 stripped
@@ -196,9 +247,21 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 5614648842731676992}
   m_PrefabAsset: {fileID: 0}
+--- !u!95 &7394047669688996954 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 3132203452215226650, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+    type: 3}
+  m_PrefabInstance: {fileID: 5614648842731676992}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3518946366019942122 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9024917114008458154, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+    type: 3}
+  m_PrefabInstance: {fileID: 5614648842731676992}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4161705208098031038 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8370614499677823230, guid: 4ab14dd3fb4643b49889b005e10b15ee,
     type: 3}
   m_PrefabInstance: {fileID: 5614648842731676992}
   m_PrefabAsset: {fileID: 0}
