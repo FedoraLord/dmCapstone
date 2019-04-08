@@ -190,7 +190,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         attacksRemaining--;
 
         if (!HasStatusEffect(Stat.Weak))
-            RemainingBlock = (int)((float)attacksRemaining / battleStats.AttacksPerTurn * battleStats.BlockAmount / 100f);
+            RemainingBlock = (int)((float)attacksRemaining / battleStats.AttacksPerTurn * battleStats.BlockAmount);
 
         if (this == LocalAuthority)
         {
