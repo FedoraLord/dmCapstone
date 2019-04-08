@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -255,7 +255,7 @@ PrefabInstance:
     - target: {fileID: 326307829229797757, guid: 013c867322a79014184393ee59612cc9,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8024783407812987177, guid: 013c867322a79014184393ee59612cc9,
         type: 3}
@@ -781,11 +781,6 @@ PrefabInstance:
       propertyPath: freezeClip
       value: 
       objectReference: {fileID: 8300000, guid: b923a4ca1dca04a25945d8b7929aca96, type: 3}
-    - target: {fileID: 978044166576981394, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: cheatMenu
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
       propertyPath: waves.Array.data[3].members.Array.data[0]
@@ -965,7 +960,7 @@ PrefabInstance:
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
       propertyPath: TEST_SkipMinigame
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
@@ -1002,6 +997,11 @@ PrefabInstance:
       propertyPath: stunClip
       value: 
       objectReference: {fileID: 8300000, guid: 76c12522a8ce5d347a5b933ad6b7781e, type: 3}
+    - target: {fileID: 978044166576981394, guid: 2533b610f63309548a9e44069e7a7ecc,
+        type: 3}
+      propertyPath: cheatMenu
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 978044166576981394, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
       propertyPath: m_LocalPosition.x

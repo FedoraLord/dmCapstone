@@ -12,6 +12,7 @@ public class EnemyBase : BattleActorBase
 
     [SyncVar]
     public int spawnPosition;
+    public bool useBossSpawn;
 
     public EnemyType enemyType;
     public enum EnemyType
@@ -28,9 +29,9 @@ public class EnemyBase : BattleActorBase
     {
         if (!(this is Boss))
         {
-            BattleController.Instance.OnEnemySpawned(this);
             battleStats = BuffStatTracker.Instance.GetEnemyStats(enemyType);
         }
+        BattleController.Instance.OnEnemySpawned(this);
         base.Initialize();
     }
 

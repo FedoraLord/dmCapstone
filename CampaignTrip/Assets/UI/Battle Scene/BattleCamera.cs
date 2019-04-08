@@ -62,9 +62,10 @@ public class BattleCamera : MonoBehaviour
             cam.orthographicSize = Mathf.Lerp(startSize, endSize, animTime);
 
             foreach (BattlePlayerBase p in BattlePlayerBase.players)
-            {
                 p.HealthBar.UpdatePosition();
-            }
+
+            foreach (EnemyBase enemy in BattleController.Instance.aliveEnemies)
+                enemy.HealthBar.UpdatePosition();
 
             yield return new WaitForEndOfFrame();
             animTime += Time.deltaTime / totalAnimTime;

@@ -370,7 +370,10 @@ public class BattleController : NetworkBehaviour
 
     public void OnEnemySpawned(EnemyBase enemy)
     {
-        enemy.transform.parent = battleCam.EnemySpawnPoints[enemy.spawnPosition];
+        if (enemy.useBossSpawn)
+            enemy.transform.parent = battleCam.BossSpawnPoint;
+        else
+            enemy.transform.parent = battleCam.EnemySpawnPoints[enemy.spawnPosition];
         enemy.transform.localPosition = Vector3.zero;
         aliveEnemies.Add(enemy);
     }

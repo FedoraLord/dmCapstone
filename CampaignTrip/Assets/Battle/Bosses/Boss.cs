@@ -10,15 +10,23 @@ public abstract class Boss : EnemyBase
     public int CurrentPhase { get; protected set; } = -1;
     
     public int numPhases;
-    
+
+    private void Start()
+    {
+        gameObject.SetActive(Started);
+    }
+
+    protected override void Initialize()
+    {
+        gameObject.SetActive(false);
+    }
+
     public void Begin()
     {
         Started = true;
-        BattleCamera cam = BattleController.Instance.battleCam;
-        BattleController.Instance.aliveEnemies.Add(this);
-        cam.ZoomOut(OnZoomCompleted);
-        transform.parent = cam.BossSpawnPoint;
-        transform.localPosition = Vector3.zero;
+        gameObject.SetActive(true);
+        BattleController.Instance.battleCam.ZoomOut(OnZoomCompleted);
+        base.Initialize();
     }
 
     private void OnZoomCompleted()
@@ -32,7 +40,9 @@ public abstract class Boss : EnemyBase
         if (Health < BattleStats.MaxHealth)
         {
             float hpStepSize = (float)BattleStats.MaxHealth / numPhases;
-            phase = numPhases - (int)(Health / hpStepSize);
+            phase = numPhases - 1 - (int)(Health / hpStepSize);
+            if (phase < 0 || phase > 2)
+                Debug.Log("nononnononon");
         }
 
         CurrentPhase = phase;

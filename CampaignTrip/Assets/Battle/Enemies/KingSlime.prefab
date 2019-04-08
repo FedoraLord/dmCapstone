@@ -48,7 +48,10 @@ MonoBehaviour:
       value: 0
       max: 0
       buffAmmount: 0
+  TEST_immortal: 0
   tempAbilityTarget: {fileID: 4682627224773576715}
+  spawnPosition: 0
+  useBossSpawn: 1
   enemyType: 4
   numPhases: 3
   phaseGroups:
