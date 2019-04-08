@@ -34,6 +34,10 @@ public class BuffStatTracker : NetworkBehaviour
         foreach (GameObject enemy in enemies.list)
         {
             EnemyBase script = enemy.GetComponent<EnemyBase>();
+            //script.BattleStats.AppliedEffects.Stats = new StatusEffect.Stat[0]; 
+            //BattleStats a = new BattleStats(script.BattleStats);
+            //BattleStats deRef = script.BattleStats;
+            //deRef.AppliedEffects.Stats = new StatusEffect.Stat[] { StatusEffect.Stat.Focus };
             enemyStats.Add(script.enemyType, script.BattleStats);
         }
     }

@@ -52,6 +52,7 @@ public class BattleController : NetworkBehaviour
 
     [HideInInspector] public List<EnemyBase> aliveEnemies;
 
+    private int dyingEnemies;
     private int playersReady;
     private int waveIndex = -1;
     private List<bool> availableSpawnPoints;
@@ -443,6 +444,12 @@ public class BattleController : NetworkBehaviour
         return i;
     }
 
+    private void UnclaimSpawnPoint(int i)
+    {
+        availableSpawnPoints[i] = true;
+        RemainingEnemySpawnPoints++;
+    }
+
     [Server]
     public void EndWave()
     {
@@ -502,14 +509,20 @@ public class BattleController : NetworkBehaviour
     public void OnEnemyDeath(EnemyBase dead)
     {
         aliveEnemies.Remove(dead);
+        dyingEnemies++;
     }
 
     public void OnEnemyDestroy(EnemyBase destroyed)
     {
-        availableSpawnPoints[destroyed.spawnPosition] = true;
-        RemainingEnemySpawnPoints++;
-        if (isServer && aliveEnemies.Count == 0 && battlePhase != Phase.StartingBattle && !boss.Started)
+        UnclaimSpawnPoint(destroyed.spawnPosition);
+        dyingEnemies--;
+        if (isServer && aliveEnemies.Count == 0 && dyingEnemies == 0 && !boss.Started)
         {
+            if (battlePhase == Phase.StartingBattle)
+            {
+                Debug.LogError("i guess you need this condition");
+                return;
+            }
             EndWave();
         }
     }
