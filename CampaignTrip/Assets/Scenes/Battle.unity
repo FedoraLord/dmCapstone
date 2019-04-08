@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -667,7 +667,7 @@ PrefabInstance:
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
       propertyPath: TEST_ForceMinigameSceneName
-      value: SwitchMaze
+      value: CardFlip
       objectReference: {fileID: 0}
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
@@ -898,7 +898,7 @@ PrefabInstance:
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
       propertyPath: TEST_SkipMinigame
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
