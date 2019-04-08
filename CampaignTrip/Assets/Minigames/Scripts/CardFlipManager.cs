@@ -34,7 +34,7 @@ public class CardFlipManager : MinigameManager
 		randomCards.Remove(winningCard);
 		winningCard.isWinner = true;
 
-		for (int playerNum = 0; playerNum < randomPlayersCopy.Count; playerNum++)
+		while (randomPlayersCopy.Count != 0)
 		{
 			PersistentPlayer p = randomPlayersCopy[0];
 			yield return new WaitUntil(() => p.connectionToClient.isReady);
@@ -46,7 +46,7 @@ public class CardFlipManager : MinigameManager
 				randomCards.RemoveAt(0);
 			}
 
-			randomPlayers.Remove(p);
+			randomPlayersCopy.Remove(p);
 		}
 	}
 
