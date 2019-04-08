@@ -34,11 +34,8 @@ public class BuffStatTracker : NetworkBehaviour
         foreach (GameObject enemy in enemies.list)
         {
             EnemyBase script = enemy.GetComponent<EnemyBase>();
-            //script.BattleStats.AppliedEffects.Stats = new StatusEffect.Stat[0]; 
-            //BattleStats a = new BattleStats(script.BattleStats);
-            //BattleStats deRef = script.BattleStats;
-            //deRef.AppliedEffects.Stats = new StatusEffect.Stat[] { StatusEffect.Stat.Focus };
-            enemyStats.Add(script.enemyType, script.BattleStats);
+            BattleStats copy = BattleStats.Copy(script.BattleStats);
+            enemyStats.Add(script.enemyType, copy);
         }
     }
 
@@ -50,8 +47,8 @@ public class BuffStatTracker : NetworkBehaviour
         {
             if (enemyStats.ContainsKey(t))
             {
-                BattleStats stats = enemyStats[t].ApplyRandomBuff();
-                RpcUpdateEnemyStats(t, stats);
+                /*BattleStats stats = */enemyStats[t].ApplyRandomBuff();
+                RpcUpdateEnemyStats(t, enemyStats[t]);
             }
         }
     }

@@ -17,7 +17,7 @@ using Random = UnityEngine.Random;
 
 #pragma warning disable 0649
 [Serializable]
-public struct BattleStats
+public class BattleStats
 {
     public BuffStatNum AttacksPerTurn;
     public BuffStatNum BasicDamage;
@@ -27,6 +27,21 @@ public struct BattleStats
     public BuffStatEffects AppliedEffects;
     public BuffStatNum ChanceToApply;
     public BuffStatNum ApplyDuration;
+
+    public static BattleStats Copy(BattleStats template)
+    {
+        return new BattleStats()
+        {
+            AttacksPerTurn = BuffStatNum.Copy(template.AttacksPerTurn),
+            BasicDamage = BuffStatNum.Copy(template.BasicDamage),
+            BlockAmount = BuffStatNum.Copy(template.BlockAmount),
+            MaxHealth = BuffStatNum.Copy(template.MaxHealth),
+            Immunities = BuffStatEffects.Copy(template.Immunities),
+            AppliedEffects = BuffStatEffects.Copy(template.AppliedEffects),
+            ChanceToApply = BuffStatNum.Copy(template.ChanceToApply),
+            ApplyDuration = BuffStatNum.Copy(template.ApplyDuration),
+        };
+    }
 
     public enum BuffType
     {
@@ -101,7 +116,7 @@ public struct BattleStats
     //    }
     //}
 
-    public BattleStats ApplyRandomBuff()
+    public /*BattleStats*/void ApplyRandomBuff()
     {
         List<BuffType> stats = new List<BuffType>()
         {
@@ -128,7 +143,7 @@ public struct BattleStats
             /*IBuffStat buffedValue = */GetStat(type).Buff();
             //SetStat(type, buffedValue);
         }
-        return this;
+        //return this;
     }
 
     public /*BattleStats*/void ApplyBuff(BuffType type)
@@ -153,6 +168,16 @@ public class BuffStatNum : IBuffStat
     public int max;
     public int buffAmmount;
     
+    public static BuffStatNum Copy(BuffStatNum template)
+    {
+        return new BuffStatNum()
+        {
+            value = template.value,
+            max = template.max,
+            buffAmmount = template.buffAmmount
+        };
+    }
+
     public IBuffStat Buff()
     {
         value = Mathf.Min(value + buffAmmount, max);
@@ -172,6 +197,15 @@ public class BuffStatEffects : IBuffStat
     public Stat[] Stats;
     //[HideInInspector]
     public Stat[] BuffPool;
+
+    public static BuffStatEffects Copy(BuffStatEffects template)
+    {
+        return new BuffStatEffects()
+        {
+            Stats = template.Stats,
+            BuffPool = template.BuffPool
+        };
+    }
 
     public IBuffStat Buff()
     {

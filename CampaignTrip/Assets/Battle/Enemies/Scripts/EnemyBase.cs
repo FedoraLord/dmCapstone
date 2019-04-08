@@ -26,11 +26,7 @@ public class EnemyBase : BattleActorBase
 
     protected override void Initialize()
     {
-        if (this is Boss)
-        {
-            transform.parent = BattleController.Instance.battleCam.transform;
-        }
-        else
+        if (!(this is Boss))
         {
             BattleController.Instance.OnEnemySpawned(this);
             battleStats = BuffStatTracker.Instance.GetEnemyStats(enemyType);
