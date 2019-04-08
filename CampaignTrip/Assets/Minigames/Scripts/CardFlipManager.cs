@@ -52,11 +52,20 @@ public class CardFlipManager : MinigameManager
 
     protected override void Win()
     {
-        throw new System.NotImplementedException();
+        StartCoroutine(EndGame(true));
     }
 
     protected override void Lose()
     {
-        throw new System.NotImplementedException();
+        StartCoroutine(EndGame(false));
+    }
+
+    private IEnumerator EndGame(bool won)
+    {
+        if (isServer)
+        {
+            yield return new WaitForSeconds(1);
+            BattleController.Instance.UnloadMinigame(won);
+        }
     }
 }
