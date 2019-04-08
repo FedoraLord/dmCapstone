@@ -219,6 +219,11 @@ PrefabInstance:
       propertyPath: singleInputSwitches.Array.data[0]
       value: 
       objectReference: {fileID: 159102835}
+    - target: {fileID: 7814994563801701088, guid: 86fb4b32027c2ab449b02d413ae5a87a,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 86fb4b32027c2ab449b02d413ae5a87a, type: 3}
 --- !u!1 &56059764
@@ -46004,6 +46009,11 @@ PrefabInstance:
       propertyPath: singleInputSwitches.Array.data[1]
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 7814994563801701088, guid: 86fb4b32027c2ab449b02d413ae5a87a,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 86fb4b32027c2ab449b02d413ae5a87a, type: 3}
 --- !u!1001 &932270400
@@ -48929,6 +48939,11 @@ PrefabInstance:
       propertyPath: singleInputSwitches.Array.data[0]
       value: 
       objectReference: {fileID: 1006399894}
+    - target: {fileID: 7814994563801701088, guid: 86fb4b32027c2ab449b02d413ae5a87a,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 86fb4b32027c2ab449b02d413ae5a87a, type: 3}
 --- !u!1001 &2017550444
@@ -49206,5 +49221,10 @@ PrefabInstance:
       propertyPath: singleInputSwitches.Array.data[0]
       value: 
       objectReference: {fileID: 439945315}
+    - target: {fileID: 7814994563801701088, guid: 86fb4b32027c2ab449b02d413ae5a87a,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 86fb4b32027c2ab449b02d413ae5a87a, type: 3}

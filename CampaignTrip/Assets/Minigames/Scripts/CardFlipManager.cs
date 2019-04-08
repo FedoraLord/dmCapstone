@@ -34,7 +34,7 @@ public class CardFlipManager : MinigameManager
 		randomCards.Remove(winningCard);
 		winningCard.isWinner = true;
 
-		for (int playerNum = 0; playerNum < randomPlayersCopy.Count; playerNum++)
+		while (randomPlayersCopy.Count != 0)
 		{
 			PersistentPlayer p = randomPlayersCopy[0];
 			yield return new WaitUntil(() => p.connectionToClient.isReady);
@@ -46,17 +46,26 @@ public class CardFlipManager : MinigameManager
 				randomCards.RemoveAt(0);
 			}
 
-			randomPlayers.Remove(p);
+			randomPlayersCopy.Remove(p);
 		}
 	}
 
     protected override void Win()
     {
-        throw new System.NotImplementedException();
+        StartCoroutine(EndGame(true));
     }
 
     protected override void Lose()
     {
-        throw new System.NotImplementedException();
+        StartCoroutine(EndGame(false));
+    }
+
+    private IEnumerator EndGame(bool won)
+    {
+        if (isServer)
+        {
+            yield return new WaitForSeconds(1);
+            BattleController.Instance.UnloadMinigame(won);
+        }
     }
 }
