@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
+#pragma warning disable 0618
 public abstract class Boss : EnemyBase
 {
     public bool Started { get; protected set; }
@@ -20,15 +22,26 @@ public abstract class Boss : EnemyBase
     {
         gameObject.SetActive(false);
     }
-
+    
+    [Server]
     public void Begin()
     {
         Started = true;
         gameObject.SetActive(true);
-        BattleController.Instance.battleCam.ZoomOut(OnZoomCompleted);
+        RpcZoomToBoss();
         base.Initialize();
     }
 
+    [ClientRpc]
+    private void RpcZoomToBoss()
+    {
+        Action callback = null;
+        if (isServer)
+            callback = OnZoomCompleted;
+        BattleController.Instance.battleCam.ZoomOut(OnZoomCompleted);
+    }
+
+    [Server]
     private void OnZoomCompleted()
     {
         StartCoroutine(ExecuteTurn());
@@ -41,12 +54,9 @@ public abstract class Boss : EnemyBase
         {
             float hpStepSize = (float)BattleStats.MaxHealth / numPhases;
             phase = numPhases - 1 - (int)(Health / hpStepSize);
-            if (phase < 0 || phase > 2)
-                Debug.Log("nononnononon");
         }
 
         CurrentPhase = phase;
-        //PhaseChangedThisTurn = (CurrentPhase != phase);
         if (CurrentPhase != phase)
             yield return OnPhaseChanged();
     }
