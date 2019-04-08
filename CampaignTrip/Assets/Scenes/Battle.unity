@@ -910,6 +910,36 @@ PrefabInstance:
       propertyPath: boss
       value: 
       objectReference: {fileID: 870598669}
+    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
+        type: 3}
+      propertyPath: invisibleClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 5a29112e8c1612f4383b958dd685e78c, type: 3}
+    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
+        type: 3}
+      propertyPath: blindClip
+      value: 
+      objectReference: {fileID: 8300000, guid: a4afbedf8eef7fa4c8e86c186e383ffb, type: 3}
+    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
+        type: 3}
+      propertyPath: freezeClip
+      value: 
+      objectReference: {fileID: 8300000, guid: b923a4ca1dca04a25945d8b7929aca96, type: 3}
+    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
+        type: 3}
+      propertyPath: weakClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 22c3e1caae038a244ae245bd76af06c6, type: 3}
+    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
+        type: 3}
+      propertyPath: focusClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 93e2cc62c9d91d84f8a6cd5b3d339b64, type: 3}
+    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
+        type: 3}
+      propertyPath: stunClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 76c12522a8ce5d347a5b933ad6b7781e, type: 3}
     - target: {fileID: 978044166576981394, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
       propertyPath: m_LocalPosition.x
