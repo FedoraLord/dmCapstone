@@ -30,8 +30,9 @@ public class EnemyBase : BattleActorBase
         if (!(this is Boss))
         {
             battleStats = BuffStatTracker.Instance.GetEnemyStats(enemyType);
+            BattleController.Instance.SetSpawnPosition(this);
         }
-        BattleController.Instance.OnEnemySpawned(this);
+        BattleController.Instance.RegisterEnemy(this);
         base.Initialize();
     }
 

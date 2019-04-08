@@ -94,6 +94,8 @@ public class BattleController : NetworkBehaviour
 
         NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
 
+        boss.gameObject.SetActive(true);
+
         int wave = 0;
         int stepSize = numWaves / (spawnGroups.Count - 1);
         foreach (SpawnGroup spawn in spawnGroups)
@@ -368,13 +370,17 @@ public class BattleController : NetworkBehaviour
 
     #region Spawning
 
-    public void OnEnemySpawned(EnemyBase enemy)
+    public void SetSpawnPosition(EnemyBase enemy)
     {
         if (enemy.useBossSpawn)
             enemy.transform.parent = battleCam.BossSpawnPoint;
         else
             enemy.transform.parent = battleCam.EnemySpawnPoints[enemy.spawnPosition];
         enemy.transform.localPosition = Vector3.zero;
+    }
+
+    public void RegisterEnemy(EnemyBase enemy)
+    {
         aliveEnemies.Add(enemy);
     }
 
@@ -384,9 +390,9 @@ public class BattleController : NetworkBehaviour
         waveIndex++;
 
         //Are all the waves done with?
-        if (waveIndex >= numWaves)
+        if (waveIndex >= numWaves || true)
         {
-            boss.Begin();
+            boss.RpcBegin();
             return false;
         }
 

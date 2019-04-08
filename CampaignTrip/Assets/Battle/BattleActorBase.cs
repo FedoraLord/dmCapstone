@@ -117,7 +117,7 @@ public abstract class BattleActorBase : NetworkBehaviour
         tempAbilityTarget = abilityTarget;
     }
 
-    public override void OnStartClient()
+    private void Start()
     {
         StartCoroutine(DelayInitialize());
     }

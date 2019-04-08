@@ -12,28 +12,24 @@ public abstract class Boss : EnemyBase
     public int CurrentPhase { get; protected set; } = -1;
     
     public int numPhases;
-
-    private void Start()
-    {
-        gameObject.SetActive(Started);
-    }
-
+    public SpriteRenderer sr;
+    
     protected override void Initialize()
     {
-        gameObject.SetActive(false);
+        sr.enabled = false;
+        BattleController.Instance.SetSpawnPosition(this);
     }
     
-    [Server]
-    public void Begin()
+    [ClientRpc]
+    public void RpcBegin()
     {
         Started = true;
-        gameObject.SetActive(true);
-        RpcZoomToBoss();
+        sr.enabled = true;
+        ZoomToBoss();
         base.Initialize();
     }
-
-    [ClientRpc]
-    private void RpcZoomToBoss()
+    
+    private void ZoomToBoss()
     {
         Action callback = null;
         if (isServer)
