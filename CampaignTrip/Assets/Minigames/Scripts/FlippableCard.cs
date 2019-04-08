@@ -32,7 +32,10 @@ public class FlippableCard : NetworkBehaviour
 	{
 		RpcFlip();
 		if (Flip())
+		{
 			MinigameManager.Instance.CmdWin();
+			MinigameManager.Instance.numPlayersWon = PersistentPlayer.players.Count;
+		}
 	}
 
 	[ClientRpc]
