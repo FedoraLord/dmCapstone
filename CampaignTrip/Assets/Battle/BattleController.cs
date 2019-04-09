@@ -390,7 +390,7 @@ public class BattleController : NetworkBehaviour
         waveIndex++;
 
         //Are all the waves done with?
-        if (waveIndex >= numWaves || true)
+        if (waveIndex >= numWaves)
         {
             boss.RpcBegin();
             return false;

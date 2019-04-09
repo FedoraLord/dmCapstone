@@ -20,23 +20,7 @@ public class BattleCamera : MonoBehaviour
     [SerializeField] private float zoomOutSize;
     [SerializeField] private Transform zoomInPos;
     [SerializeField] private Transform zoomOutPos;
-
-    //private void Start()
-    //{
-    //    StartCoroutine(test());
-    //}
-
-    private IEnumerator test()
-    {
-        while (true)
-        {
-            yield return Zoom(zoomOutSize, zoomOutPos);
-            yield return new WaitForSeconds(1);
-            yield return Zoom(zoomInSize, zoomInPos);
-            yield return new WaitForSeconds(1);
-        }
-    }
-
+    
     public void ZoomOut(Action callback = null)
     {
         StartCoroutine(Zoom(zoomOutSize, zoomOutPos, callback));

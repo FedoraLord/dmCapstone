@@ -306,6 +306,7 @@ public abstract class BattleActorBase : NetworkBehaviour
     {
         if (!battleStats.Immunities.Stats.Any(x => x == effect))
         {
+            RemoveOnAdd(effect);
             RpcAddStatusEffect(effect, otherActor.gameObject, duration, healthOnRemove);
         }
         else
@@ -324,10 +325,8 @@ public abstract class BattleActorBase : NetworkBehaviour
     private void RpcAddStatusEffect(Stat type, GameObject otherActor, int duration, int healthOnRemove)
     {
         BattleController.Instance.PlaySoundEffect(type);
-
         StatusEffect s = new StatusEffect(type, otherActor.GetComponent<BattleActorBase>(), duration, healthOnRemove);
-
-        RemoveOnAdd(type);
+        
         if (type == Stat.Cure)
         {
             Heal(healthOnRemove);
@@ -410,6 +409,7 @@ public abstract class BattleActorBase : NetworkBehaviour
         }
     }
 
+    [Server]
     private void RemoveOnAdd(Stat type)
     {
         switch (type)
@@ -567,7 +567,7 @@ public abstract class BattleActorBase : NetworkBehaviour
                     s.RemoveAt(i);
                     i--;
                 }
-                else
+                else if (isServer)
                 {
                     RemoveStatusEffect(type);
                 }
