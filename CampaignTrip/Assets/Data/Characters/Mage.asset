@@ -15,5 +15,5 @@ MonoBehaviour:
   flavorText: Heals friends and attacks with magic
   sprite: {fileID: 21300000, guid: e2f468372ea8d0d418ac87089d5f5291, type: 3}
   icon: {fileID: 21300000, guid: 35947148f3dbf1b46901b8c8d438c85c, type: 3}
-  characterPrefab: {fileID: 8458088793063255804, guid: d1d4135aeebf79d42a00a5bd414fbaef,
+  characterPrefab: {fileID: 8458088793063255136, guid: d1d4135aeebf79d42a00a5bd414fbaef,
     type: 3}

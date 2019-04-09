@@ -7,40 +7,20 @@ using UnityEngine.Networking;
 #pragma warning disable 0618
 public abstract class Boss : EnemyBase
 {
-    public bool Started { get; protected set; }
-    //public bool PhaseChangedThisTurn { get; private set; }
     public int CurrentPhase { get; protected set; } = -1;
     
     public int numPhases;
-    public SpriteRenderer sr;
     
-    protected override void Initialize()
+    public void BeginBossFight()
     {
-        sr.enabled = false;
-        BattleController.Instance.SetSpawnPosition(this);
-    }
-    
-    [ClientRpc]
-    public void RpcBegin()
-    {
-        Started = true;
-        sr.enabled = true;
-        ZoomToBoss();
-        base.Initialize();
-    }
-    
-    private void ZoomToBoss()
-    {
-        Action callback = null;
-        if (isServer)
-            callback = OnZoomCompleted;
-        BattleController.Instance.battleCam.ZoomOut(OnZoomCompleted);
+        StartCoroutine(ZoomOutCamera());
     }
 
-    [Server]
-    private void OnZoomCompleted()
+    private IEnumerator ZoomOutCamera()
     {
-        StartCoroutine(ExecuteTurn());
+        yield return new WaitForSeconds(0.1f);
+        Action callback = (isServer ? () => StartCoroutine(ExecuteTurn()) : default(Action));
+        BattleController.Instance.battleCam.ZoomOut(callback);
     }
 
     public virtual IEnumerator ExecuteTurn()

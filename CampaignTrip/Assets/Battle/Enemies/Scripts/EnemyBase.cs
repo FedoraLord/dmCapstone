@@ -10,9 +10,8 @@ public class EnemyBase : BattleActorBase
 {
     public bool HasTargets { get { return targets != null && targets.Length > 0; } }
 
-    [SyncVar]
-    public int spawnPosition;
-    public bool useBossSpawn;
+    [SyncVar] public int spawnPosition;
+    [SyncVar] public bool useBossSpawn;
 
     public EnemyType enemyType;
     public enum EnemyType
@@ -27,12 +26,19 @@ public class EnemyBase : BattleActorBase
 
     protected override void Initialize()
     {
-        if (!(this is Boss))
+        Boss b = this as Boss;
+        if (b != null)
         {
-            battleStats = BuffStatTracker.Instance.GetEnemyStats(enemyType);
-            BattleController.Instance.SetSpawnPosition(this);
+            if (useBossSpawn)
+            {
+                BattleController.Instance.OnBossSpawn(b);
+            }
         }
-        BattleController.Instance.RegisterEnemy(this);
+        else
+        {
+            BattleController.Instance.OnEnemySpawn(this);
+            battleStats = BuffStatTracker.Instance.GetEnemyStats(enemyType);
+        }
         base.Initialize();
     }
 

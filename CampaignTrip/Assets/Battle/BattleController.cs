@@ -43,10 +43,11 @@ public class BattleController : NetworkBehaviour
     public string TEST_ForceMinigameSceneName;
     
     [Header("Spawning")]
+    public GameObject prefabBoss;
+    public Boss boss;
     public Dictionary<Type, BuffStatNum> buffStats = new Dictionary<Type, BuffStatNum>();
 
     [SerializeField] private int numWaves;
-    [SerializeField] private Boss boss;
     [SerializeField] private EnemyDataList enemyDataList;
     [SerializeField] private List<SpawnGroup> spawnGroups = new List<SpawnGroup>();
 
@@ -93,9 +94,7 @@ public class BattleController : NetworkBehaviour
         DontDestroyOnLoad(battleCam.gameObject);
 
         NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
-
-        boss.gameObject.SetActive(true);
-
+        
         int wave = 0;
         int stepSize = numWaves / (spawnGroups.Count - 1);
         foreach (SpawnGroup spawn in spawnGroups)
@@ -289,7 +288,7 @@ public class BattleController : NetworkBehaviour
 
         yield return new WaitForSeconds(0.1f);
 
-        if (boss.Started)
+        if (boss != null)
         {
             yield return boss.ExecuteTurn();
         }
@@ -333,6 +332,13 @@ public class BattleController : NetworkBehaviour
     [Server]
     private void LoadMinigame()
     {
+        StartCoroutine(DelayLoadMinigame());
+    }
+
+    [Server]
+    private IEnumerator DelayLoadMinigame()
+    {
+        yield return new WaitForSeconds(0.1f);
         string sceneName = TEST_ForceMinigameSceneName;
         if (string.IsNullOrEmpty(sceneName))
         {
@@ -370,18 +376,23 @@ public class BattleController : NetworkBehaviour
 
     #region Spawning
 
-    public void SetSpawnPosition(EnemyBase enemy)
+    private void OnEnemySpawn(EnemyBase enemy, Transform spawnPoint)
     {
-        if (enemy.useBossSpawn)
-            enemy.transform.parent = battleCam.BossSpawnPoint;
-        else
-            enemy.transform.parent = battleCam.EnemySpawnPoints[enemy.spawnPosition];
+        enemy.transform.parent = spawnPoint;
         enemy.transform.localPosition = Vector3.zero;
+        aliveEnemies.Add(enemy);
     }
 
-    public void RegisterEnemy(EnemyBase enemy)
+    public void OnEnemySpawn(EnemyBase enemy)
     {
-        aliveEnemies.Add(enemy);
+        OnEnemySpawn(enemy, battleCam.EnemySpawnPoints[enemy.spawnPosition]);
+    }
+    
+    public void OnBossSpawn(Boss enemy)
+    {
+        OnEnemySpawn(enemy, battleCam.BossSpawnPoint);
+        boss = enemy;
+        boss.BeginBossFight();
     }
 
     [Server]
@@ -392,7 +403,7 @@ public class BattleController : NetworkBehaviour
         //Are all the waves done with?
         if (waveIndex >= numWaves)
         {
-            boss.RpcBegin();
+            SpawnBoss();
             return false;
         }
 
@@ -439,6 +450,15 @@ public class BattleController : NetworkBehaviour
         GameObject obj = Instantiate(prefab);
         EnemyBase enemy = obj.GetComponent<EnemyBase>();
         enemy.spawnPosition = spawnPoint;
+        NetworkServer.Spawn(obj);
+    }
+
+    [Server]
+    public void SpawnBoss()
+    {
+        GameObject obj = Instantiate(prefabBoss);
+        EnemyBase enemy = obj.GetComponent<EnemyBase>();
+        enemy.useBossSpawn = true;
         NetworkServer.Spawn(obj);
     }
 
@@ -525,13 +545,8 @@ public class BattleController : NetworkBehaviour
     {
         UnclaimSpawnPoint(destroyed.spawnPosition);
         dyingEnemies--;
-        if (isServer && aliveEnemies.Count == 0 && dyingEnemies == 0 && !boss.Started)
+        if (isServer && aliveEnemies.Count == 0 && dyingEnemies == 0)
         {
-            if (battlePhase == Phase.StartingBattle)
-            {
-                Debug.LogError("i guess you need this condition");
-                return;
-            }
             EndWave();
         }
     }
