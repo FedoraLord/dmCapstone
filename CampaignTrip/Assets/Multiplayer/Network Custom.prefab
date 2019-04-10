@@ -181,5 +181,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
   showGUI: 0
-  offsetX: 200
+  offsetX: 2585
   offsetY: 0

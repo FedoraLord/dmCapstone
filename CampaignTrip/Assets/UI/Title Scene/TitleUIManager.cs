@@ -49,5 +49,17 @@ public class TitleUIManager : UIManager
     {
         Instance.Navigate(Instance.roomSessionMenu);
     }
+
+    public void TEST_OtherMenuClicked()
+    {
+        if (Instance.hostJoinRoomMenu.gameObject.activeInHierarchy)
+        {
+            Navigate_RoomSessionMenu();
+        }
+        else
+        {
+            Navigate_HostJoinRoomMenu();
+        }
+    }
 }
 #pragma warning restore 0649
