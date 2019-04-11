@@ -36,10 +36,10 @@ MonoBehaviour:
       buffAmmount: 20
     Immunities:
       Stats: 07000000
-      BuffPool: 
+      BuffPool: 010000000200000003000000050000000a0000000b000000
     AppliedEffects:
       Stats: 07000000
-      BuffPool: 
+      BuffPool: 01000000020000000300000004000000050000000600000008000000090000000a0000000b0000000c000000
     ChanceToApply:
       value: 10
       max: 100
@@ -48,6 +48,7 @@ MonoBehaviour:
       value: 0
       max: 0
       buffAmmount: 0
+  TEST_immortal: 1
   tempAbilityTarget: {fileID: 2731567121900576358}
   playerNum: 0
   characterType: 2

@@ -20,23 +20,7 @@ public class BattleCamera : MonoBehaviour
     [SerializeField] private float zoomOutSize;
     [SerializeField] private Transform zoomInPos;
     [SerializeField] private Transform zoomOutPos;
-
-    //private void Start()
-    //{
-    //    StartCoroutine(test());
-    //}
-
-    private IEnumerator test()
-    {
-        while (true)
-        {
-            yield return Zoom(zoomOutSize, zoomOutPos);
-            yield return new WaitForSeconds(1);
-            yield return Zoom(zoomInSize, zoomInPos);
-            yield return new WaitForSeconds(1);
-        }
-    }
-
+    
     public void ZoomOut(Action callback = null)
     {
         StartCoroutine(Zoom(zoomOutSize, zoomOutPos, callback));
@@ -62,9 +46,10 @@ public class BattleCamera : MonoBehaviour
             cam.orthographicSize = Mathf.Lerp(startSize, endSize, animTime);
 
             foreach (BattlePlayerBase p in BattlePlayerBase.players)
-            {
                 p.HealthBar.UpdatePosition();
-            }
+
+            foreach (EnemyBase enemy in BattleController.Instance.aliveEnemies)
+                enemy.HealthBar.UpdatePosition();
 
             yield return new WaitForEndOfFrame();
             animTime += Time.deltaTime / totalAnimTime;

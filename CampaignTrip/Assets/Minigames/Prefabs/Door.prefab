@@ -105,7 +105,7 @@ MonoBehaviour:
   openColliderLeft: {fileID: 7814994563801701091}
   openColliderRight: {fileID: 7814994563801701090}
   doorOpenAudio: {fileID: 8300000, guid: 83279d65dbc03764aa3d080b7fcee551, type: 3}
-  doorCloseAudio: {fileID: 0}
+  doorCloseAudio: {fileID: 8300000, guid: 1c28302eb0f01c8479ac0360b93e6dba, type: 3}
 --- !u!61 &7814994563801701088
 BoxCollider2D:
   m_ObjectHideFlags: 0

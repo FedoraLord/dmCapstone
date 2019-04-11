@@ -34,7 +34,8 @@ public class BuffStatTracker : NetworkBehaviour
         foreach (GameObject enemy in enemies.list)
         {
             EnemyBase script = enemy.GetComponent<EnemyBase>();
-            enemyStats.Add(script.enemyType, script.BattleStats);
+            BattleStats copy = BattleStats.Copy(script.BattleStats);
+            enemyStats.Add(script.enemyType, copy);
         }
     }
 
@@ -46,8 +47,8 @@ public class BuffStatTracker : NetworkBehaviour
         {
             if (enemyStats.ContainsKey(t))
             {
-                BattleStats stats = enemyStats[t].ApplyRandomBuff();
-                RpcUpdateEnemyStats(t, stats);
+                /*BattleStats stats = */enemyStats[t].ApplyRandomBuff();
+                RpcUpdateEnemyStats(t, enemyStats[t]);
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -7,8 +8,6 @@ using UnityEngine.UI;
 #pragma warning disable 0618
 public class CS_Manager : MinigameManager
 {
-    public static new CS_Manager Instance;
-
     public Text timerText;
     public List<CS_Card> selectableCards;
     public List<CS_Card> sequenceCards;
@@ -16,7 +15,7 @@ public class CS_Manager : MinigameManager
     public GameObject sequenceCardObject;
 
     //contains the indecies in selectCards
-    private List<CS_Card> randomSequence;
+    private List<CS_Card> randomSequenceCards;
     private List<CS_Card> unassignedCards;
     private List<int> userSequence = new List<int>();
 
@@ -41,7 +40,7 @@ public class CS_Manager : MinigameManager
         for (int i = 1; i < randomPlayers.Count; i++)
         {
             //will look something like this { -1, 3, -1, -1, 8, -1 } where non-negatives are their shown cards
-            int[] indecies = new int[randomSequence.Count];
+            int[] indecies = new int[randomSequenceCards.Count];
             for (int j = 0; j < indecies.Length; j++)
             {
                 indecies[j] = -1;
@@ -52,7 +51,7 @@ public class CS_Manager : MinigameManager
             {
                 int k = Random.Range(0, unassignedCards.Count);
                 CS_Card assignment = unassignedCards[k];
-                int sequenceIndex = randomSequence.IndexOf(assignment);
+                int sequenceIndex = randomSequenceCards.IndexOf(assignment);
                 indecies[sequenceIndex] = assignment.index;
                 unassignedCards.RemoveAt(k);
             }
@@ -85,7 +84,7 @@ public class CS_Manager : MinigameManager
     private void GenerateCardSequence()
     {
         List<CS_Card> tempPool = new List<CS_Card>(selectableCards);
-        randomSequence = new List<CS_Card>();
+        randomSequenceCards = new List<CS_Card>();
         unassignedCards = new List<CS_Card>();
         for (int i = 0; i < sequenceCards.Count; i++)
         {
@@ -93,19 +92,36 @@ public class CS_Manager : MinigameManager
             CS_Card randomCard = tempPool[tempPoolIndex];
             tempPool.RemoveAt(tempPoolIndex);
 
-            randomSequence.Add(randomCard);
+            randomSequenceCards.Add(randomCard);
             unassignedCards.Add(randomCard);
         }
+
+        int[] rnd = randomSequenceCards.Select(x => x.index).ToArray();
+        RpcSendRandomSequence(rnd);
+    }
+
+    private int[] rndSeqIndecies;
+
+    [ClientRpc]
+    private void RpcSendRandomSequence(int[] seq)
+    {
+        rndSeqIndecies = seq;
     }
 
     public void CardSelected(CS_Card card)
     {
         userSequence.Add(card.index);
-        if (userSequence.Count == randomSequence.Count)
+        if (userSequence.Count == rndSeqIndecies.Length)
         {
-            //compare
-            //CmdWin();
-            //CmdLose();
+            for (int i = 0; i < rndSeqIndecies.Length; i++)
+            {
+                if (userSequence[i] != rndSeqIndecies[i])
+                {
+                    CmdLose();
+                    return;
+                }
+            }
+            CmdWin();
         }
     }
 
@@ -127,10 +143,21 @@ public class CS_Manager : MinigameManager
     protected override void Win()
     {
         winText.text = "Success!";
+        StartCoroutine(EndGame(true));
     }
 
     protected override void Lose()
     {
         winText.text = "Lose";
+        StartCoroutine(EndGame(false));
+    }
+
+    private IEnumerator EndGame(bool won)
+    {
+        if (isServer)
+        {
+            yield return new WaitForSeconds(1);
+            BattleController.Instance.UnloadMinigame(won);
+        }
     }
 }

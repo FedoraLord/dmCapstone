@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 
 public class CS_Card : MonoBehaviour
@@ -16,11 +17,11 @@ public class CS_Card : MonoBehaviour
         isSelectable = true;
     }
 
-    private void OnMouseDown()
+    private void OnMouseUpAsButton()
     {
         if (isSelectable)
         {
-            CS_Manager.Instance.CardSelected(this);
+            (MinigameManager.Instance as CS_Manager).CardSelected(this);
         }
     }
 }

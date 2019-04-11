@@ -246,7 +246,9 @@ MonoBehaviour:
       value: 2
       max: 10
       buffAmmount: 2
+  TEST_immortal: 0
   tempAbilityTarget: {fileID: 4488493214754744244}
+  spawnPosition: 0
   enemyType: 1
   smallSlimes:
   - {fileID: 8892714193608038005}

@@ -43,15 +43,17 @@ public class BattleController : NetworkBehaviour
     public string TEST_ForceMinigameSceneName;
     
     [Header("Spawning")]
+    public GameObject prefabBoss;
+    public Boss boss;
     public Dictionary<Type, BuffStatNum> buffStats = new Dictionary<Type, BuffStatNum>();
 
     [SerializeField] private int numWaves;
-    [SerializeField] private Boss boss;
     [SerializeField] private EnemyDataList enemyDataList;
     [SerializeField] private List<SpawnGroup> spawnGroups = new List<SpawnGroup>();
 
     [HideInInspector] public List<EnemyBase> aliveEnemies;
 
+    private int dyingEnemies;
     private int playersReady;
     private int waveIndex = -1;
     private List<bool> availableSpawnPoints;
@@ -92,7 +94,7 @@ public class BattleController : NetworkBehaviour
         DontDestroyOnLoad(battleCam.gameObject);
 
         NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
-
+        
         int wave = 0;
         int stepSize = numWaves / (spawnGroups.Count - 1);
         foreach (SpawnGroup spawn in spawnGroups)
@@ -286,7 +288,7 @@ public class BattleController : NetworkBehaviour
 
         yield return new WaitForSeconds(0.1f);
 
-        if (boss.Started)
+        if (boss != null)
         {
             yield return boss.ExecuteTurn();
         }
@@ -330,6 +332,13 @@ public class BattleController : NetworkBehaviour
     [Server]
     private void LoadMinigame()
     {
+        StartCoroutine(DelayLoadMinigame());
+    }
+
+    [Server]
+    private IEnumerator DelayLoadMinigame()
+    {
+        yield return new WaitForSeconds(0.1f);
         string sceneName = TEST_ForceMinigameSceneName;
         if (string.IsNullOrEmpty(sceneName))
         {
@@ -367,11 +376,23 @@ public class BattleController : NetworkBehaviour
 
     #region Spawning
 
-    public void OnEnemySpawned(EnemyBase enemy)
+    private void OnEnemySpawn(EnemyBase enemy, Transform spawnPoint)
     {
-        enemy.transform.parent = battleCam.EnemySpawnPoints[enemy.spawnPosition];
+        enemy.transform.parent = spawnPoint;
         enemy.transform.localPosition = Vector3.zero;
         aliveEnemies.Add(enemy);
+    }
+
+    public void OnEnemySpawn(EnemyBase enemy)
+    {
+        OnEnemySpawn(enemy, battleCam.EnemySpawnPoints[enemy.spawnPosition]);
+    }
+    
+    public void OnBossSpawn(Boss enemy)
+    {
+        OnEnemySpawn(enemy, battleCam.BossSpawnPoint);
+        boss = enemy;
+        boss.BeginBossFight();
     }
 
     [Server]
@@ -382,7 +403,7 @@ public class BattleController : NetworkBehaviour
         //Are all the waves done with?
         if (waveIndex >= numWaves)
         {
-            boss.Begin();
+            SpawnBoss();
             return false;
         }
 
@@ -432,6 +453,15 @@ public class BattleController : NetworkBehaviour
         NetworkServer.Spawn(obj);
     }
 
+    [Server]
+    public void SpawnBoss()
+    {
+        GameObject obj = Instantiate(prefabBoss);
+        EnemyBase enemy = obj.GetComponent<EnemyBase>();
+        enemy.useBossSpawn = true;
+        NetworkServer.Spawn(obj);
+    }
+
     private int ClaimSpawnPoint()
     {
         int i = availableSpawnPoints.IndexOf(true);
@@ -441,6 +471,12 @@ public class BattleController : NetworkBehaviour
             RemainingEnemySpawnPoints--;
         }
         return i;
+    }
+
+    private void UnclaimSpawnPoint(int i)
+    {
+        availableSpawnPoints[i] = true;
+        RemainingEnemySpawnPoints++;
     }
 
     [Server]
@@ -502,13 +538,14 @@ public class BattleController : NetworkBehaviour
     public void OnEnemyDeath(EnemyBase dead)
     {
         aliveEnemies.Remove(dead);
+        dyingEnemies++;
     }
 
     public void OnEnemyDestroy(EnemyBase destroyed)
     {
-        availableSpawnPoints[destroyed.spawnPosition] = true;
-        RemainingEnemySpawnPoints++;
-        if (isServer && aliveEnemies.Count == 0 && battlePhase != Phase.StartingBattle && !boss.Started)
+        UnclaimSpawnPoint(destroyed.spawnPosition);
+        dyingEnemies--;
+        if (isServer && aliveEnemies.Count == 0 && dyingEnemies == 0)
         {
             EndWave();
         }

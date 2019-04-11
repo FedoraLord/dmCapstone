@@ -31,11 +31,10 @@ public class FlippableCard : NetworkBehaviour
 	public void CmdFlip()
 	{
 		RpcFlip();
-		if (Flip())
-		{
-			MinigameManager.Instance.CmdWin();
-			MinigameManager.Instance.numPlayersWon = PersistentPlayer.players.Count;
-		}
+        if (Flip())
+            MinigameManager.Instance.CmdWin();
+        else
+            MinigameManager.Instance.CmdLose();
 	}
 
 	[ClientRpc]

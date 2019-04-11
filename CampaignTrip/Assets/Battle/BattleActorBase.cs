@@ -87,14 +87,8 @@ public abstract class BattleActorBase : NetworkBehaviour
 
     private void OnValidate()
     {
-        if (name == "GreenSlime")
-        {
-            if (BattleStats.AppliedEffects.Stats.ToList().Contains(Stat.Blind))
-            {
-                //BattleStats.AppliedEffects.Stats = new Stat[0];
-                Debug.LogWarning("IT CAME BACKKKKKKKKKKK");
-            }
-        }
+        //BattleStats.AppliedEffects.Stats = new Stat[0];
+        //BattleStats.Immunities.Stats = new Stat[0];
 
         //Validate Debuffs
         for (int i = 0; i < BattleStats.Immunities.Stats.Length; i++)
@@ -123,7 +117,7 @@ public abstract class BattleActorBase : NetworkBehaviour
         tempAbilityTarget = abilityTarget;
     }
 
-    public override void OnStartClient()
+    private void Start()
     {
         StartCoroutine(DelayInitialize());
     }
@@ -312,6 +306,7 @@ public abstract class BattleActorBase : NetworkBehaviour
     {
         if (!battleStats.Immunities.Stats.Any(x => x == effect))
         {
+            RemoveOnAdd(effect);
             RpcAddStatusEffect(effect, otherActor.gameObject, duration, healthOnRemove);
         }
         else
@@ -330,10 +325,8 @@ public abstract class BattleActorBase : NetworkBehaviour
     private void RpcAddStatusEffect(Stat type, GameObject otherActor, int duration, int healthOnRemove)
     {
         BattleController.Instance.PlaySoundEffect(type);
-
         StatusEffect s = new StatusEffect(type, otherActor.GetComponent<BattleActorBase>(), duration, healthOnRemove);
-
-        RemoveOnAdd(type);
+        
         if (type == Stat.Cure)
         {
             Heal(healthOnRemove);
@@ -416,6 +409,7 @@ public abstract class BattleActorBase : NetworkBehaviour
         }
     }
 
+    [Server]
     private void RemoveOnAdd(Stat type)
     {
         switch (type)
@@ -573,7 +567,7 @@ public abstract class BattleActorBase : NetworkBehaviour
                     s.RemoveAt(i);
                     i--;
                 }
-                else
+                else if (isServer)
                 {
                     RemoveStatusEffect(type);
                 }

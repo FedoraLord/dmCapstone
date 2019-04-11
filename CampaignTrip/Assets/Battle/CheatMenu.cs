@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class CheatMenu : MonoBehaviour
+#pragma warning disable 0618
+public class CheatMenu : NetworkBehaviour
 {
     public static CheatMenu Instance;
 
@@ -16,17 +18,20 @@ public class CheatMenu : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            ToggleCheats(true);
             DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
+            return;
         }
 
 #if UNITY_EDITOR
         isEditor = true;
 #endif
+
+        ToggleCheats(minigameCheats, false);
+        ToggleCheats(battleCheats, isEditor);
     }
 
     public void ToggleCheats(bool isBattleScene)
@@ -47,6 +52,12 @@ public class CheatMenu : MonoBehaviour
     }
 
     public void KillEnemies()
+    {
+        CmdKillEnemies();
+    }
+
+    [Command]
+    private void CmdKillEnemies()
     {
         foreach (EnemyBase enemy in BattleController.Instance.aliveEnemies)
         {
