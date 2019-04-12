@@ -80,7 +80,7 @@ public abstract class BattleActorBase : NetworkBehaviour
     {
         if (!IsAlive && TEST_immortal)
         {
-            Heal(battleStats.MaxHealth);
+            RpcHeal(battleStats.MaxHealth);
             PlayAnimation(BattleAnimation.Revive);
         }
     }
@@ -266,16 +266,21 @@ public abstract class BattleActorBase : NetworkBehaviour
         damagePopup.DisplayMiss();
     }
     
+    [ClientRpc]
+    public void RpcHeal(int amount)
+    {
+        Heal(amount);
+    }
+
     public void Heal(int amount)
     {
         Health += amount;
-        //TODO: hp popup like damage popup
     }
 
     #endregion
 
     #region StatusEffects
-    
+
     protected virtual void OnAddBleed() {}
     protected virtual void OnAddBlind() {}
     protected virtual void OnAddBurn() {}

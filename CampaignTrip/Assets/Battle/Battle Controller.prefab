@@ -733,7 +733,7 @@ MonoBehaviour:
     type: 3}
   prefabMage: {fileID: 8458088793063255136, guid: d1d4135aeebf79d42a00a5bd414fbaef,
     type: 3}
-  prefabWarrior: {fileID: 3126196965850195258, guid: efe228486430c6e48b9bdcd8d1726a5f,
+  prefabWarrior: {fileID: 3126196965850195787, guid: efe228486430c6e48b9bdcd8d1726a5f,
     type: 3}
   prefabBoss: {fileID: 0}
   boss: {fileID: 0}

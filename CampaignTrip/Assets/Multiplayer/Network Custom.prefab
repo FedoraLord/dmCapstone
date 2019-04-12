@@ -76,11 +76,10 @@ MonoBehaviour:
   m_OnlineScene: 
   m_SpawnPrefabs:
   - {fileID: 5389947726256375910, guid: 5edbfece0d9fa46d1a5b13ea5ee779ee, type: 3}
-  - {fileID: 28, guid: 54e2aa1d050673e459432da61c3d9441, type: 3}
   - {fileID: 1054630008981005556, guid: e0ec02e4620468d42a2b2e314bb03e1d, type: 3}
   - {fileID: 8458088793063255136, guid: d1d4135aeebf79d42a00a5bd414fbaef, type: 3}
   - {fileID: 5365767304399832582, guid: 2160ec161c577fd45bf809abbc9b19e1, type: 3}
-  - {fileID: 3126196965850195258, guid: efe228486430c6e48b9bdcd8d1726a5f, type: 3}
+  - {fileID: 3126196965850195787, guid: efe228486430c6e48b9bdcd8d1726a5f, type: 3}
   - {fileID: 1269885308792982226, guid: 722416cb1d3dffb409b806446c11cabe, type: 3}
   - {fileID: 7479651146532222750, guid: 8ab6a0ccef6b49843aaa4aead30a0378, type: 3}
   - {fileID: 2309045038468197896, guid: 0a8aaa5c85a427a4f96d7bcd9031da31, type: 3}
@@ -180,6 +179,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
-  showGUI: 0
-  offsetX: 2585
+  showGUI: 1
+  offsetX: 0
   offsetY: 0

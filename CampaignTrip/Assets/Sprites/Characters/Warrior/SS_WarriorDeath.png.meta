@@ -8,6 +8,12 @@ TextureImporter:
     21300006: WarriorDeath_3
     21300008: WarriorDeath_4
     21300010: WarriorDeath_5
+    21300012: SS_WarriorDeath_0
+    21300014: SS_WarriorDeath_1
+    21300016: SS_WarriorDeath_2
+    21300018: SS_WarriorDeath_3
+    21300020: SS_WarriorDeath_4
+    21300022: SS_WarriorDeath_5
   externalObjects: {}
   serializedVersion: 9
   mipmaps:
@@ -37,7 +43,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: -1
+    filterMode: 0
     aniso: -1
     mipBias: -100
     wrapU: 1
@@ -51,7 +57,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -69,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -80,7 +86,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -91,7 +97,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -101,7 +107,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: WarriorDeath_0
+      name: SS_WarriorDeath_0
       rect:
         serializedVersion: 2
         x: 0
@@ -115,13 +121,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3372a266e950f594d9e6683437943a8b
+      spriteID: d4deec4fb3f22f2458cfc5beb92b7b6f
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WarriorDeath_1
+      name: SS_WarriorDeath_1
       rect:
         serializedVersion: 2
         x: 64
@@ -135,13 +141,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3ad7e40f0db97ca48bf5a1777c528bcf
+      spriteID: 0a3a3a2253d64204dae6334872bdf767
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WarriorDeath_2
+      name: SS_WarriorDeath_2
       rect:
         serializedVersion: 2
         x: 128
@@ -155,13 +161,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0731d6e38657a1349b15913075761ba6
+      spriteID: 42bd4a6c3aeb44949920abd20df56f33
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WarriorDeath_3
+      name: SS_WarriorDeath_3
       rect:
         serializedVersion: 2
         x: 192
@@ -175,13 +181,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 23da06e1ebf60f549ad65d6dec14b656
+      spriteID: 49186dd9e8046d6479500d1fb61279f2
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WarriorDeath_4
+      name: SS_WarriorDeath_4
       rect:
         serializedVersion: 2
         x: 256
@@ -195,13 +201,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3f249ba7ba4143241a6bc443d7027a0e
+      spriteID: 9a0c7f2cc320c9445a18909b6f973561
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: WarriorDeath_5
+      name: SS_WarriorDeath_5
       rect:
         serializedVersion: 2
         x: 320
@@ -215,7 +221,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f28333c9711bfc6479174c2bac15745a
+      spriteID: b386da902a429cc448e89695c1085864
       vertices: []
       indices: 
       edges: []
