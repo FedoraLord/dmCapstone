@@ -727,13 +727,13 @@ MonoBehaviour:
   minigameSceneNames: []
   TEST_SkipMinigame: 0
   TEST_ForceMinigameSceneName: 
-  prefabAlchemist: {fileID: 1054630008981005556, guid: e0ec02e4620468d42a2b2e314bb03e1d,
+  prefabAlchemist: {fileID: 5325525674367666447, guid: 063275ca0f8f8554a81f6b2abf3c58fb,
     type: 3}
-  prefabRogue: {fileID: 5365767304399832582, guid: 2160ec161c577fd45bf809abbc9b19e1,
+  prefabRogue: {fileID: 9010902834346660168, guid: f55bddf65e1a72346a06815449dc8bf7,
     type: 3}
-  prefabMage: {fileID: 8458088793063255136, guid: d1d4135aeebf79d42a00a5bd414fbaef,
+  prefabMage: {fileID: 1981672482925545085, guid: 520e3575bdc46794bb9de10ab9ffe3f4,
     type: 3}
-  prefabWarrior: {fileID: 3126196965850195787, guid: efe228486430c6e48b9bdcd8d1726a5f,
+  prefabWarrior: {fileID: 4082833283236575520, guid: efddc90c705712946ad3400c7160ec1b,
     type: 3}
   prefabBoss: {fileID: 0}
   boss: {fileID: 0}
