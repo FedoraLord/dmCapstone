@@ -144,6 +144,8 @@ MonoBehaviour:
   isNetworkActive: 0
   matchMaker: {fileID: 0}
   sceneAfterLobbyName: Battle
+  title:
+    m_Handle: 0
 --- !u!114 &3162331145551321809
 MonoBehaviour:
   m_ObjectHideFlags: 0

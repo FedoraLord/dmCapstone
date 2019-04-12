@@ -171,6 +171,14 @@ public class BattleController : NetworkBehaviour
         }
     }
 
+    public void ReturnToTitle()
+    {
+        Destroy(battleCam.gameObject);
+        Destroy(gameObject);
+        Destroy(BuffStatTracker.Instance.gameObject);
+        SceneManager.LoadScene("Title");
+    }
+
     #endregion
 
     #region Flow

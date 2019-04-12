@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+#pragma warning disable 0618
 public class SwitchMazeManager : MinigameManager
 {
 	public GameObject playerPrefab;
@@ -44,9 +45,8 @@ public class SwitchMazeManager : MinigameManager
 
 			GameObject obj = Instantiate(playerPrefab);
 			obj.transform.position = spawnPoints[i].position;
-
 			obj.GetComponent<SM_Player>().playernum = p.playerNum;
-			NetworkSpawner.Instance.NetworkSpawn(obj, p.gameObject);
+            NetworkServer.SpawnWithClientAuthority(obj, p.gameObject);
 		}
 	}
 

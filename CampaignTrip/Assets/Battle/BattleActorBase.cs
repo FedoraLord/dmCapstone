@@ -87,9 +87,6 @@ public abstract class BattleActorBase : NetworkBehaviour
 
     private void OnValidate()
     {
-        //BattleStats.AppliedEffects.Stats = new Stat[0];
-        //BattleStats.Immunities.Stats = new Stat[0];
-
         //Validate Debuffs
         for (int i = 0; i < BattleStats.Immunities.Stats.Length; i++)
         {

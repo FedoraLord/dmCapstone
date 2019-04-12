@@ -2,11 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 #pragma warning disable CS0618
 public class CustomNetworkManager : NetworkManager
 {
 	public string sceneAfterLobbyName;
+    
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+        if (NetworkWrapper.currentScene == NetworkWrapper.Scene.Battle)
+        {
+            BattleController.Instance.ReturnToTitle();
+            networkSceneName = string.Empty;
+        }
+    }
 
     //public override void OnClientConnect(NetworkConnection conn)
     //{

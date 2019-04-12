@@ -42,17 +42,7 @@ public class PersistentPlayer : NetworkBehaviour
         base.OnStartLocalPlayer();
         localAuthority = this;
     }
-
-    private void InitGameplay()
-    {
-        if (gameplayInitialized)
-            return;
-
-        gameplayInitialized = true;
-        GameObject obj = Instantiate(NetworkWrapper.Instance.spawnerPrefab);
-        NetworkServer.Spawn(obj);
-    }
-
+    
     private void OnDestroy()
     {
         if (isLocalPlayer)
@@ -70,12 +60,9 @@ public class PersistentPlayer : NetworkBehaviour
             }
         }
 
-        if (NetworkWrapper.currentScene == NetworkWrapper.Scene.MainMenu)
-        {
-            players.Remove(this);
-            if (lobbyPanel != null)
-                Destroy(lobbyPanel.gameObject);
-        }
+        players.Remove(this);
+        if (lobbyPanel != null)
+            Destroy(lobbyPanel.gameObject);
     }
 
     [Command]
@@ -111,10 +98,10 @@ public class PersistentPlayer : NetworkBehaviour
 			if (!p.isReady)
 				return; //someones not ready so don't start
         }
-
-        InitGameplay();
+        
         NetworkWrapper.manager.ServerChangeScene(NetworkWrapper.manager.sceneAfterLobbyName);
-		RpcRelayStart();
+        NetworkWrapper.discovery.StopBroadcast();
+        RpcRelayStart();
 	}
 
 	[ClientRpc]
