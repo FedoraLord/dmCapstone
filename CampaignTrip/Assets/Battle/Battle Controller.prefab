@@ -725,14 +725,22 @@ MonoBehaviour:
   attacksLeftText: {fileID: 978044166622188987}
   blockText: {fileID: 978044166606812425}
   minigameSceneNames: []
-  TEST_GoToMinigame: 0
+  TEST_SkipMinigame: 0
   TEST_ForceMinigameSceneName: 
-  aliveEnemies: []
+  prefabAlchemist: {fileID: 1054630008981005556, guid: e0ec02e4620468d42a2b2e314bb03e1d,
+    type: 3}
+  prefabRogue: {fileID: 5365767304399832582, guid: 2160ec161c577fd45bf809abbc9b19e1,
+    type: 3}
+  prefabMage: {fileID: 8458088793063255136, guid: d1d4135aeebf79d42a00a5bd414fbaef,
+    type: 3}
+  prefabWarrior: {fileID: 3126196965850195258, guid: efe228486430c6e48b9bdcd8d1726a5f,
+    type: 3}
+  prefabBoss: {fileID: 0}
+  boss: {fileID: 0}
+  numWaves: 0
   enemyDataList: {fileID: 11400000, guid: 444a86a589f7caf48beb2133db50fb0e, type: 2}
-  waves:
-  - members: 
-  - members: 
-  - members: 
+  spawnGroups: []
+  aliveEnemies: []
   buttonClickAudio: {fileID: 8300000, guid: 5ba88182d620dbd468274251b82aaad8, type: 3}
   bleedClip: {fileID: 8300000, guid: 8a82b268259b7471b8a3da0fce9a017e, type: 3}
   blindClip: {fileID: 0}

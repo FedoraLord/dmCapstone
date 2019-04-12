@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using static BattleActorBase;
+using static BattlePlayerBase;
 using static EnemyBase;
 using static StatusEffect;
 
@@ -41,8 +42,12 @@ public class BattleController : NetworkBehaviour
     public List<string> minigameSceneNames;
     public bool TEST_SkipMinigame;
     public string TEST_ForceMinigameSceneName;
-    
+
     [Header("Spawning")]
+    public GameObject prefabAlchemist;
+    public GameObject prefabRogue;
+    public GameObject prefabMage;
+    public GameObject prefabWarrior;
     public GameObject prefabBoss;
     public Boss boss;
     public Dictionary<Type, BuffStatNum> buffStats = new Dictionary<Type, BuffStatNum>();
@@ -120,9 +125,39 @@ public class BattleController : NetworkBehaviour
         }
     }
 
+    public void SpawnPlayer(PersistentPlayer player)
+    {
+        GameObject prefab = null;
+        switch (player.character.Type)
+        {
+            case CharacterType.Warrior:
+                prefab = prefabWarrior;
+                break;
+            case CharacterType.Rogue:
+                prefab = prefabRogue;
+                break;
+            case CharacterType.Alchemist:
+                prefab = prefabAlchemist;
+                break;
+            case CharacterType.Mage:
+                prefab = prefabMage;
+                break;
+        }
+
+        if (prefab == null)
+        {
+            Debug.LogError("Could not find character prefab.");
+            return;
+        }
+
+        GameObject spawned = Instantiate(prefab);
+        spawned.GetComponent<BattlePlayerBase>().playerNum = player.playerNum;
+        NetworkServer.SpawnWithClientAuthority(spawned, player.gameObject);
+    }
+
     public void OnBattlePlayerSpawned(BattlePlayerBase player)
     {
-        if (player == BattlePlayerBase.LocalAuthority)
+        if (player == LocalAuthority)
         {
             for (int i = 0; i < player.Abilities.Count; i++)
             {

@@ -1,9 +1,15 @@
 ﻿using UnityEngine;
+using static BattlePlayerBase;
 
-#pragma warning disable 0649 
+#pragma warning disable 0649
 [CreateAssetMenu(fileName = "NewCharacterClass", menuName = "Data Object/Character")]
 public class CharacterData : ScriptableObject
 {
+    public CharacterType Type
+    {
+        get { return type; }
+    }
+
     public string FlavorText
     {
         get { return flavorText; }
@@ -19,13 +25,8 @@ public class CharacterData : ScriptableObject
         get { return icon; }
     }
 
-    public GameObject CharacterPrefab
-    {
-        get { return characterPrefab; }
-    }
-
+    [SerializeField] private CharacterType type;
     [SerializeField] private string flavorText;
 	[SerializeField] private Sprite sprite;
     [SerializeField] private Sprite icon;
-    [SerializeField] private GameObject characterPrefab;
 }

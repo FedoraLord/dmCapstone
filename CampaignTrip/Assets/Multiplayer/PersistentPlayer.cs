@@ -24,7 +24,6 @@ public class PersistentPlayer : NetworkBehaviour
     [SerializeField] private NetworkIdentity networkIdentity;
 
     private bool gameplayInitialized;
-    private GameObject characterPrefab;
 
     #region InitAndDestroy
 
@@ -92,7 +91,6 @@ public class PersistentPlayer : NetworkBehaviour
     [Command]
     public void CmdUpdatePanel(int characterIndex, bool isReadyNow)
 	{
-		characterPrefab = TitleUIManager.RoomSessionMenu.characters[characterIndex].CharacterPrefab;
 		isReady = isReadyNow;
 		RpcUpdatePanel(characterIndex, isReadyNow);
 		TryStart();
@@ -102,7 +100,6 @@ public class PersistentPlayer : NetworkBehaviour
     public void RpcUpdatePanel(int characterIndex, bool isReadyNow)
     {
         character = TitleUIManager.RoomSessionMenu.characters[characterIndex];
-        characterPrefab = character.CharacterPrefab;
 		isReady = isReadyNow;
         lobbyPanel.UpdateUI(characterIndex, isReady);
 	}
@@ -138,9 +135,7 @@ public class PersistentPlayer : NetworkBehaviour
     [Command]
     public void CmdSpawnBattlePlayer()
     {
-        GameObject cp = Instantiate(characterPrefab);
-        cp.GetComponent<BattlePlayerBase>().playerNum = playerNum;
-        NetworkServer.SpawnWithClientAuthority(cp, gameObject);
+        BattleController.Instance.SpawnPlayer(this);
     }
 
     #endregion
