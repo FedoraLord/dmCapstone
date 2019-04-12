@@ -44,10 +44,6 @@ public class BattleController : NetworkBehaviour
     public string TEST_ForceMinigameSceneName;
 
     [Header("Spawning")]
-    public GameObject prefabAlchemist;
-    public GameObject prefabRogue;
-    public GameObject prefabMage;
-    public GameObject prefabWarrior;
     public GameObject prefabBoss;
     public Boss boss;
     public Dictionary<Type, BuffStatNum> buffStats = new Dictionary<Type, BuffStatNum>();
@@ -127,26 +123,10 @@ public class BattleController : NetworkBehaviour
 
     public void SpawnPlayer(PersistentPlayer player)
     {
-        GameObject prefab = null;
-        switch (player.character.Type)
-        {
-            case CharacterType.Warrior:
-                prefab = prefabWarrior;
-                break;
-            case CharacterType.Rogue:
-                prefab = prefabRogue;
-                break;
-            case CharacterType.Alchemist:
-                prefab = prefabAlchemist;
-                break;
-            case CharacterType.Mage:
-                prefab = prefabMage;
-                break;
-        }
-
+        GameObject prefab = player.character.BattlePrefab;
         if (prefab == null)
         {
-            Debug.LogError("Could not find character prefab.");
+            Debug.LogError("Character prefab is null.");
             return;
         }
 

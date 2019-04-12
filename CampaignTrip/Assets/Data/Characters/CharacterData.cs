@@ -5,11 +5,6 @@ using static BattlePlayerBase;
 [CreateAssetMenu(fileName = "NewCharacterClass", menuName = "Data Object/Character")]
 public class CharacterData : ScriptableObject
 {
-    public CharacterType Type
-    {
-        get { return type; }
-    }
-
     public string FlavorText
     {
         get { return flavorText; }
@@ -24,9 +19,14 @@ public class CharacterData : ScriptableObject
     {
         get { return icon; }
     }
+    
+    public GameObject BattlePrefab
+    {
+        get { return battlePrefab; }
+    }
 
-    [SerializeField] private CharacterType type;
     [SerializeField] private string flavorText;
 	[SerializeField] private Sprite sprite;
     [SerializeField] private Sprite icon;
+    [SerializeField] private GameObject battlePrefab;
 }

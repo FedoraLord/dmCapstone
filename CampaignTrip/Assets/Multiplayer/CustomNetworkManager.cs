@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
-#pragma warning disable CS0618
+#pragma warning disable 0618
 public class CustomNetworkManager : NetworkManager
 {
 	public string sceneAfterLobbyName;
@@ -31,4 +31,3 @@ public class CustomNetworkManager : NetworkManager
     //    TitleUIManager.Instance.roomSessionMenu.ClientDisconnected(conn);
     //}
 }
-#pragma warning restore CS0618

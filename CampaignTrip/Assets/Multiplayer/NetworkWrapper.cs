@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-#pragma warning disable CS0618
+#pragma warning disable 0618
 /// <summary>
 /// This just holds static references to other Network scripts
 /// </summary>
@@ -16,8 +16,6 @@ public class NetworkWrapper : MonoBehaviour
 
     public static bool IsHost { get; private set; }
     public static bool IsClient { get { return !IsHost; } }
-
-    public GameObject spawnerPrefab;
 
     public static Scene currentScene;
     public enum Scene
@@ -71,4 +69,3 @@ public class NetworkWrapper : MonoBehaviour
         IsHost = true;
     }
 }
-#pragma warning restore CS0618
