@@ -45,6 +45,7 @@ public class Ability
     {
         BattlePlayerBase.LocalAuthority.CanPlayAbility = false;
         RemainingCooldown = cooldown + 1;
+        UpdateButtonUI();
     }
 
     public void DecrementCooldown()
@@ -58,7 +59,8 @@ public class Ability
     {
         if (AButton == null)
             return;
-        AButton.button.interactable = (RemainingCooldown <= 0 && BattlePlayerBase.LocalAuthority.CanPlayAbility);
+        BattlePlayerBase player = BattlePlayerBase.LocalAuthority;
+        AButton.button.interactable = (player.IsAlive && player.CanPlayAbility && RemainingCooldown <= 0);
         AButton.UpdateCooldown(RemainingCooldown, cooldown + 1);
     }
 }

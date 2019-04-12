@@ -365,6 +365,10 @@ public abstract class BattlePlayerBase : BattleActorBase
     protected override void Die()
     {
         base.Die();
+        foreach (Ability ability in Abilities)
+        {
+            ability.UpdateButtonUI();
+        }
     }
 
     #endregion

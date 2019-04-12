@@ -367,7 +367,7 @@ MonoBehaviour:
     cooldown: 2
     targetAll: 0
     targetGroup: 4
-    applies: 12
+    applies: 0
     buttonIcon: {fileID: 0}
     IsUpgraded: 0
 --- !u!1 &7107424402805552029

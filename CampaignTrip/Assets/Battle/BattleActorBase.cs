@@ -26,12 +26,11 @@ public abstract class BattleActorBase : NetworkBehaviour
         get { return health; }
         protected set
         {
+            bool wasAlive = IsAlive;
             int hp = Mathf.Clamp(value, 0, battleStats.MaxHealth);
-            if (IsAlive && hp == 0)
-            {
-                Die();
-            }
             health = hp;
+            if (wasAlive && !IsAlive)
+                Die();
             HealthBar.UpdateHealth();
         }
     }
