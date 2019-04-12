@@ -30,7 +30,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 978044166576981394}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &570006804
 MonoBehaviour:
@@ -66,6 +66,41 @@ MonoBehaviour:
   m_InputActionsPerSecond: 10
   m_RepeatDelay: 0.5
   m_ForceModuleActive: 0
+--- !u!1 &840626083644804612
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5369036932526311985}
+  m_Layer: 5
+  m_Name: HealthAndDamage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &5369036932526311985
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 840626083644804612}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 978044166576981394}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &978044165425556927
 GameObject:
   m_ObjectHideFlags: 0
@@ -602,6 +637,7 @@ RectTransform:
   m_Children:
   - {fileID: 978044165662216704}
   - {fileID: 978044166161494817}
+  - {fileID: 5369036932526311985}
   - {fileID: 8234137627918986703}
   - {fileID: 570006802}
   m_Father: {fileID: 0}
@@ -725,6 +761,9 @@ MonoBehaviour:
   attackTimerText: {fileID: 978044165974690376}
   attacksLeftText: {fileID: 978044166622188987}
   blockText: {fileID: 978044166606812425}
+  healthAndDamage: {fileID: 840626083644804612}
+  messageDialog: {fileID: 7700527039643841450}
+  messageDialogText: {fileID: 1576216418045959699}
   minigameSceneNames: []
   TEST_SkipMinigame: 0
   TEST_ForceMinigameSceneName: 
@@ -747,8 +786,6 @@ MonoBehaviour:
   reflectClip: {fileID: 8300000, guid: e96c553c3d6ab486f86b670903bacf40, type: 3}
   stunClip: {fileID: 0}
   weakClip: {fileID: 0}
-  messageDialog: {fileID: 7700527039643841450}
-  messageDialogText: {fileID: 1576216418045959699}
 --- !u!1 &978044166595590772
 GameObject:
   m_ObjectHideFlags: 0
@@ -1174,7 +1211,7 @@ RectTransform:
   m_Children:
   - {fileID: 5223969445282419903}
   m_Father: {fileID: 978044166576981394}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}

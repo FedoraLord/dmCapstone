@@ -12,9 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b29e01d01f27884fa8baaf04b7886ad, type: 3}
   m_Name: Warrior
   m_EditorClassIdentifier: 
-  characterName: 0
   flavorText: A big fellow that can take a lot of hits and deal a lot of damage
   sprite: {fileID: 21300000, guid: b31054068891538479387b2d3a4941d7, type: 3}
   icon: {fileID: 21300000, guid: a52cfc186aad169489e8594a2f3f39bb, type: 3}
-  characterPrefab: {fileID: 3126196965850195258, guid: efe228486430c6e48b9bdcd8d1726a5f,
+  battlePrefab: {fileID: 4082833283236575520, guid: efddc90c705712946ad3400c7160ec1b,
     type: 3}

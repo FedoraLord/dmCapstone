@@ -332,7 +332,7 @@ MonoBehaviour:
       value: 0
       max: 0
       buffAmmount: 0
-  TEST_immortal: 1
+  TEST_immortal: 0
   tempAbilityTarget: {fileID: 3515874433408646383}
   playerNum: 0
   characterType: 2

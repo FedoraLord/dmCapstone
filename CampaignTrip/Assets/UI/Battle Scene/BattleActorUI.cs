@@ -9,7 +9,7 @@ public abstract class BattleActorUI : MonoBehaviour
     public virtual void Init(BattleActorBase actor)
     {
         owner = actor;
-        transform.SetParent(BattleController.Instance.transform);
+        transform.SetParent(BattleController.Instance.healthAndDamage.transform);
         UpdatePosition();
         (transform as RectTransform).sizeDelta = Vector2.zero;
     }

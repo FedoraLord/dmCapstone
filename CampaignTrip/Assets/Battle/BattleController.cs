@@ -28,6 +28,7 @@ public class BattleController : NetworkBehaviour
     [Header("UI")]
     public BattleCamera battleCam;
     public Canvas battleCanvas;
+    public GameObject healthAndDamage;
 
     [SerializeField] private float totalAttackTime = 5;
     [SerializeField] private RectTransform attackTimerBar;
@@ -35,6 +36,8 @@ public class BattleController : NetworkBehaviour
     [SerializeField] private Text attackTimerText;
     [SerializeField] private Text attacksLeftText;
     [SerializeField] private Text blockText;
+    [SerializeField] private GameObject messageDialog;
+    [SerializeField] private Text messageDialogText;
 
     private Coroutine attackTimerCountdown;
 
@@ -186,9 +189,14 @@ public class BattleController : NetworkBehaviour
     [Server]
     public void StartPlayerPhase()
     {
-        battlePhase = Phase.Player;
+        if (!players.Any(x => x.IsAlive))
+        {
+            RpcLose();
+            return;
+        }
 
-        foreach (BattlePlayerBase p in BattlePlayerBase.players)
+        battlePhase = Phase.Player;
+        foreach (BattlePlayerBase p in players)
         {
             p.OnPlayerPhaseStart();
         }
@@ -308,7 +316,7 @@ public class BattleController : NetworkBehaviour
         yield return ApplyDOTs(aliveEnemies);
 
         DecrementStats(aliveEnemies);
-        DecrementStats(BattlePlayerBase.players);
+        DecrementStats(players);
 
         yield return new WaitForSeconds(0.1f);
 
@@ -617,14 +625,19 @@ public class BattleController : NetworkBehaviour
     {
         StartCoroutine(DisplayMessageThenExit("You Lose"));
     }
-
-    [SerializeField] private GameObject messageDialog;
-    [SerializeField] private Text messageDialogText;
+    
     private IEnumerator DisplayMessageThenExit(string message)
     {
         messageDialogText.text = message;
         messageDialog.SetActive(true);
-        yield return new WaitForSeconds(5f);
+        healthAndDamage.SetActive(false);
+
+        yield return new WaitForSeconds(4f);
+
+        if (isServer)
+            NetworkWrapper.manager.StopHost();
+        else
+            NetworkWrapper.manager.StopClient();
         ReturnToTitle();
     }
 

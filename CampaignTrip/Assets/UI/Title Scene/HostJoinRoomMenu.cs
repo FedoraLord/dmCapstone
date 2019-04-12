@@ -98,11 +98,7 @@ public class HostJoinRoomMenu : NavigationMenu
             Debug.LogError("Cannot get name of room selected.");
         }
     }
-
-    /// <summary>
-    /// Button click method for "Create Room"
-    /// </summary>
-    /// <param name="roomName">Textbox for the name of the room</param>
+    
     public void CreateRoomButtonClicked(InputField roomName)
     {
         if (roomName.text.Length == 0)
