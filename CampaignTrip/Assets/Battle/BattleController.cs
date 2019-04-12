@@ -54,6 +54,7 @@ public class BattleController : NetworkBehaviour
 
     [HideInInspector] public List<EnemyBase> aliveEnemies;
 
+    private bool bossKilled;
     private int dyingEnemies;
     private int playersReady;
     private int waveIndex = -1;
@@ -506,10 +507,21 @@ public class BattleController : NetworkBehaviour
     public void EndWave()
     {
         RpcStopAttackTimer();
-        if (TEST_SkipMinigame)
-            StartBattle();
+        if (bossKilled)
+        {
+            RpcWin();
+        }
         else
-            LoadMinigame();
+        {
+            if (TEST_SkipMinigame)
+            {
+                StartBattle();
+            }
+            else
+            {
+                LoadMinigame();
+            }
+        }
     }
 
     [ClientRpc]
@@ -560,6 +572,8 @@ public class BattleController : NetworkBehaviour
 
     public void OnEnemyDeath(EnemyBase dead)
     {
+        if (dead == boss)
+            bossKilled = true;
         aliveEnemies.Remove(dead);
         dyingEnemies++;
     }
@@ -592,9 +606,26 @@ public class BattleController : NetworkBehaviour
 
     #endregion
     
-    protected void Win()
+    [ClientRpc]
+    private void RpcWin()
     {
-        //TODO
+        StartCoroutine(DisplayMessageThenExit("You Win"));
+    }
+
+    [ClientRpc]
+    private void RpcLose()
+    {
+        StartCoroutine(DisplayMessageThenExit("You Lose"));
+    }
+
+    [SerializeField] private GameObject messageDialog;
+    [SerializeField] private Text messageDialogText;
+    private IEnumerator DisplayMessageThenExit(string message)
+    {
+        messageDialogText.text = message;
+        messageDialog.SetActive(true);
+        yield return new WaitForSeconds(5f);
+        ReturnToTitle();
     }
 
     [ClientRpc]

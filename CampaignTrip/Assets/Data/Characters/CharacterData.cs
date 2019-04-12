@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using static BattlePlayerBase;
 
 #pragma warning disable 0649
 [CreateAssetMenu(fileName = "NewCharacterClass", menuName = "Data Object/Character")]
