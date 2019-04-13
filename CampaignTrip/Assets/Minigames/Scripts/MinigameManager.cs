@@ -9,17 +9,18 @@ public abstract class MinigameManager : NetworkBehaviour
 {
     public static MinigameManager Instance;
 
-    public List<Transform> spawnPoints;
-
-	public int numPlayersWon = 0;
     public float timer = 30;
-	public Text winText;
+    public Text timerText;
+    public Dialogue dialogue;
+
+    [HideInInspector] public bool isGameOver;
+
+    private Coroutine timerRoutine;
 
     protected virtual void Start()
     {
         Instance = this;
-
-		numPlayersWon = 0;
+        
         PersistentPlayer.localAuthority.CmdReadyForMinigame();
 
         if (NetworkWrapper.IsHost)
@@ -37,17 +38,8 @@ public abstract class MinigameManager : NetworkBehaviour
 			}
 
 			StartCoroutine(HandlePlayers(randomPlayers));
+            timerRoutine = StartCoroutine(Timer());
         }
-    }
-
-    private void LateUpdate()
-    {
-		if (numPlayersWon != 0 && numPlayersWon == PersistentPlayer.players.Count)
-		{
-            Win();
-            BattleController.Instance.UnloadMinigame(true);
-		}
-        // TODO Add timer for failure
     }
 
     private void OnDestroy()
@@ -55,6 +47,17 @@ public abstract class MinigameManager : NetworkBehaviour
         Instance = null;
     }
 
+    private IEnumerator Timer()
+    {
+        while (timer > 0)
+        {
+            timer -= Time.deltaTime;
+            timerText.text = string.Format("Time Remaining: {0}", (int)timer + 1);
+            yield return new WaitForEndOfFrame();
+        }
+        Lose();
+    }
+    
     [Server]
     protected virtual IEnumerator HandlePlayers(List<PersistentPlayer> randomPlayers)
     {
@@ -63,9 +66,6 @@ public abstract class MinigameManager : NetworkBehaviour
         });
     }
     
-    protected abstract void Win();
-    protected abstract void Lose();
-
     [Command]
 	public void CmdWin()
 	{
@@ -88,5 +88,25 @@ public abstract class MinigameManager : NetworkBehaviour
     public void RpcLose()
     {
         Lose();
+    }
+
+    protected virtual void Win()
+    {
+        EndMinigame(true);
+    }
+
+    protected virtual void Lose()
+    {
+        EndMinigame(false);
+    }
+
+    private void EndMinigame(bool won)
+    {
+        if (timerRoutine != null)
+            StopCoroutine(timerRoutine);
+        isGameOver = true;
+
+        string message = (won ? "Success" : "Failure");
+        dialogue.DisplayMessage(message, 3, () => BattleController.Instance.UnloadMinigame(won));
     }
 }

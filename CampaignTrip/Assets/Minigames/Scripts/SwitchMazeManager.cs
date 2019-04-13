@@ -7,32 +7,17 @@ using UnityEngine.UI;
 #pragma warning disable 0618
 public class SwitchMazeManager : MinigameManager
 {
-	public GameObject playerPrefab;
-    public Text timerText;
+    public List<Transform> spawnPoints;
+    public GameObject playerPrefab;
     public Camera cam;
 
-    protected override void Win()
-	{
-		winText.text = "Success!";
-	}
+    private int numPlayersWon;
 
-    protected override void Lose()
+    public static SwitchMazeManager GetInstance()
     {
-        winText.text = "Failure";
+        return Instance as SwitchMazeManager;
     }
-
-    private void Update()
-    {
-        timer -= Time.deltaTime;
-        timerText.text = string.Format("Time Remaining: {0}", (int)timer);
-
-        if (timer <= 0.0f)
-        {
-            Lose();
-            BattleController.Instance.UnloadMinigame(false);
-        }
-    }
-
+    
     protected override IEnumerator HandlePlayers(List<PersistentPlayer> randomPlayers)
 	{
 		if (!playerPrefab)
@@ -50,5 +35,20 @@ public class SwitchMazeManager : MinigameManager
 		}
 	}
 
-
+    public void PlayerEnteredWinArea()
+    {
+        numPlayersWon++;
+        if (isServer && numPlayersWon == PersistentPlayer.players.Count)
+        {
+            if (!isGameOver)
+            {
+                Instance.CmdWin();
+            }
+        }
+    }
+    
+    public void PlayerLeftWinArea()
+    {
+        numPlayersWon--;
+    }
 }

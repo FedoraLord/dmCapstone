@@ -22,7 +22,7 @@ public class CS_Card : MonoBehaviour
     {
         if (isSelectable)
         {
-            CS_Manager manager = (MinigameManager.Instance as CS_Manager);
+            CS_Manager manager = CS_Manager.GetInstance();
             if (manager.CanSelect)
             {
                 isSelectable = false;

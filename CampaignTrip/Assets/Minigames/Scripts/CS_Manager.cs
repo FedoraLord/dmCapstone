@@ -8,9 +8,8 @@ using UnityEngine.UI;
 #pragma warning disable 0618
 public class CS_Manager : MinigameManager
 {
-    public bool CanSelect { get { return randomSequenceCards.Count > userSequence.Count; } }
-
-    public Text timerText;
+    public bool CanSelect { get { return rndSeqIndecies.Length > userSequence.Count; } }
+    
     public List<CS_Card> selectableCards;
     public List<CS_Card> sequenceCards;
     public GameObject selectCardObject;
@@ -22,11 +21,15 @@ public class CS_Manager : MinigameManager
     private List<int> userSequence = new List<int>();
     private int[] rndSeqIndecies;
 
+    public static CS_Manager GetInstance()
+    {
+        return Instance as CS_Manager;
+    }
+
     protected override void Start()
     {
         base.Start();
-
-        StartCoroutine(Timer());
+        
         for (int i = 0; i < selectableCards.Count; i++)
         {
             selectableCards[i].InitializeSelectable(i);
@@ -62,19 +65,6 @@ public class CS_Manager : MinigameManager
 
 		GetComponent<NetworkIdentity>().AssignClientAuthority(randomPlayers[0].connectionToClient); //give the person who selects the card the ability to end the game
 	}
-
-    private IEnumerator Timer()
-    {
-        while (timer > 0)
-        {
-            timer -= Time.deltaTime;
-            timerText.text = string.Format("Time Remaining: {0}", (int)timer);
-            yield return new WaitForEndOfFrame();
-        }
-
-        Lose();
-        BattleController.Instance.UnloadMinigame(false);
-    }
 
     [TargetRpc]
     private void TargetShowSelectCards(NetworkConnection connection)
@@ -139,26 +129,5 @@ public class CS_Manager : MinigameManager
 
         selectCardObject.SetActive(false);
         sequenceCardObject.SetActive(true);
-    }
-    
-    protected override void Win()
-    {
-        winText.text = "Success!";
-        StartCoroutine(EndGame(true));
-    }
-
-    protected override void Lose()
-    {
-        winText.text = "Lose";
-        StartCoroutine(EndGame(false));
-    }
-
-    private IEnumerator EndGame(bool won)
-    {
-        if (isServer)
-        {
-            yield return new WaitForSeconds(1);
-            BattleController.Instance.UnloadMinigame(won);
-        }
     }
 }

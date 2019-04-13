@@ -20,9 +20,9 @@ public class FlippableCard : NetworkBehaviour
 	public bool Flip()
 	{
 		if (isWinner)
-			GetComponent<SpriteRenderer>().sprite = ((CardFlipManager)MinigameManager.Instance).winningSprite;
+			GetComponent<SpriteRenderer>().sprite = (CardFlipManager.GetInstance()).winningSprite;
 		else
-			GetComponent<SpriteRenderer>().sprite = ((CardFlipManager)MinigameManager.Instance).failSprite;
+			GetComponent<SpriteRenderer>().sprite = (CardFlipManager.GetInstance()).failSprite;
 
 		return isWinner;
 	}

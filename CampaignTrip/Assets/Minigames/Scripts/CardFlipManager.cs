@@ -10,7 +10,12 @@ public class CardFlipManager : MinigameManager
 	public Sprite failSprite;
 	public List<FlippableCard> cards;
 
-	protected override IEnumerator HandlePlayers(List<PersistentPlayer> randomPlayers)
+    public static CardFlipManager GetInstance()
+    {
+        return Instance as CardFlipManager;
+    }
+
+    protected override IEnumerator HandlePlayers(List<PersistentPlayer> randomPlayers)
 	{
 		List<FlippableCard> randomCards = new List<FlippableCard>(cards);
 		//Fisher-Yates Shuffle
@@ -49,23 +54,4 @@ public class CardFlipManager : MinigameManager
 			randomPlayersCopy.Remove(p);
 		}
 	}
-
-    protected override void Win()
-    {
-        StartCoroutine(EndGame(true));
-    }
-
-    protected override void Lose()
-    {
-        StartCoroutine(EndGame(false));
-    }
-
-    private IEnumerator EndGame(bool won)
-    {
-        if (isServer)
-        {
-            yield return new WaitForSeconds(1);
-            BattleController.Instance.UnloadMinigame(won);
-        }
-    }
 }

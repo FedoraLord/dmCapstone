@@ -12,7 +12,7 @@ using static BattlePlayerBase;
 using static EnemyBase;
 using static StatusEffect;
 
-#pragma warning disable CS0618, 0649
+#pragma warning disable 0618, 0649
 public class BattleController : NetworkBehaviour
 {
     public static BattleController Instance;
@@ -23,7 +23,7 @@ public class BattleController : NetworkBehaviour
     public Camera MainCamera { get { return battleCam.Cam; } }
     public int RemainingEnemySpawnPoints { get; private set; }
 
-    private bool AllPlayersReady { get { return playersReady == PersistentPlayer.players.Count; } }
+    private bool AllPlayersReady { get { return playersReady >= PersistentPlayer.players.Count; } }
 
     [Header("UI")]
     public BattleCamera battleCam;
@@ -36,8 +36,7 @@ public class BattleController : NetworkBehaviour
     [SerializeField] private Text attackTimerText;
     [SerializeField] private Text attacksLeftText;
     [SerializeField] private Text blockText;
-    [SerializeField] private GameObject messageDialog;
-    [SerializeField] private Text messageDialogText;
+    [SerializeField] private Dialogue dialogue;
 
     private Coroutine attackTimerCountdown;
 
@@ -617,23 +616,19 @@ public class BattleController : NetworkBehaviour
     [ClientRpc]
     private void RpcWin()
     {
-        StartCoroutine(DisplayMessageThenExit("You Win"));
+        dialogue.DisplayMessage("You Win", 4, EndGame);
+        healthAndDamage.SetActive(false);
     }
 
     [ClientRpc]
     private void RpcLose()
     {
-        StartCoroutine(DisplayMessageThenExit("You Lose"));
-    }
-    
-    private IEnumerator DisplayMessageThenExit(string message)
-    {
-        messageDialogText.text = message;
-        messageDialog.SetActive(true);
+        dialogue.DisplayMessage("You Lose", 4, EndGame);
         healthAndDamage.SetActive(false);
+    }
 
-        yield return new WaitForSeconds(4f);
-
+    private void EndGame()
+    {
         if (isServer)
             NetworkWrapper.manager.StopHost();
         else

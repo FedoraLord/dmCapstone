@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using static BattlePlayerBase;
 
-#pragma warning disable CS0618
+#pragma warning disable 0618
 public class SM_Player : NetworkBehaviour
 {
     public RuntimeAnimatorController warriorController;
@@ -21,7 +21,7 @@ public class SM_Player : NetworkBehaviour
     [SyncVar]
     public int playernum;
 
-    Rigidbody2D rb;
+    private Rigidbody2D rb;
 
     // Start is called before the first frame update
     void Start()
@@ -34,16 +34,14 @@ public class SM_Player : NetworkBehaviour
         {
             localAuthority = true;
 
-            Camera cam = (MinigameManager.Instance as SwitchMazeManager).cam;
+            Camera cam = SwitchMazeManager.GetInstance().cam;
             cam.transform.parent = gameObject.transform;
 			cam.transform.localPosition = new Vector3(0, 0, -10f);
 
             DPad.Instance.Setup(this);
-
-            //SwitchMazeManager.Instance.CmdSetAnimatorForPlayer(playernum, PersistentPlayer.localAuthority.character.CharacterName);
         }
 
-        BattlePlayerBase player = BattlePlayerBase.players.Where(x => x.playerNum == playernum).First();
+        BattlePlayerBase player = players.Where(x => x.playerNum == playernum).First();
         SetAnimator(player.characterType);
     }
 
@@ -81,7 +79,7 @@ public class SM_Player : NetworkBehaviour
             {
                 rb.velocity = velocity.normalized * speed;
                 
-                CmdUpdatePosition(rb.velocity, this.transform.position);
+                CmdUpdatePosition(rb.velocity, transform.position);
             }
         }
 
@@ -119,7 +117,7 @@ public class SM_Player : NetworkBehaviour
     {
         if (collision.gameObject.CompareTag("WinArea"))
         {
-            MinigameManager.Instance.numPlayersWon++;
+            SwitchMazeManager.GetInstance().PlayerEnteredWinArea();
         }
     }
     
@@ -127,7 +125,7 @@ public class SM_Player : NetworkBehaviour
     {
         if (collision.gameObject.CompareTag("WinArea"))
         {
-            MinigameManager.Instance.numPlayersWon--;
+            SwitchMazeManager.GetInstance().PlayerLeftWinArea();
         }
     }
 
@@ -147,4 +145,3 @@ public class SM_Player : NetworkBehaviour
         }
     }
 }
-#pragma warning restore CS0618
