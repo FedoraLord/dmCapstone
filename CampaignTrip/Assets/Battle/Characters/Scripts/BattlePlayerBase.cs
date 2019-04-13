@@ -95,7 +95,7 @@ public abstract class BattlePlayerBase : BattleActorBase
         Abilities = new List<Ability>() { ability1, ability2, ability3 };
         BattleController.Instance.OnBattlePlayerSpawned(this);
 
-        battleStats = BuffStatTracker.Instance.GetPlayerStats(CharacterType.Alchemist, battleStats);
+        battleStats = BuffStatTracker.Instance.GetPlayerStats(characterType, battleStats);
         base.Initialize();
     }
 
