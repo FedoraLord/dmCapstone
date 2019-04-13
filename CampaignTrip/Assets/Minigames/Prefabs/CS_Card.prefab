@@ -120,4 +120,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 7419913632964830580}
+  cardBack: {fileID: 21300000, guid: a1f11c9c36ebb410e860a1e24bd7a256, type: 3}
   index: 0
+  isSelectable: 0

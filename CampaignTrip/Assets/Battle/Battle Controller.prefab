@@ -755,19 +755,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleCam: {fileID: 0}
   battleCanvas: {fileID: 978044166576981395}
+  healthAndDamage: {fileID: 840626083644804612}
   totalAttackTime: 5
   attackTimerBar: {fileID: 978044165425556926}
-  abilityButtons: []
+  abilityButtons:
+  - {fileID: 1110685639704706596}
+  - {fileID: 6861965198517744830}
+  - {fileID: 790287431056552409}
   attackTimerText: {fileID: 978044165974690376}
   attacksLeftText: {fileID: 978044166622188987}
   blockText: {fileID: 978044166606812425}
-  healthAndDamage: {fileID: 840626083644804612}
   messageDialog: {fileID: 7700527039643841450}
   messageDialogText: {fileID: 1576216418045959699}
-  minigameSceneNames: []
+  minigameSceneNames:
+  - SwitchMaze
+  - CardFlip
+  - CardSequence
   TEST_SkipMinigame: 0
   TEST_ForceMinigameSceneName: 
-  prefabBoss: {fileID: 0}
+  prefabBoss: {fileID: 1836153066313980065, guid: 013c867322a79014184393ee59612cc9,
+    type: 3}
   boss: {fileID: 0}
   numWaves: 0
   enemyDataList: {fileID: 11400000, guid: 444a86a589f7caf48beb2133db50fb0e, type: 2}
@@ -775,17 +782,17 @@ MonoBehaviour:
   aliveEnemies: []
   buttonClickAudio: {fileID: 8300000, guid: 5ba88182d620dbd468274251b82aaad8, type: 3}
   bleedClip: {fileID: 8300000, guid: 8a82b268259b7471b8a3da0fce9a017e, type: 3}
-  blindClip: {fileID: 0}
+  blindClip: {fileID: 8300000, guid: a4afbedf8eef7fa4c8e86c186e383ffb, type: 3}
   burnClip: {fileID: 8300000, guid: eb8a5b1d7e47a46e09a13e403f470f53, type: 3}
   cureClip: {fileID: 8300000, guid: 4380a780a723c4eb08bacacdd6800bb1, type: 3}
-  focusClip: {fileID: 0}
-  freezeClip: {fileID: 0}
-  invisibleClip: {fileID: 0}
+  focusClip: {fileID: 8300000, guid: 93e2cc62c9d91d84f8a6cd5b3d339b64, type: 3}
+  freezeClip: {fileID: 8300000, guid: b923a4ca1dca04a25945d8b7929aca96, type: 3}
+  invisibleClip: {fileID: 8300000, guid: 5a29112e8c1612f4383b958dd685e78c, type: 3}
   poisonClip: {fileID: 8300000, guid: 823252fe7bf594ac4998cd3410269239, type: 3}
   protectedClip: {fileID: 8300000, guid: 81aae57f2be6546e8a77df676a33f3b5, type: 3}
   reflectClip: {fileID: 8300000, guid: e96c553c3d6ab486f86b670903bacf40, type: 3}
-  stunClip: {fileID: 0}
-  weakClip: {fileID: 0}
+  stunClip: {fileID: 8300000, guid: 76c12522a8ce5d347a5b933ad6b7781e, type: 3}
+  weakClip: {fileID: 8300000, guid: 22c3e1caae038a244ae245bd76af06c6, type: 3}
 --- !u!1 &978044166595590772
 GameObject:
   m_ObjectHideFlags: 0
@@ -1389,6 +1396,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5976124378157ac4b9bcb5d7fa31062f, type: 3}
+--- !u!114 &6861965198517744830 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7922384335523765348, guid: 5976124378157ac4b9bcb5d7fa31062f,
+    type: 3}
+  m_PrefabInstance: {fileID: 3660140523642775770}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da7ac25da18f9914ab948a128d6d555d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &7617802235703082220 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6592338208418124854, guid: 5976124378157ac4b9bcb5d7fa31062f,
@@ -1524,6 +1543,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5976124378157ac4b9bcb5d7fa31062f, type: 3}
+--- !u!114 &1110685639704706596 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7922384335523765348, guid: 5976124378157ac4b9bcb5d7fa31062f,
+    type: 3}
+  m_PrefabInstance: {fileID: 7104432949788582464}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da7ac25da18f9914ab948a128d6d555d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &4171657669335447158 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6592338208418124854, guid: 5976124378157ac4b9bcb5d7fa31062f,
@@ -1664,6 +1695,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5976124378157ac4b9bcb5d7fa31062f, type: 3}
+--- !u!114 &790287431056552409 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7922384335523765348, guid: 5976124378157ac4b9bcb5d7fa31062f,
+    type: 3}
+  m_PrefabInstance: {fileID: 7423722943053016509}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da7ac25da18f9914ab948a128d6d555d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &4358055087540074891 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6592338208418124854, guid: 5976124378157ac4b9bcb5d7fa31062f,

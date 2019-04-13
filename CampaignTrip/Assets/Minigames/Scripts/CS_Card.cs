@@ -7,6 +7,7 @@ using UnityEngine.Networking;
 public class CS_Card : MonoBehaviour
 {
     public SpriteRenderer spriteRenderer;
+    public Sprite cardBack;
 
     [HideInInspector] public int index = -1;
     [HideInInspector] public bool isSelectable;
@@ -21,7 +22,13 @@ public class CS_Card : MonoBehaviour
     {
         if (isSelectable)
         {
-            (MinigameManager.Instance as CS_Manager).CardSelected(this);
+            CS_Manager manager = (MinigameManager.Instance as CS_Manager);
+            if (manager.CanSelect)
+            {
+                isSelectable = false;
+                spriteRenderer.sprite = cardBack;
+                manager.CardSelected(this);
+            }
         }
     }
 }

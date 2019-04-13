@@ -8,6 +8,8 @@ using UnityEngine.UI;
 #pragma warning disable 0618
 public class CS_Manager : MinigameManager
 {
+    public bool CanSelect { get { return randomSequenceCards.Count > userSequence.Count; } }
+
     public Text timerText;
     public List<CS_Card> selectableCards;
     public List<CS_Card> sequenceCards;
@@ -18,22 +20,24 @@ public class CS_Manager : MinigameManager
     private List<CS_Card> randomSequenceCards;
     private List<CS_Card> unassignedCards;
     private List<int> userSequence = new List<int>();
+    private int[] rndSeqIndecies;
 
     protected override void Start()
     {
         base.Start();
+
+        StartCoroutine(Timer());
         for (int i = 0; i < selectableCards.Count; i++)
         {
             selectableCards[i].InitializeSelectable(i);
         }
     }
 
+    [Server]
     protected override IEnumerator HandlePlayers(List<PersistentPlayer> randomPlayers)
     {
         yield return base.HandlePlayers(randomPlayers);
         
-        StartCoroutine(Timer());
-
         TargetShowSelectCards(randomPlayers[0].connectionToClient);
 
 		GenerateCardSequence();
@@ -41,10 +45,7 @@ public class CS_Manager : MinigameManager
         {
             //will look something like this { -1, 3, -1, -1, 8, -1 } where non-negatives are their shown cards
             int[] indecies = new int[randomSequenceCards.Count];
-            for (int j = 0; j < indecies.Length; j++)
-            {
-                indecies[j] = -1;
-            }
+            indecies.Initialize(() => -1);
             
             //chooses 6 / 3 = 2 cards per player, did it this way so you dont have to use 4 players to test the minigame
             for (int j = 0; j < indecies.Length / (randomPlayers.Count - 1); j++)
@@ -101,9 +102,7 @@ public class CS_Manager : MinigameManager
         int[] rnd = randomSequenceCards.Select(x => x.index).ToArray();
         RpcSendRandomSequence(rnd);
     }
-
-    private int[] rndSeqIndecies;
-
+    
     [ClientRpc]
     private void RpcSendRandomSequence(int[] seq)
     {

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -606,16 +606,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
-      propertyPath: minigameSceneNames.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: abilityButtons.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
       propertyPath: waves.Array.data[3].members.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -796,74 +786,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
-      propertyPath: minigameSceneNames.Array.data[0]
-      value: SwitchMaze
-      objectReference: {fileID: 0}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: minigameSceneNames.Array.data[1]
-      value: CardFlip
-      objectReference: {fileID: 0}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: minigameSceneNames.Array.data[2]
-      value: CardSequence
-      objectReference: {fileID: 0}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: TEST_ForceMinigameSceneName
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
       propertyPath: TEST_GoToMinigame
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: totalAttackTime
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: abilityButtons.Array.data[3]
-      value: 
-      objectReference: {fileID: 980754186}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: abilityButtons.Array.data[4]
-      value: 
-      objectReference: {fileID: 980754185}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: abilityButtons.Array.data[5]
-      value: 
-      objectReference: {fileID: 980754184}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: abilityButtons.Array.data[0]
-      value: 
-      objectReference: {fileID: 980754186}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: abilityButtons.Array.data[1]
-      value: 
-      objectReference: {fileID: 980754185}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: abilityButtons.Array.data[2]
-      value: 
-      objectReference: {fileID: 980754184}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: buttonClickAudio
-      value: 
-      objectReference: {fileID: 8300000, guid: 5ba88182d620dbd468274251b82aaad8, type: 3}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: freezeClip
-      value: 
-      objectReference: {fileID: 8300000, guid: b923a4ca1dca04a25945d8b7929aca96, type: 3}
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
       propertyPath: waves.Array.data[3].members.Array.data[0]
@@ -1012,7 +937,7 @@ PrefabInstance:
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
       propertyPath: numWaves
-      value: 0
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
@@ -1042,50 +967,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
-      propertyPath: TEST_SkipMinigame
-      value: 0
+      propertyPath: TEST_ForceMinigameSceneName
+      value: CardSequence
       objectReference: {fileID: 0}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: boss
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: invisibleClip
-      value: 
-      objectReference: {fileID: 8300000, guid: 5a29112e8c1612f4383b958dd685e78c, type: 3}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: blindClip
-      value: 
-      objectReference: {fileID: 8300000, guid: a4afbedf8eef7fa4c8e86c186e383ffb, type: 3}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: freezeClip
-      value: 
-      objectReference: {fileID: 8300000, guid: b923a4ca1dca04a25945d8b7929aca96, type: 3}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: weakClip
-      value: 
-      objectReference: {fileID: 8300000, guid: 22c3e1caae038a244ae245bd76af06c6, type: 3}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: focusClip
-      value: 
-      objectReference: {fileID: 8300000, guid: 93e2cc62c9d91d84f8a6cd5b3d339b64, type: 3}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: stunClip
-      value: 
-      objectReference: {fileID: 8300000, guid: 76c12522a8ce5d347a5b933ad6b7781e, type: 3}
-    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
-        type: 3}
-      propertyPath: prefabBoss
-      value: 
-      objectReference: {fileID: 1836153066313980065, guid: 013c867322a79014184393ee59612cc9,
-        type: 3}
     - target: {fileID: 4171657669335447158, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -1216,42 +1100,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2533b610f63309548a9e44069e7a7ecc, type: 3}
---- !u!114 &980754184 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 790287431056552409, guid: 2533b610f63309548a9e44069e7a7ecc,
-    type: 3}
-  m_PrefabInstance: {fileID: 980754183}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da7ac25da18f9914ab948a128d6d555d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &980754185 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6861965198517744830, guid: 2533b610f63309548a9e44069e7a7ecc,
-    type: 3}
-  m_PrefabInstance: {fileID: 980754183}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da7ac25da18f9914ab948a128d6d555d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &980754186 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1110685639704706596, guid: 2533b610f63309548a9e44069e7a7ecc,
-    type: 3}
-  m_PrefabInstance: {fileID: 980754183}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da7ac25da18f9914ab948a128d6d555d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1302149107
 GameObject:
   m_ObjectHideFlags: 0

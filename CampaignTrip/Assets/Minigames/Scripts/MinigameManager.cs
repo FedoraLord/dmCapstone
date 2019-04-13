@@ -55,6 +55,7 @@ public abstract class MinigameManager : NetworkBehaviour
         Instance = null;
     }
 
+    [Server]
     protected virtual IEnumerator HandlePlayers(List<PersistentPlayer> randomPlayers)
     {
         yield return new WaitUntil(() => {
