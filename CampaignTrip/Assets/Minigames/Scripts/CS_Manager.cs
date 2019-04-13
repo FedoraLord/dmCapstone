@@ -36,7 +36,7 @@ public class CS_Manager : MinigameManager
 
         TargetShowSelectCards(randomPlayers[0].connectionToClient);
 
-        GenerateCardSequence();
+		GenerateCardSequence();
         for (int i = 1; i < randomPlayers.Count; i++)
         {
             //will look something like this { -1, 3, -1, -1, 8, -1 } where non-negatives are their shown cards
@@ -58,7 +58,9 @@ public class CS_Manager : MinigameManager
             
             TargetShowSequenceCards(randomPlayers[i].connectionToClient, indecies);
         }
-    }
+
+		GetComponent<NetworkIdentity>().AssignClientAuthority(randomPlayers[0].connectionToClient); //give the person who selects the card the ability to end the game
+	}
 
     private IEnumerator Timer()
     {
