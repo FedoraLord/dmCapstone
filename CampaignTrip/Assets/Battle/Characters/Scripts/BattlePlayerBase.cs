@@ -365,6 +365,8 @@ public abstract class BattlePlayerBase : BattleActorBase
     protected override void Die()
     {
         base.Die();
+
+        PlayAnimation(BattleAnimation.Die);
         foreach (Ability ability in Abilities)
         {
             ability.UpdateButtonUI();

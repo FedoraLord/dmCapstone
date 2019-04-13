@@ -266,9 +266,9 @@ public class BattleController : NetworkBehaviour
         }
         
         //apply attack damage on the players
-        for (int i = 0; i < BattlePlayerBase.players.Count; i++)
+        for (int i = 0; i < players.Count; i++)
         {
-            BattlePlayerBase bp = BattlePlayerBase.players[i];
+            BattlePlayerBase bp = players[i];
             List<EnemyAttack> hits = new List<EnemyAttack>();
             bool containedMiss = false;
 

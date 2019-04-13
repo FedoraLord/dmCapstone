@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using static StatusEffect;
 
-#pragma warning disable CS0618, 0649
+#pragma warning disable 0618, 0649
 public abstract class BattleActorBase : NetworkBehaviour
 {
     public bool IsAlive { get { return Health > 0; } }
@@ -244,14 +244,14 @@ public abstract class BattleActorBase : NetworkBehaviour
     [Server]
     protected void TakeDamage(int damageTaken, int blocked)
     {
-        if (damageTaken > 0)
-            PlayAnimation(BattleAnimation.Hurt);
         RpcTakeDamage(damageTaken, blocked);
     }
 
     [ClientRpc]
     protected void RpcTakeDamage(int damageTaken, int blocked)
     {
+        if (damageTaken > 0)
+            PlayAnimation(BattleAnimation.Hurt);
         Health -= damageTaken;
         damagePopup.DisplayDamage(damageTaken, blocked);
     }
