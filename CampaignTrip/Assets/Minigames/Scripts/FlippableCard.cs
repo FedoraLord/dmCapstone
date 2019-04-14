@@ -13,7 +13,7 @@ public class FlippableCard : NetworkBehaviour
 	protected void OnMouseUpAsButton()
 	{
 		//the player who can flip them is the only one with authority to do so
-		if(hasAuthority)
+		if(hasAuthority && !MinigameManager.Instance.isGameOver)
 			CmdFlip();
 	}
 

@@ -39,6 +39,8 @@ public class CardFlipManager : MinigameManager
 		randomCards.Remove(winningCard);
 		winningCard.isWinner = true;
 
+		yield return new WaitForSecondsRealtime(.5f);//make sure everyones here
+
 		while (randomPlayersCopy.Count != 0)
 		{
 			PersistentPlayer p = randomPlayersCopy[0];
