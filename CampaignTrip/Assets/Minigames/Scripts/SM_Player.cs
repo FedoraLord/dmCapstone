@@ -74,15 +74,13 @@ public class SM_Player : NetworkBehaviour
     {
         if (localAuthority)
         {
-            AnimatePlayer();
             if (rb.velocity != Vector2.zero || velocity != Vector3.zero)
             {
                 rb.velocity = velocity.normalized * speed;
-                
                 CmdUpdatePosition(rb.velocity, transform.position);
             }
         }
-
+        AnimatePlayer();
     }
 
     void AnimatePlayer()

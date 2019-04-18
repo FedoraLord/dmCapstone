@@ -43,6 +43,7 @@ public class BattleController : NetworkBehaviour
     [Header("Minigames")]
     public List<string> minigameSceneNames;
     public bool TEST_SkipMinigame;
+    public bool TEST_StartBoss;
     public string TEST_ForceMinigameSceneName;
 
     [Header("Spawning")]
@@ -432,7 +433,7 @@ public class BattleController : NetworkBehaviour
         waveIndex++;
 
         //Are all the waves done with?
-        if (waveIndex >= numWaves)
+        if (waveIndex >= numWaves || TEST_StartBoss)
         {
             SpawnBoss();
             return false;
