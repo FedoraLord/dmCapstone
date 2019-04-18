@@ -86,7 +86,13 @@ public class BattleController : NetworkBehaviour
     
     protected void Start()
     {
-        //duplicate instances will be auto disabled by UNET because we have a network identity component
+        if (Instance)
+        {
+            Destroy(battleCam.gameObject);
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
         DontDestroyOnLoad(gameObject);
         DontDestroyOnLoad(battleCam.gameObject);
