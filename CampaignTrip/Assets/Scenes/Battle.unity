@@ -973,7 +973,12 @@ PrefabInstance:
     - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}
       propertyPath: TEST_ForceMinigameSceneName
-      value: SwitchMaze
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3751728710107936905, guid: 2533b610f63309548a9e44069e7a7ecc,
+        type: 3}
+      propertyPath: TEST_BossWaveIndex
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 4171657669335447158, guid: 2533b610f63309548a9e44069e7a7ecc,
         type: 3}

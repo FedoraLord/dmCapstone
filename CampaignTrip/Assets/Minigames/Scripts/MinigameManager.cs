@@ -20,7 +20,6 @@ public abstract class MinigameManager : NetworkBehaviour
     protected virtual void Start()
     {
         Instance = this;
-        
         PersistentPlayer.localAuthority.CmdReadyForMinigame();
 
         if (NetworkWrapper.IsHost)
@@ -38,8 +37,9 @@ public abstract class MinigameManager : NetworkBehaviour
 			}
 
 			StartCoroutine(HandlePlayers(randomPlayers));
-            timerRoutine = StartCoroutine(Timer());
         }
+
+        timerRoutine = StartCoroutine(Timer());
     }
 
     private void OnDestroy()

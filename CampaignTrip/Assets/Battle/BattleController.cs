@@ -43,7 +43,7 @@ public class BattleController : NetworkBehaviour
     [Header("Minigames")]
     public List<string> minigameSceneNames;
     public bool TEST_SkipMinigame;
-    public bool TEST_StartBoss;
+    public int TEST_BossWaveIndex;
     public string TEST_ForceMinigameSceneName;
 
     [Header("Spawning")]
@@ -86,14 +86,7 @@ public class BattleController : NetworkBehaviour
     
     protected void Start()
     {
-        if (Instance)
-        {
-            //coming back after a minigame:
-            Destroy(gameObject);
-            Destroy(battleCam.gameObject);
-            return;
-        }
-
+        //duplicate instances will be auto disabled by UNET because we have a network identity component
         Instance = this;
         DontDestroyOnLoad(gameObject);
         DontDestroyOnLoad(battleCam.gameObject);
@@ -433,7 +426,7 @@ public class BattleController : NetworkBehaviour
         waveIndex++;
 
         //Are all the waves done with?
-        if (waveIndex >= numWaves || TEST_StartBoss)
+        if (waveIndex >= numWaves || TEST_BossWaveIndex == waveIndex)
         {
             SpawnBoss();
             return false;
