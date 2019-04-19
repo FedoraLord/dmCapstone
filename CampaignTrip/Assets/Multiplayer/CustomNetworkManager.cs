@@ -18,16 +18,4 @@ public class CustomNetworkManager : NetworkManager
             networkSceneName = string.Empty;
         }
     }
-
-    //public override void OnClientConnect(NetworkConnection conn)
-    //{
-    //    base.OnClientConnect(conn);
-    //    TitleUIManager.Instance.roomSessionMenu.ClientConnected(conn);
-    //}
-
-    //public override void OnClientDisconnect(NetworkConnection conn)
-    //{
-    //    base.OnClientDisconnect(conn);
-    //    TitleUIManager.Instance.roomSessionMenu.ClientDisconnected(conn);
-    //}
 }

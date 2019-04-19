@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -14,7 +15,8 @@ using UnityEngine.UI;
 public class CustomNetworkDiscovery : NetworkDiscovery
 {
     private Coroutine cleanup;
-    private float timeout = 5;
+    private float timeout = 1;
+    private string room;
 
     private class LANInfo
     {
@@ -51,11 +53,39 @@ public class CustomNetworkDiscovery : NetworkDiscovery
     /// <summary>
     /// Host begins broadcasting
     /// </summary>
-    public void BroadcastAsServer()
+    public void BroadcastAsServer(string roomName)
     {
+        room = roomName;
+        BroadcastOpenRoom();
         StopBroadcast();
         Initialize();
         StartAsServer();
+    }
+
+    public void BroadcastClosedRoom()
+    {
+        broadcastData = "[FULL]\0";
+        if (isServer)
+        {
+            StopBroadcast();
+            StartCoroutine(Delay(StartAsServer));
+        }
+    }
+
+    public void BroadcastOpenRoom()
+    {
+        broadcastData = room + '\0';
+        if (isServer)
+        {
+            StopBroadcast();
+            StartCoroutine(Delay(StartAsServer));
+        }
+    }
+
+    private IEnumerator Delay(Func<bool> callback)
+    {
+        yield return new WaitForSeconds(0.1f);
+        callback();
     }
 
     /// <summary>
@@ -106,10 +136,16 @@ public class CustomNetworkDiscovery : NetworkDiscovery
         {
             if (lanAddresses[i].ipAddress == cleanAddress)
             {
-                lanAddresses[i].removeAtTime = Time.time + timeout;
+                if (data.StartsWith("[FULL]"))
+                    TitleUIManager.HostJoinRoomMenu.RemoveRoom(lanAddresses[i].roomButton);
+                else
+                    lanAddresses[i].removeAtTime = Time.time + timeout;
                 return;
             }
         }
+
+        if (data.StartsWith("[FULL]"))
+            return;
 
         GameObject button = TitleUIManager.HostJoinRoomMenu.AddRoom(data);
         

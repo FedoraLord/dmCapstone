@@ -34,6 +34,15 @@ public class PersistentPlayer : NetworkBehaviour
         if (NetworkWrapper.IsHost)
         {
             playerNum = players.Count;
+            if (playerNum == 4)
+            {
+                NetworkWrapper.discovery.BroadcastClosedRoom();
+            }
+        }
+        else if (players.Count > 4)
+        {
+            NetworkWrapper.manager.StopClient();
+            SceneManager.LoadScene("Title");
         }
     }
     
@@ -59,6 +68,9 @@ public class PersistentPlayer : NetworkBehaviour
                     players[i].playerNum = i;
             }
         }
+
+        if (NetworkWrapper.currentScene == NetworkWrapper.Scene.MainMenu && players.Count == 4)
+            NetworkWrapper.discovery.BroadcastOpenRoom();
 
         players.Remove(this);
         if (lobbyPanel != null)

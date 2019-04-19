@@ -63,8 +63,7 @@ public class NetworkWrapper : MonoBehaviour
 
     public static void StartServer(string roomName)
     {
-        discovery.broadcastData = roomName;
-        discovery.BroadcastAsServer();
+        discovery.BroadcastAsServer(roomName);
         manager.StartHost();
         IsHost = true;
     }
