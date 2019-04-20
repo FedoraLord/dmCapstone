@@ -349,7 +349,7 @@ MonoBehaviour:
     targetAll: 0
     targetGroup: 3
     applies: 9
-    buttonIcon: {fileID: 0}
+    buttonIcon: {fileID: 21300000, guid: cdba521dd3f719e40ba13e8579bd58fa, type: 3}
     IsUpgraded: 0
   ability2:
     RemainingCooldown: 0
@@ -360,7 +360,7 @@ MonoBehaviour:
     targetAll: 0
     targetGroup: 4
     applies: 5
-    buttonIcon: {fileID: 0}
+    buttonIcon: {fileID: 21300000, guid: 074be95b11e5e76428858316666442dd, type: 3}
     IsUpgraded: 0
   ability3:
     RemainingCooldown: 0
@@ -371,7 +371,7 @@ MonoBehaviour:
     targetAll: 0
     targetGroup: 3
     applies: 4
-    buttonIcon: {fileID: 0}
+    buttonIcon: {fileID: 21300000, guid: 2b73e888dd2149141b966626335e56e0, type: 3}
     IsUpgraded: 0
   damageBeforeFocusBreaks: 10
 --- !u!1 &3446015233435963669
@@ -490,6 +490,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1981672482925545027}
     m_Modifications:
+    - target: {fileID: 1665753913249771026, guid: f4d29fe1c2f5fc948b8d691e458a8015,
+        type: 3}
+      propertyPath: m_Name
+      value: HealthBarUI
+      objectReference: {fileID: 0}
     - target: {fileID: 6045472781469882529, guid: f4d29fe1c2f5fc948b8d691e458a8015,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -595,11 +600,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 1665753913249771026, guid: f4d29fe1c2f5fc948b8d691e458a8015,
-        type: 3}
-      propertyPath: m_Name
-      value: HealthBarUI
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f4d29fe1c2f5fc948b8d691e458a8015, type: 3}
 --- !u!224 &4845821086824494811 stripped
@@ -627,6 +627,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1981672482925545027}
     m_Modifications:
+    - target: {fileID: 4632699813934859906, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
+        type: 3}
+      propertyPath: m_Name
+      value: DamagePopup
+      objectReference: {fileID: 0}
     - target: {fileID: 4964402801478723068, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -732,11 +737,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 4632699813934859906, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
-        type: 3}
-      propertyPath: m_Name
-      value: DamagePopup
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa2af7e17aa701a4daa6a03da0e3f58d, type: 3}
 --- !u!224 &8143740516896954678 stripped
@@ -764,6 +764,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1981672482925545027}
     m_Modifications:
+    - target: {fileID: 7258902256873901116, guid: e63f07229e56fef4793ace7ddcbfa0a1,
+        type: 3}
+      propertyPath: m_Name
+      value: StatusEffectOverlays
+      objectReference: {fileID: 0}
     - target: {fileID: 7356145978160666732, guid: e63f07229e56fef4793ace7ddcbfa0a1,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -818,11 +823,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7258902256873901116, guid: e63f07229e56fef4793ace7ddcbfa0a1,
-        type: 3}
-      propertyPath: m_Name
-      value: StatusEffectOverlays
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e63f07229e56fef4793ace7ddcbfa0a1, type: 3}
