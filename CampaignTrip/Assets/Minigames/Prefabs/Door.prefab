@@ -30,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7814994563801701093}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -4, z: 0.115234375}
+  m_LocalPosition: {x: 0, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -73,7 +73,7 @@ SpriteRenderer:
   m_SortingLayerID: -1825837995
   m_SortingLayer: 4
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300142, guid: 1cb17029de20b47799168bdd80ec42e2, type: 3}
+  m_Sprite: {fileID: 21300018, guid: ebfad1834dcd9f346986885d1e27bcc8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -96,8 +96,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03293c966e40c154f9986a46a0ae2f61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  closedSprite: {fileID: 21300142, guid: 1cb17029de20b47799168bdd80ec42e2, type: 3}
-  openSprite: {fileID: 21300146, guid: 1cb17029de20b47799168bdd80ec42e2, type: 3}
+  closedSprite: {fileID: 21300018, guid: ebfad1834dcd9f346986885d1e27bcc8, type: 3}
+  openSprite: {fileID: 21300006, guid: ebfad1834dcd9f346986885d1e27bcc8, type: 3}
   spriteRenderer: {fileID: 7814994563801701022}
   multiInputSwitches: []
   singleInputSwitches: []
@@ -122,8 +122,8 @@ BoxCollider2D:
   m_Offset: {x: 0.5, y: -0.000060081482}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.25, y: 0.25}
-    oldSize: {x: 2, y: 2}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.40625, y: 1.71875}
     newSize: {x: 2, y: 2}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -148,8 +148,8 @@ BoxCollider2D:
   m_Offset: {x: -0.30673692, y: 0.0004916191}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.25, y: 0.25}
-    oldSize: {x: 2, y: 2}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.40625, y: 1.71875}
     newSize: {x: 2, y: 2}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -174,8 +174,8 @@ BoxCollider2D:
   m_Offset: {x: 1.4070567, y: 0.0025815964}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.25, y: 0.25}
-    oldSize: {x: 2, y: 2}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.40625, y: 1.71875}
     newSize: {x: 2, y: 2}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
