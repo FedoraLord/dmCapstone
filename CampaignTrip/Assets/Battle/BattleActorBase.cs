@@ -62,6 +62,10 @@ public abstract class BattleActorBase : NetworkBehaviour
     private int health;
     private int remainingBlock;
 
+    [SerializeField] protected AudioSource audioSource;
+    [SerializeField] protected AudioClip hurtClip;
+    [SerializeField] protected AudioClip dieClip;
+
     private Dictionary<Stat, List<StatusEffect>> statusEffects = new Dictionary<Stat, List<StatusEffect>>();
 
     //TODO: REMOVE AND REPLACE
@@ -251,9 +255,22 @@ public abstract class BattleActorBase : NetworkBehaviour
     protected void RpcTakeDamage(int damageTaken, int blocked)
     {
         if (damageTaken > 0)
+        {
             PlayAnimation(BattleAnimation.Hurt);
+        }
         Health -= damageTaken;
         damagePopup.DisplayDamage(damageTaken, blocked);
+        if (damageTaken > 0)
+        {
+            if (Health > 0)
+            {
+                audioSource.TryPlay(hurtClip);
+            }
+            else
+            {
+                audioSource.TryPlay(dieClip);
+            }
+        }
     }
 
     [ClientRpc]

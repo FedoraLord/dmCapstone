@@ -333,6 +333,9 @@ MonoBehaviour:
       max: 0
       buffAmmount: 0
   TEST_immortal: 0
+  audioSource: {fileID: 8351974204840993276}
+  hurtClip: {fileID: 8300000, guid: 71a665ec8806842f09b0872dd2053f7d, type: 3}
+  dieClip: {fileID: 8300000, guid: 8a182515c50946b4e9e078c1dba940c1, type: 3}
   tempAbilityTarget: {fileID: 3515874433408646383}
   playerNum: 0
   characterType: 2
