@@ -3,7 +3,17 @@ guid: d31eb7e283c4ced4b9f8226da083ef85
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - animator: {instanceID: 0}
+  - damagePopup: {instanceID: 0}
+  - healthBarUI: {instanceID: 0}
+  - overlays: {instanceID: 0}
+  - uiTransform: {instanceID: 0}
+  - audioSource: {instanceID: 0}
+  - hurtClip: {fileID: 8300000, guid: 71a665ec8806842f09b0872dd2053f7d, type: 3}
+  - dieClip: {fileID: 8300000, guid: 8a182515c50946b4e9e078c1dba940c1, type: 3}
+  - tempAbilityTarget: {instanceID: 0}
+  - persistentPlayer: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

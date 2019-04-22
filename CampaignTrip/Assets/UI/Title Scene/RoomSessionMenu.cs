@@ -58,6 +58,11 @@ public class RoomSessionMenu : NavigationMenu
 	public void ClassCycleLeftButtonClicked()
 	{
         TitleUIManager.PlayButtonSound();
+
+		//dont change characters if we're readied up
+		if (PersistentPlayer.localAuthority.isReady)
+			return;
+
         if (characterIndex == 0)
 			characterIndex = characters.Count - 1;
 		else
@@ -69,7 +74,12 @@ public class RoomSessionMenu : NavigationMenu
 	public void ClassCycleRightButtonClicked()
 	{
         TitleUIManager.PlayButtonSound();
-        if (characterIndex == (characters.Count - 1))
+
+		//dont change characters if we're readied up
+		if (PersistentPlayer.localAuthority.isReady)
+			return;
+
+		if (characterIndex == (characters.Count - 1))
 			characterIndex = 0;
 		else
 			characterIndex++;

@@ -442,6 +442,9 @@ MonoBehaviour:
       max: 0
       buffAmmount: 0
   TEST_immortal: 0
+  audioSource: {fileID: 1541731581729666761}
+  hurtClip: {fileID: 8300000, guid: 71a665ec8806842f09b0872dd2053f7d, type: 3}
+  dieClip: {fileID: 8300000, guid: 8a182515c50946b4e9e078c1dba940c1, type: 3}
   tempAbilityTarget: {fileID: 6217111353879538650}
   playerNum: 0
   characterType: 1
@@ -455,7 +458,7 @@ MonoBehaviour:
     targetAll: 0
     targetGroup: 2
     applies: 6
-    buttonIcon: {fileID: 0}
+    buttonIcon: {fileID: 21300000, guid: 1dc5c39711be76f48abc05cc14662f59, type: 3}
     IsUpgraded: 0
   ability2:
     RemainingCooldown: 0
@@ -466,7 +469,7 @@ MonoBehaviour:
     targetAll: 0
     targetGroup: 4
     applies: 1
-    buttonIcon: {fileID: 0}
+    buttonIcon: {fileID: 21300000, guid: 01583d139f2ebfc49ad0fed879becc28, type: 3}
     IsUpgraded: 0
   ability3:
     RemainingCooldown: 0
@@ -477,7 +480,7 @@ MonoBehaviour:
     targetAll: 1
     targetGroup: 4
     applies: 2
-    buttonIcon: {fileID: 0}
+    buttonIcon: {fileID: 21300000, guid: 36edbfc5e278a8b4a865af7f8cae54c0, type: 3}
     IsUpgraded: 0
 --- !u!1001 &4585071022973389883
 PrefabInstance:
@@ -486,6 +489,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 9010902834346660214}
     m_Modifications:
+    - target: {fileID: 7258902256873901116, guid: e63f07229e56fef4793ace7ddcbfa0a1,
+        type: 3}
+      propertyPath: m_Name
+      value: StatusEffectOverlays
+      objectReference: {fileID: 0}
     - target: {fileID: 7356145978160666732, guid: e63f07229e56fef4793ace7ddcbfa0a1,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -541,11 +549,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7258902256873901116, guid: e63f07229e56fef4793ace7ddcbfa0a1,
-        type: 3}
-      propertyPath: m_Name
-      value: StatusEffectOverlays
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e63f07229e56fef4793ace7ddcbfa0a1, type: 3}
 --- !u!4 &6464695196262814807 stripped
@@ -573,6 +576,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 9010902834346660214}
     m_Modifications:
+    - target: {fileID: 4632699813934859906, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
+        type: 3}
+      propertyPath: m_Name
+      value: DamagePopup
+      objectReference: {fileID: 0}
     - target: {fileID: 4964402801478723068, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -678,11 +686,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 4632699813934859906, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
-        type: 3}
-      propertyPath: m_Name
-      value: DamagePopup
-      objectReference: {fileID: 0}
     - target: {fileID: 1936890516382535782, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
         type: 3}
       propertyPath: damageText
@@ -744,6 +747,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 9010902834346660214}
     m_Modifications:
+    - target: {fileID: 1665753913249771026, guid: f4d29fe1c2f5fc948b8d691e458a8015,
+        type: 3}
+      propertyPath: m_Name
+      value: HealthBarUI
+      objectReference: {fileID: 0}
     - target: {fileID: 6045472781469882529, guid: f4d29fe1c2f5fc948b8d691e458a8015,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -848,11 +856,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1665753913249771026, guid: f4d29fe1c2f5fc948b8d691e458a8015,
-        type: 3}
-      propertyPath: m_Name
-      value: HealthBarUI
       objectReference: {fileID: 0}
     - target: {fileID: 2177948957340730466, guid: f4d29fe1c2f5fc948b8d691e458a8015,
         type: 3}
