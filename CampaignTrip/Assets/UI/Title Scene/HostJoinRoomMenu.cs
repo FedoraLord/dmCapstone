@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -103,6 +104,13 @@ public class HostJoinRoomMenu : NavigationMenu
     {
         if (roomName.text.Length == 0)
             return;
+
+        if (roomName.text.All(x => char.IsNumber(x) || x == '.'))
+        {
+            NetworkWrapper.ConnectToServer(roomName.text);
+            NavigateToRoomSessionMenu(roomName.text);
+            return;
+        }
 
         TitleUIManager.PlayButtonSound();
 

@@ -103,7 +103,8 @@ public class RoomSessionMenu : NavigationMenu
 
 	private IEnumerator ClientLeave()
 	{
-		PersistentPlayer.localAuthority.CmdDisconnect();
+        if (PersistentPlayer.localAuthority != null)
+		    PersistentPlayer.localAuthority.CmdDisconnect();
 
 		//Need to wait a little before disconnecting so we can call the server Command method.
 		yield return new WaitForSeconds(0.2f);
