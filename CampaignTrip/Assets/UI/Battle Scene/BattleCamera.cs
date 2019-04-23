@@ -48,8 +48,11 @@ public class BattleCamera : MonoBehaviour
             foreach (BattlePlayerBase p in BattlePlayerBase.players)
                 p.HealthBar.UpdatePosition();
 
-            foreach (EnemyBase enemy in BattleController.Instance.aliveEnemies)
-                enemy.HealthBar.UpdatePosition();
+            if (BattleController.Instance != null)
+            {
+                foreach (EnemyBase enemy in BattleController.Instance.aliveEnemies)
+                    enemy.HealthBar.UpdatePosition();
+            }
 
             yield return new WaitForEndOfFrame();
             animTime += Time.deltaTime / totalAnimTime;

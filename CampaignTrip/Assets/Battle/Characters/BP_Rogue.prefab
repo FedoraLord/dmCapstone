@@ -420,11 +420,11 @@ MonoBehaviour:
       max: 30
       buffAmmount: 3
     BlockAmount:
-      value: 50
+      value: 75
       max: 100
       buffAmmount: 20
     MaxHealth:
-      value: 100
+      value: 250
       max: 200
       buffAmmount: 25
     Immunities:
@@ -432,7 +432,7 @@ MonoBehaviour:
       BuffPool: 01000000020000000300000005000000070000000a0000000b000000
     AppliedEffects:
       Stats: 
-      BuffPool: 0100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c000000
+      BuffPool: 01000000020000000300000005000000070000000a0000000b000000
     ChanceToApply:
       value: 10
       max: 20
@@ -489,11 +489,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 9010902834346660214}
     m_Modifications:
-    - target: {fileID: 7258902256873901116, guid: e63f07229e56fef4793ace7ddcbfa0a1,
-        type: 3}
-      propertyPath: m_Name
-      value: StatusEffectOverlays
-      objectReference: {fileID: 0}
     - target: {fileID: 7356145978160666732, guid: e63f07229e56fef4793ace7ddcbfa0a1,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -549,6 +544,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7258902256873901116, guid: e63f07229e56fef4793ace7ddcbfa0a1,
+        type: 3}
+      propertyPath: m_Name
+      value: StatusEffectOverlays
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e63f07229e56fef4793ace7ddcbfa0a1, type: 3}
 --- !u!4 &6464695196262814807 stripped
@@ -576,11 +576,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 9010902834346660214}
     m_Modifications:
-    - target: {fileID: 4632699813934859906, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
+    - target: {fileID: 1936890516382535782, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
         type: 3}
-      propertyPath: m_Name
-      value: DamagePopup
-      objectReference: {fileID: 0}
+      propertyPath: damageText
+      value: 
+      objectReference: {fileID: 7862467849410708803}
+    - target: {fileID: 1936890516382535782, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
+        type: 3}
+      propertyPath: blockText
+      value: 
+      objectReference: {fileID: 2728564765553585624}
     - target: {fileID: 4964402801478723068, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -686,16 +691,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 1936890516382535782, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
+    - target: {fileID: 4632699813934859906, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
         type: 3}
-      propertyPath: damageText
-      value: 
-      objectReference: {fileID: 7862467849410708803}
-    - target: {fileID: 1936890516382535782, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
-        type: 3}
-      propertyPath: blockText
-      value: 
-      objectReference: {fileID: 2728564765553585624}
+      propertyPath: m_Name
+      value: DamagePopup
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa2af7e17aa701a4daa6a03da0e3f58d, type: 3}
 --- !u!224 &1695913291196648963 stripped
@@ -747,11 +747,36 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 9010902834346660214}
     m_Modifications:
-    - target: {fileID: 1665753913249771026, guid: f4d29fe1c2f5fc948b8d691e458a8015,
+    - target: {fileID: 2177948957340730466, guid: f4d29fe1c2f5fc948b8d691e458a8015,
         type: 3}
-      propertyPath: m_Name
-      value: HealthBarUI
-      objectReference: {fileID: 0}
+      propertyPath: healthBar
+      value: 
+      objectReference: {fileID: 360201391988213006}
+    - target: {fileID: 2177948957340730466, guid: f4d29fe1c2f5fc948b8d691e458a8015,
+        type: 3}
+      propertyPath: healthText
+      value: 
+      objectReference: {fileID: 5313116338489492267}
+    - target: {fileID: 2177948957340730466, guid: f4d29fe1c2f5fc948b8d691e458a8015,
+        type: 3}
+      propertyPath: target1
+      value: 
+      objectReference: {fileID: 5004162395676292856}
+    - target: {fileID: 2177948957340730466, guid: f4d29fe1c2f5fc948b8d691e458a8015,
+        type: 3}
+      propertyPath: target2
+      value: 
+      objectReference: {fileID: 3958197519007700103}
+    - target: {fileID: 2177948957340730466, guid: f4d29fe1c2f5fc948b8d691e458a8015,
+        type: 3}
+      propertyPath: target3
+      value: 
+      objectReference: {fileID: 2882084971606746061}
+    - target: {fileID: 2177948957340730466, guid: f4d29fe1c2f5fc948b8d691e458a8015,
+        type: 3}
+      propertyPath: target4
+      value: 
+      objectReference: {fileID: 5571466500623276024}
     - target: {fileID: 6045472781469882529, guid: f4d29fe1c2f5fc948b8d691e458a8015,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -857,36 +882,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 2177948957340730466, guid: f4d29fe1c2f5fc948b8d691e458a8015,
+    - target: {fileID: 1665753913249771026, guid: f4d29fe1c2f5fc948b8d691e458a8015,
         type: 3}
-      propertyPath: healthBar
-      value: 
-      objectReference: {fileID: 360201391988213006}
-    - target: {fileID: 2177948957340730466, guid: f4d29fe1c2f5fc948b8d691e458a8015,
-        type: 3}
-      propertyPath: healthText
-      value: 
-      objectReference: {fileID: 5313116338489492267}
-    - target: {fileID: 2177948957340730466, guid: f4d29fe1c2f5fc948b8d691e458a8015,
-        type: 3}
-      propertyPath: target1
-      value: 
-      objectReference: {fileID: 5004162395676292856}
-    - target: {fileID: 2177948957340730466, guid: f4d29fe1c2f5fc948b8d691e458a8015,
-        type: 3}
-      propertyPath: target2
-      value: 
-      objectReference: {fileID: 3958197519007700103}
-    - target: {fileID: 2177948957340730466, guid: f4d29fe1c2f5fc948b8d691e458a8015,
-        type: 3}
-      propertyPath: target3
-      value: 
-      objectReference: {fileID: 2882084971606746061}
-    - target: {fileID: 2177948957340730466, guid: f4d29fe1c2f5fc948b8d691e458a8015,
-        type: 3}
-      propertyPath: target4
-      value: 
-      objectReference: {fileID: 5571466500623276024}
+      propertyPath: m_Name
+      value: HealthBarUI
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f4d29fe1c2f5fc948b8d691e458a8015, type: 3}
 --- !u!224 &2716418688990306798 stripped

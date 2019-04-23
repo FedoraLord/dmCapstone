@@ -104,7 +104,7 @@ public abstract class BattleActorBase : NetworkBehaviour
 
         //Serialize Stat Pools
         BattleStats.Immunities.BuffPool = Debuffs.Where(x => !BattleStats.Immunities.Stats.Contains(x)).ToArray();
-        BattleStats.AppliedEffects.BuffPool = All.Where(x => !BattleStats.AppliedEffects.Stats.Contains(x)).ToArray();
+        BattleStats.AppliedEffects.BuffPool = Debuffs.Where(x => !BattleStats.AppliedEffects.Stats.Contains(x)).ToArray();
     }
 
     public void SetReferences(Animator a, DamagePopup d, HealthBarUI h, StatusEffectOverlays o, Transform UITransform, GameObject abilityTarget)

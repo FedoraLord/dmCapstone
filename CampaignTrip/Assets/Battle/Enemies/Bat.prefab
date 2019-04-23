@@ -23,7 +23,7 @@ MonoBehaviour:
       max: 4
       buffAmmount: 1
     BasicDamage:
-      value: 50
+      value: 20
       max: 100
       buffAmmount: 12
     BlockAmount:
@@ -39,7 +39,7 @@ MonoBehaviour:
       BuffPool: 01000000020000000300000005000000070000000a0000000b000000
     AppliedEffects:
       Stats: 
-      BuffPool: 0100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c000000
+      BuffPool: 01000000020000000300000005000000070000000a0000000b000000
     ChanceToApply:
       value: 10
       max: 20
@@ -48,7 +48,13 @@ MonoBehaviour:
       value: 5
       max: 10
       buffAmmount: 1
+  TEST_immortal: 0
+  audioSource: {fileID: 0}
+  hurtClip: {fileID: 0}
+  dieClip: {fileID: 0}
   tempAbilityTarget: {fileID: 4761516545006755573}
+  spawnPosition: 0
+  useBossSpawn: 0
   enemyType: 6
 --- !u!1001 &3908609459718602251
 PrefabInstance:
@@ -128,6 +134,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 22100000, guid: 8f26a418952f44a0a8e678297fd3e8be,
         type: 2}
+    - target: {fileID: 3481610247651453320, guid: 4ab14dd3fb4643b49889b005e10b15ee,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: f59c31996a0638347a0d27e3a7974324,
+        type: 3}
     - target: {fileID: 3719451401222448736, guid: 4ab14dd3fb4643b49889b005e10b15ee,
         type: 3}
       propertyPath: m_AssetId.i0
@@ -208,12 +220,6 @@ PrefabInstance:
       propertyPath: m_AssetId.i15
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3481610247651453320, guid: 4ab14dd3fb4643b49889b005e10b15ee,
-        type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: f59c31996a0638347a0d27e3a7974324,
-        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4ab14dd3fb4643b49889b005e10b15ee, type: 3}
 --- !u!1 &1986955822417415775 stripped

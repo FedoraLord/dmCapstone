@@ -311,11 +311,11 @@ MonoBehaviour:
       max: 100
       buffAmmount: 10
     BlockAmount:
-      value: 30
+      value: 50
       max: 100
       buffAmmount: 15
     MaxHealth:
-      value: 100
+      value: 200
       max: 200
       buffAmmount: 20
     Immunities:
@@ -323,7 +323,7 @@ MonoBehaviour:
       BuffPool: 010000000200000003000000050000000a0000000b000000
     AppliedEffects:
       Stats: 07000000
-      BuffPool: 01000000020000000300000004000000050000000600000008000000090000000a0000000b0000000c000000
+      BuffPool: 010000000200000003000000050000000a0000000b000000
     ChanceToApply:
       value: 10
       max: 100
@@ -489,11 +489,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5325525674367666481}
     m_Modifications:
-    - target: {fileID: 7258902256873901116, guid: e63f07229e56fef4793ace7ddcbfa0a1,
-        type: 3}
-      propertyPath: m_Name
-      value: StatusEffectOverlays
-      objectReference: {fileID: 0}
     - target: {fileID: 7356145978160666732, guid: e63f07229e56fef4793ace7ddcbfa0a1,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -549,6 +544,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7258902256873901116, guid: e63f07229e56fef4793ace7ddcbfa0a1,
+        type: 3}
+      propertyPath: m_Name
+      value: StatusEffectOverlays
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e63f07229e56fef4793ace7ddcbfa0a1, type: 3}
 --- !u!4 &7877375224424434704 stripped
@@ -576,11 +576,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5325525674367666481}
     m_Modifications:
-    - target: {fileID: 1665753913249771026, guid: f4d29fe1c2f5fc948b8d691e458a8015,
-        type: 3}
-      propertyPath: m_Name
-      value: HealthBarUI
-      objectReference: {fileID: 0}
     - target: {fileID: 6045472781469882529, guid: f4d29fe1c2f5fc948b8d691e458a8015,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -686,6 +681,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 1665753913249771026, guid: f4d29fe1c2f5fc948b8d691e458a8015,
+        type: 3}
+      propertyPath: m_Name
+      value: HealthBarUI
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f4d29fe1c2f5fc948b8d691e458a8015, type: 3}
 --- !u!224 &1249627295708920233 stripped
@@ -713,11 +713,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5325525674367666481}
     m_Modifications:
-    - target: {fileID: 4632699813934859906, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
-        type: 3}
-      propertyPath: m_Name
-      value: DamagePopup
-      objectReference: {fileID: 0}
     - target: {fileID: 4964402801478723068, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -822,6 +817,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4632699813934859906, guid: fa2af7e17aa701a4daa6a03da0e3f58d,
+        type: 3}
+      propertyPath: m_Name
+      value: DamagePopup
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa2af7e17aa701a4daa6a03da0e3f58d, type: 3}

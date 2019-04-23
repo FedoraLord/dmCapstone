@@ -111,7 +111,7 @@ public class PersistentPlayer : NetworkBehaviour
 				return; //someones not ready so don't start
         }
         
-        NetworkWrapper.manager.ServerChangeScene(NetworkWrapper.manager.sceneAfterLobbyName);
+        NetworkWrapper.manager.ServerChangeScene(NetworkWrapper.manager.battleScenes.Random()); 
         NetworkWrapper.discovery.StopBroadcast();
         RpcRelayStart();
 	}

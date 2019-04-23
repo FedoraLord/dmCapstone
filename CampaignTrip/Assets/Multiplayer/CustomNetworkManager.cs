@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 #pragma warning disable 0618
 public class CustomNetworkManager : NetworkManager
 {
-	public string sceneAfterLobbyName;
+	public List<string> battleScenes;
     
     public override void OnStopClient()
     {

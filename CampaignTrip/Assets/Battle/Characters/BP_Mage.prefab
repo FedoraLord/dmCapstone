@@ -315,7 +315,7 @@ MonoBehaviour:
       max: 100
       buffAmmount: 20
     MaxHealth:
-      value: 100
+      value: 200
       max: 200
       buffAmmount: 25
     Immunities:
@@ -323,7 +323,7 @@ MonoBehaviour:
       BuffPool: 01000000020000000300000005000000070000000a0000000b000000
     AppliedEffects:
       Stats: 
-      BuffPool: 0100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c000000
+      BuffPool: 01000000020000000300000005000000070000000a0000000b000000
     ChanceToApply:
       value: 10
       max: 20
@@ -764,11 +764,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1981672482925545027}
     m_Modifications:
-    - target: {fileID: 7258902256873901116, guid: e63f07229e56fef4793ace7ddcbfa0a1,
-        type: 3}
-      propertyPath: m_Name
-      value: StatusEffectOverlays
-      objectReference: {fileID: 0}
     - target: {fileID: 7356145978160666732, guid: e63f07229e56fef4793ace7ddcbfa0a1,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -823,6 +818,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7258902256873901116, guid: e63f07229e56fef4793ace7ddcbfa0a1,
+        type: 3}
+      propertyPath: m_Name
+      value: StatusEffectOverlays
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e63f07229e56fef4793ace7ddcbfa0a1, type: 3}

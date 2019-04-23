@@ -46,6 +46,8 @@ public class BattleController : NetworkBehaviour
     public int TEST_BossWaveIndex;
     public string TEST_ForceMinigameSceneName;
 
+    private string battleSceneName;
+
     [Header("Spawning")]
     public GameObject prefabBoss;
     public Boss boss;
@@ -98,6 +100,7 @@ public class BattleController : NetworkBehaviour
         DontDestroyOnLoad(battleCam.gameObject);
 
         NetworkWrapper.OnEnterScene(NetworkWrapper.Scene.Battle);
+        battleSceneName = SceneManager.GetActiveScene().name;
         
         int wave = 0;
         int stepSize = numWaves / (spawnGroups.Count - 1);
@@ -399,7 +402,7 @@ public class BattleController : NetworkBehaviour
 
         StartBattle();
         RpcLoadScene(true);
-        NetworkWrapper.manager.ServerChangeScene("Battle");
+        NetworkWrapper.manager.ServerChangeScene(battleSceneName);
         CheatMenu.Instance.ToggleCheats(true);
     }
 
