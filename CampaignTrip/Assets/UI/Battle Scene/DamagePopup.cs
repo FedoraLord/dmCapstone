@@ -74,9 +74,10 @@ public class DamagePopup : BattleActorUI
     {
         remainingDuration = Mathf.Max(remainingDuration, 0);
 
+        dotText.gameObject.SetActive(true);
+        dotText.transform.position = mainCamera.WorldToScreenPoint(owner.transform.position);
         dotText.color = color;
         dotText.text = prefix + remainingDuration.ToString();
-        dotText.gameObject.SetActive(true);
 
         StopAnimation(dotAnimation);
         dotAnimation = StartCoroutine(AnimateStat(() => dotAnimation = null));

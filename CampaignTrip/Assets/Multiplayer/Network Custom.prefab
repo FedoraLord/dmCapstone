@@ -46,8 +46,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0887806c8d82de744a36b19c7f1190af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnerPrefab: {fileID: 5389947726256375910, guid: 5edbfece0d9fa46d1a5b13ea5ee779ee,
-    type: 3}
 --- !u!114 &3162331145551321813
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75,7 +73,6 @@ MonoBehaviour:
   m_OfflineScene: 
   m_OnlineScene: 
   m_SpawnPrefabs:
-  - {fileID: 5389947726256375910, guid: 5edbfece0d9fa46d1a5b13ea5ee779ee, type: 3}
   - {fileID: 5325525674367666447, guid: 063275ca0f8f8554a81f6b2abf3c58fb, type: 3}
   - {fileID: 1981672482925545085, guid: 520e3575bdc46794bb9de10ab9ffe3f4, type: 3}
   - {fileID: 9010902834346660168, guid: f55bddf65e1a72346a06815449dc8bf7, type: 3}
@@ -88,6 +85,7 @@ MonoBehaviour:
   - {fileID: 1986955822417415775, guid: 5bf3bbf368e824a18b8239e1f245e73f, type: 3}
   - {fileID: 8311256818723065402, guid: d02bf1aca06274cbcb3c77ee5cf82b34, type: 3}
   - {fileID: 1836153066313980065, guid: 013c867322a79014184393ee59612cc9, type: 3}
+  - {fileID: 6476168563751981359, guid: b6e9ee2751f166c4f9399d1ad00000a6, type: 3}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:
@@ -143,9 +141,10 @@ MonoBehaviour:
   matchSize: 4
   isNetworkActive: 0
   matchMaker: {fileID: 0}
-  sceneAfterLobbyName: Battle
-  title:
-    m_Handle: 0
+  battleScenes:
+  - Battle_Forest
+  - Battle_Cave
+  - Battle_Crypt
 --- !u!114 &3162331145551321809
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -181,6 +180,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
-  showGUI: 1
+  showGUI: 0
   offsetX: 0
   offsetY: 0
